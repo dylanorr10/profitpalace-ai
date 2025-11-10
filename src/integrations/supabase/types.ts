@@ -14,6 +14,92 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_usage: {
+        Row: {
+          created_at: string | null
+          id: string
+          last_question_at: string | null
+          messages_count: number | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          last_question_at?: string | null
+          messages_count?: number | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          last_question_at?: string | null
+          messages_count?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      chat_messages: {
+        Row: {
+          content: string
+          created_at: string | null
+          id: string
+          lesson_context: string | null
+          role: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          id?: string
+          lesson_context?: string | null
+          role: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          id?: string
+          lesson_context?: string | null
+          role?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_messages_lesson_context_fkey"
+            columns: ["lesson_context"]
+            isOneToOne: false
+            referencedRelation: "lessons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      email_subscribers: {
+        Row: {
+          created_at: string | null
+          email: string
+          id: string
+          source: string | null
+          subscribed_at: string | null
+          tags: string[] | null
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          id?: string
+          source?: string | null
+          subscribed_at?: string | null
+          tags?: string[] | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          id?: string
+          source?: string | null
+          subscribed_at?: string | null
+          tags?: string[] | null
+        }
+        Relationships: []
+      }
       lessons: {
         Row: {
           category: string
@@ -58,37 +144,55 @@ export type Database = {
           business_structure: string | null
           created_at: string | null
           experience_level: string | null
+          has_purchased: boolean | null
           id: string
           industry: string | null
           learning_goal: string | null
+          newsletter_subscribed: boolean | null
           onboarding_completed: boolean | null
           pain_point: string | null
+          payment_method: string | null
+          purchased_at: string | null
           updated_at: string | null
           user_id: string
+          waitlist_joined: boolean | null
+          waitlist_joined_at: string | null
         }
         Insert: {
           business_structure?: string | null
           created_at?: string | null
           experience_level?: string | null
+          has_purchased?: boolean | null
           id?: string
           industry?: string | null
           learning_goal?: string | null
+          newsletter_subscribed?: boolean | null
           onboarding_completed?: boolean | null
           pain_point?: string | null
+          payment_method?: string | null
+          purchased_at?: string | null
           updated_at?: string | null
           user_id: string
+          waitlist_joined?: boolean | null
+          waitlist_joined_at?: string | null
         }
         Update: {
           business_structure?: string | null
           created_at?: string | null
           experience_level?: string | null
+          has_purchased?: boolean | null
           id?: string
           industry?: string | null
           learning_goal?: string | null
+          newsletter_subscribed?: boolean | null
           onboarding_completed?: boolean | null
           pain_point?: string | null
+          payment_method?: string | null
+          purchased_at?: string | null
           updated_at?: string | null
           user_id?: string
+          waitlist_joined?: boolean | null
+          waitlist_joined_at?: string | null
         }
         Relationships: []
       }
