@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      achievements: {
+        Row: {
+          achievement_description: string | null
+          achievement_name: string
+          achievement_type: string
+          earned_at: string | null
+          id: string
+          metadata: Json | null
+          user_id: string
+        }
+        Insert: {
+          achievement_description?: string | null
+          achievement_name: string
+          achievement_type: string
+          earned_at?: string | null
+          id?: string
+          metadata?: Json | null
+          user_id: string
+        }
+        Update: {
+          achievement_description?: string | null
+          achievement_name?: string
+          achievement_type?: string
+          earned_at?: string | null
+          id?: string
+          metadata?: Json | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       ai_usage: {
         Row: {
           created_at: string | null
@@ -67,6 +97,44 @@ export type Database = {
           {
             foreignKeyName: "chat_messages_lesson_context_fkey"
             columns: ["lesson_context"]
+            isOneToOne: false
+            referencedRelation: "lessons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      daily_goals: {
+        Row: {
+          completed: boolean | null
+          completed_at: string | null
+          created_at: string | null
+          goal_date: string
+          id: string
+          target_lesson_id: string | null
+          user_id: string
+        }
+        Insert: {
+          completed?: boolean | null
+          completed_at?: string | null
+          created_at?: string | null
+          goal_date: string
+          id?: string
+          target_lesson_id?: string | null
+          user_id: string
+        }
+        Update: {
+          completed?: boolean | null
+          completed_at?: string | null
+          created_at?: string | null
+          goal_date?: string
+          id?: string
+          target_lesson_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "daily_goals_target_lesson_id_fkey"
+            columns: ["target_lesson_id"]
             isOneToOne: false
             referencedRelation: "lessons"
             referencedColumns: ["id"]
@@ -152,7 +220,10 @@ export type Database = {
           onboarding_completed: boolean | null
           pain_point: string | null
           payment_method: string | null
+          preferred_study_time: string | null
           purchased_at: string | null
+          study_days: string[] | null
+          time_commitment: string | null
           updated_at: string | null
           user_id: string
           waitlist_joined: boolean | null
@@ -170,7 +241,10 @@ export type Database = {
           onboarding_completed?: boolean | null
           pain_point?: string | null
           payment_method?: string | null
+          preferred_study_time?: string | null
           purchased_at?: string | null
+          study_days?: string[] | null
+          time_commitment?: string | null
           updated_at?: string | null
           user_id: string
           waitlist_joined?: boolean | null
@@ -188,7 +262,10 @@ export type Database = {
           onboarding_completed?: boolean | null
           pain_point?: string | null
           payment_method?: string | null
+          preferred_study_time?: string | null
           purchased_at?: string | null
+          study_days?: string[] | null
+          time_commitment?: string | null
           updated_at?: string | null
           user_id?: string
           waitlist_joined?: boolean | null
@@ -202,6 +279,10 @@ export type Database = {
           completion_rate: number | null
           id: string
           lesson_id: string
+          notes: string | null
+          quiz_attempts: number | null
+          quiz_completed_at: string | null
+          quiz_score: number | null
           started_at: string | null
           time_spent: number | null
           user_id: string
@@ -211,6 +292,10 @@ export type Database = {
           completion_rate?: number | null
           id?: string
           lesson_id: string
+          notes?: string | null
+          quiz_attempts?: number | null
+          quiz_completed_at?: string | null
+          quiz_score?: number | null
           started_at?: string | null
           time_spent?: number | null
           user_id: string
@@ -220,6 +305,10 @@ export type Database = {
           completion_rate?: number | null
           id?: string
           lesson_id?: string
+          notes?: string | null
+          quiz_attempts?: number | null
+          quiz_completed_at?: string | null
+          quiz_score?: number | null
           started_at?: string | null
           time_spent?: number | null
           user_id?: string

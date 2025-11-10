@@ -1,12 +1,24 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 import { ArrowLeft, Clock, CheckCircle2, XCircle, Lightbulb, MessageSquare } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { hasAccessToLesson } from "@/utils/accessControl";
+import { LessonQuiz } from "@/components/LessonQuiz";
+import { checkAndAwardAchievements, checkTimeBasedAchievement } from "@/utils/achievements";
+
+interface QuizQuestion {
+  id: number;
+  question: string;
+  options: string[];
+  correct_answer: number;
+  explanation: string;
+}
 
 interface LessonContent {
   intro: string;
@@ -20,6 +32,10 @@ interface LessonContent {
   cantDo: string[];
   proTips: string[];
   actionSteps: string[];
+  quiz?: {
+    questions: QuizQuestion[];
+    passing_score?: number;
+  };
 }
 
 interface LessonData {
@@ -40,6 +56,12 @@ const Lesson = () => {
   const [lesson, setLesson] = useState<LessonData | null>(null);
   const [userIndustry, setUserIndustry] = useState<string>('general');
   const [hasPurchased, setHasPurchased] = useState(false);
+  const [userId, setUserId] = useState<string>('');
+  const [notes, setNotes] = useState<string>('');
+  const [showQuiz, setShowQuiz] = useState(false);
+  const [quizCompleted, setQuizCompleted] = useState(false);
+  const [startTime] = useState(Date.now());
+  const notesTimeoutRef = useRef<NodeJS.Timeout>();
 
   useEffect(() => {
     fetchLesson();
@@ -51,6 +73,12 @@ const Lesson = () => {
       navigate('/login');
       return;
     }
+    
+    setUserId(user.id);
+
+    // Track time-based achievement
+    const hour = new Date().getHours();
+    await checkTimeBasedAchievement(user.id, hour);
 
     // Fetch user profile
     const { data: profile } = await supabase
@@ -96,6 +124,83 @@ const Lesson = () => {
       ...lessonData,
       content: lessonData.content as unknown as LessonContent
     } as LessonData);
+
+    // Create or fetch user progress record
+    const { data: progressData } = await supabase
+      .from('user_progress')
+      .select('notes, quiz_score')
+      .eq('user_id', user.id)
+      .eq('lesson_id', id)
+      .maybeSingle();
+
+    if (progressData) {
+      setNotes(progressData.notes || '');
+      if (progressData.quiz_score !== null) {
+        setQuizCompleted(true);
+      }
+    } else {
+      // Create progress record
+      await supabase.from('user_progress').insert({
+        user_id: user.id,
+        lesson_id: id,
+        started_at: new Date().toISOString(),
+      });
+
+      // Check for first lesson achievement
+      const { data: allProgress } = await supabase
+        .from('user_progress')
+        .select('id')
+        .eq('user_id', user.id);
+
+      if (allProgress && allProgress.length === 1) {
+        await checkAndAwardAchievements(user.id, 'first_lesson');
+      }
+    }
+  };
+
+  const handleNotesChange = (value: string) => {
+    setNotes(value);
+    
+    // Debounce save
+    if (notesTimeoutRef.current) {
+      clearTimeout(notesTimeoutRef.current);
+    }
+
+    notesTimeoutRef.current = setTimeout(async () => {
+      await supabase
+        .from('user_progress')
+        .update({ notes: value })
+        .eq('user_id', userId)
+        .eq('lesson_id', id);
+    }, 1000);
+  };
+
+  const handleQuizComplete = async (score: number, passed: boolean) => {
+    if (passed) {
+      setQuizCompleted(true);
+      
+      // Calculate time spent
+      const timeSpent = Math.floor((Date.now() - startTime) / 1000);
+      
+      // Update progress
+      await supabase
+        .from('user_progress')
+        .update({
+          completed_at: new Date().toISOString(),
+          completion_rate: 100,
+          time_spent: timeSpent,
+        })
+        .eq('user_id', userId)
+        .eq('lesson_id', id);
+
+      toast({
+        title: 'Lesson Complete! 🎉',
+        description: `You scored ${score}% on the quiz.`,
+      });
+    } else {
+      setShowQuiz(false);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   };
 
   if (!lesson) {
@@ -252,23 +357,60 @@ const Lesson = () => {
           </Card>
         </div>
 
+        {/* Notes Section */}
+        <Card className="p-6 mt-8">
+          <Label htmlFor="notes" className="text-lg font-semibold mb-2">Your Notes 📝</Label>
+          <Textarea
+            id="notes"
+            placeholder="Write your thoughts, questions, or key takeaways..."
+            value={notes}
+            onChange={(e) => handleNotesChange(e.target.value)}
+            className="mt-2 min-h-[120px]"
+          />
+          <p className="text-xs text-muted-foreground mt-2">
+            Auto-saved • Visible only to you
+          </p>
+        </Card>
+
+        {/* Quiz Section */}
+        {lesson.content.quiz && !quizCompleted && (
+          <div className="mt-8">
+            {!showQuiz ? (
+              <Card className="p-8 text-center">
+                <h2 className="text-2xl font-bold mb-4">Ready to test your knowledge?</h2>
+                <p className="text-muted-foreground mb-6">
+                  Complete the quiz to finish this lesson
+                </p>
+                <Button size="lg" onClick={() => setShowQuiz(true)}>
+                  Start Quiz
+                </Button>
+              </Card>
+            ) : (
+              <LessonQuiz
+                lessonId={lesson.id}
+                userId={userId}
+                questions={lesson.content.quiz.questions}
+                passingScore={lesson.content.quiz.passing_score}
+                onComplete={handleQuizComplete}
+              />
+            )}
+          </div>
+        )}
+
         {/* Lesson Navigation */}
         <div className="mt-12 flex justify-between items-center">
           <Button variant="outline" onClick={() => navigate("/dashboard")}>
             Back to Lessons
           </Button>
-          <Button 
-            size="lg" 
-            className="bg-gradient-primary"
-            onClick={() => {
-              toast({
-                title: 'Great job! 🎉',
-                description: 'Lesson marked as complete',
-              });
-            }}
-          >
-            Mark as Complete ✓
-          </Button>
+          {quizCompleted && (
+            <Button 
+              size="lg" 
+              className="bg-gradient-primary"
+              onClick={() => navigate("/dashboard")}
+            >
+              Continue Learning →
+            </Button>
+          )}
         </div>
       </div>
     </div>

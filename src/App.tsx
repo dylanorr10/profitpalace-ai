@@ -11,6 +11,7 @@ import Lesson from "./pages/Lesson";
 import Pricing from "./pages/Pricing";
 import Waitlist from "./pages/Waitlist";
 import Chat from "./pages/Chat";
+import Progress from "./pages/Progress";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -30,6 +31,7 @@ const App = () => (
           <Route path="/pricing" element={<Pricing />} />
           <Route path="/waitlist" element={<Waitlist />} />
           <Route path="/chat" element={<Chat />} />
+          <Route path="/progress" element={<Progress />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

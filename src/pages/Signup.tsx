@@ -8,7 +8,7 @@ import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
-type QuizStep = "account" | "business" | "industry" | "experience" | "pain" | "goal";
+type QuizStep = "account" | "business" | "industry" | "experience" | "pain" | "goal" | "schedule" | "study_time";
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -26,6 +26,9 @@ const Signup = () => {
     experience: "",
     painPoint: "",
     goal: "",
+    timeCommitment: "",
+    preferredStudyTime: "",
+    studyDays: [] as string[],
   });
 
   const handleSignup = async () => {
@@ -61,6 +64,9 @@ const Signup = () => {
             experience_level: formData.experience,
             pain_point: formData.painPoint,
             learning_goal: formData.goal,
+            time_commitment: formData.timeCommitment,
+            preferred_study_time: formData.preferredStudyTime,
+            study_days: formData.studyDays,
             onboarding_completed: true,
           });
 
@@ -87,7 +93,7 @@ const Signup = () => {
   };
 
   const handleNext = () => {
-    const steps: QuizStep[] = ["account", "business", "industry", "experience", "pain", "goal"];
+    const steps: QuizStep[] = ["account", "business", "industry", "experience", "pain", "goal", "schedule", "study_time"];
     const currentIndex = steps.indexOf(step);
     
     if (currentIndex === 0 && (!formData.email || !formData.password)) {
@@ -231,6 +237,64 @@ const Signup = () => {
             </RadioGroup>
           </div>
         );
+
+      case "schedule":
+        return (
+          <div className="space-y-4">
+            <Label>How much time can you dedicate to learning per day?</Label>
+            <RadioGroup
+              value={formData.timeCommitment}
+              onValueChange={(value) => setFormData({ ...formData, timeCommitment: value })}
+            >
+              <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-secondary/50 cursor-pointer">
+                <RadioGroupItem value="15min" id="15min" />
+                <Label htmlFor="15min" className="cursor-pointer flex-1">⚡ Quick learner - 15 minutes/day (1 lesson per week)</Label>
+              </div>
+              <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-secondary/50 cursor-pointer">
+                <RadioGroupItem value="30min" id="30min" />
+                <Label htmlFor="30min" className="cursor-pointer flex-1">📚 Steady pace - 30 minutes/day (2-3 lessons per week)</Label>
+              </div>
+              <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-secondary/50 cursor-pointer">
+                <RadioGroupItem value="1hour" id="1hour" />
+                <Label htmlFor="1hour" className="cursor-pointer flex-1">🚀 Intensive - 1 hour/day (1 lesson per day)</Label>
+              </div>
+              <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-secondary/50 cursor-pointer">
+                <RadioGroupItem value="2hours" id="2hours" />
+                <Label htmlFor="2hours" className="cursor-pointer flex-1">💪 Power mode - 2+ hours/day (Complete course in 1 week)</Label>
+              </div>
+            </RadioGroup>
+          </div>
+        );
+
+      case "study_time":
+        return (
+          <div className="space-y-4">
+            <div className="space-y-4">
+              <Label>When do you prefer to study?</Label>
+              <RadioGroup
+                value={formData.preferredStudyTime}
+                onValueChange={(value) => setFormData({ ...formData, preferredStudyTime: value })}
+              >
+                <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-secondary/50 cursor-pointer">
+                  <RadioGroupItem value="morning" id="morning" />
+                  <Label htmlFor="morning" className="cursor-pointer flex-1">🌅 Morning (6am - 12pm)</Label>
+                </div>
+                <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-secondary/50 cursor-pointer">
+                  <RadioGroupItem value="afternoon" id="afternoon" />
+                  <Label htmlFor="afternoon" className="cursor-pointer flex-1">☀️ Afternoon (12pm - 6pm)</Label>
+                </div>
+                <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-secondary/50 cursor-pointer">
+                  <RadioGroupItem value="evening" id="evening" />
+                  <Label htmlFor="evening" className="cursor-pointer flex-1">🌙 Evening (6pm - 12am)</Label>
+                </div>
+                <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-secondary/50 cursor-pointer">
+                  <RadioGroupItem value="flexible" id="flexible" />
+                  <Label htmlFor="flexible" className="cursor-pointer flex-1">🔄 Flexible (no preference)</Label>
+                </div>
+              </RadioGroup>
+            </div>
+          </div>
+        );
     }
   };
 
@@ -241,6 +305,8 @@ const Signup = () => {
     experience: "Business Experience",
     pain: "Your Biggest Challenge",
     goal: "Your Learning Goal",
+    schedule: "Your Learning Schedule",
+    study_time: "Best Time to Study",
   };
 
   return (
@@ -257,24 +323,24 @@ const Signup = () => {
 
         <div className="flex gap-3">
           {step !== "account" && (
-            <Button 
-              variant="outline" 
-              onClick={() => {
-                const steps: QuizStep[] = ["account", "business", "industry", "experience", "pain", "goal"];
-                const currentIndex = steps.indexOf(step);
-                if (currentIndex > 0) setStep(steps[currentIndex - 1]);
-              }}
-              className="flex-1"
-            >
-              Back
-            </Button>
+          <Button 
+            variant="outline" 
+            onClick={() => {
+              const steps: QuizStep[] = ["account", "business", "industry", "experience", "pain", "goal", "schedule", "study_time"];
+              const currentIndex = steps.indexOf(step);
+              if (currentIndex > 0) setStep(steps[currentIndex - 1]);
+            }}
+            className="flex-1"
+          >
+            Back
+          </Button>
           )}
           <Button 
             onClick={handleNext} 
             disabled={loading}
             className="flex-1"
           >
-            {step === "goal" ? (loading ? "Creating..." : "Complete Signup") : "Continue"}
+            {step === "study_time" ? (loading ? "Creating..." : "Complete Signup") : "Continue"}
           </Button>
         </div>
 
