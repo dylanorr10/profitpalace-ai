@@ -4,20 +4,31 @@ import { Input } from "@/components/ui/input";
 import { Check, Clock, TrendingUp, Users, Zap } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const Landing = () => {
   const [email, setEmail] = useState("");
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const handleEmailSubmit = (e: React.FormEvent) => {
+  const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (email) {
+      // Save email to database
+      try {
+        await supabase.from('email_subscribers').insert({
+          email,
+          source: 'landing_page',
+          tags: ['course_interest']
+        });
+      } catch (error) {
+        console.log('Email already exists or error saving');
+      }
+
       toast({
         title: "Thanks for your interest!",
-        description: "We'll send you a free mini-lesson shortly.",
+        description: "Let's get you started.",
       });
-      // Store email and redirect to signup
       navigate("/signup", { state: { email } });
     }
   };
@@ -40,8 +51,8 @@ const Landing = () => {
             </h1>
             
             <p className="text-xl md:text-2xl text-white/90 max-w-3xl mx-auto">
-              Learn tax, bookkeeping, and business finances in minutes. 
-              <span className="font-semibold"> The time we save you pays for the course itself</span> - essentially free.
+              Learn tax, bookkeeping, and business finances in bite-sized lessons.
+              <span className="font-semibold"> One-time payment. Lifetime access.</span>
             </p>
 
             <form onSubmit={handleEmailSubmit} className="max-w-md mx-auto mt-8 flex gap-3">
@@ -59,7 +70,7 @@ const Landing = () => {
             </form>
 
             <p className="text-white/70 text-sm">
-              7-day free trial • No credit card required • Cancel anytime
+              Get 3 free lessons • £149 for full course • Lifetime access
             </p>
           </div>
         </div>

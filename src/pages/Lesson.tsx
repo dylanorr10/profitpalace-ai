@@ -1,77 +1,139 @@
+import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Clock, CheckCircle2, XCircle, Lightbulb } from "lucide-react";
+import { ArrowLeft, Clock, CheckCircle2, XCircle, Lightbulb, MessageSquare } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import { hasAccessToLesson } from "@/utils/accessControl";
+
+interface LessonContent {
+  intro: string;
+  sections: Array<{
+    heading: string;
+    content: string;
+    bullets?: string[];
+  }>;
+  industry_examples: { [key: string]: string };
+  canDo: string[];
+  cantDo: string[];
+  proTips: string[];
+  actionSteps: string[];
+}
+
+interface LessonData {
+  id: string;
+  title: string;
+  category: string;
+  difficulty: string;
+  duration: number;
+  emoji: string;
+  content: LessonContent;
+  order_index: number;
+}
 
 const Lesson = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { toast } = useToast();
+  const [lesson, setLesson] = useState<LessonData | null>(null);
+  const [userIndustry, setUserIndustry] = useState<string>('general');
+  const [hasPurchased, setHasPurchased] = useState(false);
 
-  // Sample lesson data - in real app, fetch from database based on id
-  const lesson = {
-    id: "1",
-    title: "Understanding Profit & Loss",
-    category: "Tax",
-    difficulty: "Beginner",
-    duration: 3,
-    emoji: "💰",
-    content: {
-      intro: "Understanding your profit is the foundation of running a successful business. Let's break it down in simple terms.",
-      sections: [
-        {
-          title: "What is Profit?",
-          content: "Profit is simply what's left after you subtract all your business expenses from your income. It's the money you actually get to keep.",
-          formula: "Profit = Income - Expenses"
-        },
-        {
-          title: "Real Example: Trades Business",
-          content: "Let's say you're a plumber. This month you earned £5,000 from jobs. Your expenses were:",
-          bullets: [
-            "Materials and parts: £1,200",
-            "Van fuel: £300",
-            "Insurance: £150",
-            "Phone and internet: £50",
-            "Tools: £200"
-          ],
-          calculation: "£5,000 - (£1,200 + £300 + £150 + £50 + £200) = £3,100 profit"
-        }
-      ],
-      canDo: [
-        "Claim all legitimate business expenses",
-        "Track expenses as they happen",
-        "Keep receipts for everything",
-        "Use accounting software to automate tracking"
-      ],
-      cantDo: [
-        "Claim personal expenses as business expenses",
-        "Forget to track cash payments",
-        "Mix personal and business money",
-        "Wait until tax return time to organize"
-      ],
-      proTips: [
-        "Set aside 25-30% of profit for tax",
-        "Review your profit monthly, not just yearly",
-        "Look for patterns - which months are most profitable?",
-        "If profit is low, check if you're claiming all allowable expenses"
-      ],
-      actionSteps: [
-        "Download our Profit Calculator spreadsheet",
-        "List all your income sources this month",
-        "List all your business expenses",
-        "Calculate your profit"
-      ]
+  useEffect(() => {
+    fetchLesson();
+  }, [id]);
+
+  const fetchLesson = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      navigate('/login');
+      return;
     }
+
+    // Fetch user profile
+    const { data: profile } = await supabase
+      .from('user_profiles')
+      .select('industry, has_purchased')
+      .eq('user_id', user.id)
+      .single();
+
+    if (profile) {
+      setUserIndustry(profile.industry?.toLowerCase() || 'general');
+      setHasPurchased(profile.has_purchased || false);
+    }
+
+    // Fetch lesson
+    const { data: lessonData, error } = await supabase
+      .from('lessons')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (error || !lessonData) {
+      toast({
+        title: 'Lesson not found',
+        description: 'This lesson could not be loaded.',
+        variant: 'destructive',
+      });
+      navigate('/dashboard');
+      return;
+    }
+
+    // Check access
+    if (!hasAccessToLesson(lessonData.order_index, profile?.has_purchased || false)) {
+      toast({
+        title: 'Upgrade Required',
+        description: 'This lesson requires a premium account.',
+        variant: 'destructive',
+      });
+      navigate('/pricing');
+      return;
+    }
+
+    setLesson({
+      ...lessonData,
+      content: lessonData.content as unknown as LessonContent
+    } as LessonData);
   };
+
+  if (!lesson) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <p className="text-muted-foreground">Loading lesson...</p>
+      </div>
+    );
+  }
+
+  const industryExample = lesson.content.industry_examples[userIndustry] || 
+                         lesson.content.industry_examples.general || 
+                         'Example for your business type';
 
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="border-b bg-card sticky top-0 z-10">
-        <div className="container mx-auto px-4 py-4">
+        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <Button variant="ghost" onClick={() => navigate("/dashboard")}>
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Dashboard
+          </Button>
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={() => navigate('/chat', { 
+              state: { 
+                lessonContext: { 
+                  id: lesson.id, 
+                  title: lesson.title, 
+                  category: lesson.category 
+                }
+              }
+            })}
+          >
+            <MessageSquare className="w-4 h-4 mr-2" />
+            Ask AI About This
           </Button>
         </div>
       </header>
@@ -82,7 +144,7 @@ const Lesson = () => {
           <div className="flex items-start gap-4 mb-4">
             <div className="text-6xl">{lesson.emoji}</div>
             <div className="flex-1">
-              <div className="flex items-center gap-2 mb-2">
+              <div className="flex items-center gap-2 mb-2 flex-wrap">
                 <Badge className="bg-success/10 text-success">{lesson.difficulty}</Badge>
                 <Badge variant="outline">{lesson.category}</Badge>
                 <div className="flex items-center gap-1 text-muted-foreground text-sm">
@@ -96,21 +158,25 @@ const Lesson = () => {
           </div>
         </div>
 
+        {/* Industry-Specific Example */}
+        {industryExample && industryExample !== 'Example for your business type' && (
+          <Card className="p-6 bg-primary/10 border-primary mb-8">
+            <h3 className="font-semibold mb-2 flex items-center gap-2">
+              <span>💡</span> For Your Industry ({userIndustry})
+            </h3>
+            <p>{industryExample}</p>
+          </Card>
+        )}
+
         {/* Main Content */}
         <div className="space-y-8">
           {lesson.content.sections.map((section, idx) => (
             <Card key={idx} className="p-6 bg-gradient-card">
-              <h2 className="text-2xl font-bold mb-4">{section.title}</h2>
-              <p className="text-lg mb-4">{section.content}</p>
-              
-              {section.formula && (
-                <div className="bg-primary/10 p-4 rounded-lg text-center font-mono text-lg mb-4">
-                  {section.formula}
-                </div>
-              )}
+              <h2 className="text-2xl font-bold mb-4">{section.heading}</h2>
+              <p className="text-lg mb-4 whitespace-pre-line">{section.content}</p>
 
               {section.bullets && (
-                <ul className="space-y-2 mb-4">
+                <ul className="space-y-2">
                   {section.bullets.map((bullet, i) => (
                     <li key={i} className="flex items-start gap-2">
                       <span className="text-primary mt-1">•</span>
@@ -118,13 +184,6 @@ const Lesson = () => {
                     </li>
                   ))}
                 </ul>
-              )}
-
-              {section.calculation && (
-                <div className="bg-success/10 p-4 rounded-lg">
-                  <div className="font-semibold mb-2">Calculation:</div>
-                  <div className="font-mono">{section.calculation}</div>
-                </div>
               )}
             </Card>
           ))}
@@ -145,7 +204,7 @@ const Lesson = () => {
             </ul>
           </Card>
 
-          {/* What You CAN'T Do */}
+          {/* Common Mistakes */}
           <Card className="p-6 border-destructive">
             <div className="flex items-center gap-2 mb-4">
               <XCircle className="w-6 h-6 text-destructive" />
@@ -193,12 +252,21 @@ const Lesson = () => {
           </Card>
         </div>
 
-        {/* Lesson Complete */}
+        {/* Lesson Navigation */}
         <div className="mt-12 flex justify-between items-center">
           <Button variant="outline" onClick={() => navigate("/dashboard")}>
             Back to Lessons
           </Button>
-          <Button size="lg" className="bg-gradient-primary">
+          <Button 
+            size="lg" 
+            className="bg-gradient-primary"
+            onClick={() => {
+              toast({
+                title: 'Great job! 🎉',
+                description: 'Lesson marked as complete',
+              });
+            }}
+          >
             Mark as Complete ✓
           </Button>
         </div>
