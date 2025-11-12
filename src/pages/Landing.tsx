@@ -156,13 +156,11 @@ const Landing = () => {
               Take Control of Your
               <br />
               <span className="text-white/90">Self-Employed Finances</span>
-              <br />
-              <span className="text-white/90">— Without the Stress</span>
             </h1>
             
             {/* Subheadline */}
-            <p className="text-xl md:text-2xl lg:text-3xl text-white/90 max-w-3xl mx-auto leading-relaxed animate-slide-up" style={{ animationDelay: '0.2s' }}>
-              Learn how to master tax, bookkeeping, and money management in simple, bite-sized lessons — guided by your <span className="font-semibold text-white">personal AI finance coach</span>.
+            <p className="text-xl md:text-2xl text-white/90 max-w-3xl mx-auto leading-relaxed animate-slide-up" style={{ animationDelay: '0.2s' }}>
+              Master tax, bookkeeping, and money management with your <span className="font-semibold text-white">personal AI finance coach</span>.
             </p>
 
             {/* CTA Form */}
@@ -171,7 +169,7 @@ const Landing = () => {
                 <div className="flex flex-col sm:flex-row gap-4 p-2 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 shadow-2xl">
                   <Input
                     type="email"
-                    placeholder="Enter your work email"
+                    placeholder="Enter your email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="bg-white/95 text-foreground flex-1 h-14 text-lg border-0 rounded-xl focus:ring-2 focus:ring-white/50"
@@ -195,22 +193,6 @@ const Landing = () => {
               <span className="text-sm font-medium">Cancel anytime</span>
               <div className="hidden sm:block w-1 h-1 bg-white/50 rounded-full"></div>
               <span className="text-sm font-medium">No card required</span>
-            </div>
-
-            {/* Social Proof Stats */}
-            <div className="grid grid-cols-3 gap-8 max-w-3xl mx-auto mt-16 pt-12 border-t border-white/20 animate-slide-up" style={{ animationDelay: '0.5s' }}>
-              <div>
-                <div className="text-4xl md:text-5xl font-bold text-white mb-2">20+</div>
-                <div className="text-white/80 text-sm md:text-base">Expert Lessons</div>
-              </div>
-              <div>
-                <div className="text-4xl md:text-5xl font-bold text-white mb-2">500+</div>
-                <div className="text-white/80 text-sm md:text-base">Active Learners</div>
-              </div>
-              <div>
-                <div className="text-4xl md:text-5xl font-bold text-white mb-2">10h</div>
-                <div className="text-white/80 text-sm md:text-base">Saved Monthly</div>
-              </div>
             </div>
           </div>
         </div>
