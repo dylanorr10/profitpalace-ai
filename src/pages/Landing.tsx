@@ -5,6 +5,7 @@ import { Check, Clock, TrendingUp, Users, Zap } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { z } from "zod";
 
 const Landing = () => {
   const [email, setEmail] = useState("");
@@ -77,26 +78,44 @@ const Landing = () => {
     };
   }, []);
 
+  const emailSchema = z.object({
+    email: z.string()
+      .trim()
+      .toLowerCase()
+      .email({ message: 'Please enter a valid email address' })
+      .max(255, { message: 'Email must be less than 255 characters' })
+  });
+
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (email) {
-      // Save email to database
-      try {
-        await supabase.from('email_subscribers').insert({
-          email,
-          source: 'landing_page',
-          tags: ['course_interest']
-        });
-      } catch (error) {
-        console.log('Email already exists or error saving');
-      }
-
+    
+    // Validate email input
+    const result = emailSchema.safeParse({ email });
+    if (!result.success) {
       toast({
-        title: "Thanks for your interest!",
-        description: "Let's get you started.",
+        title: 'Invalid email',
+        description: result.error.errors[0].message,
+        variant: 'destructive'
       });
-      navigate("/signup", { state: { email } });
+      return;
     }
+
+    // Save validated email to database
+    try {
+      await supabase.from('email_subscribers').insert({
+        email: result.data.email,
+        source: 'landing_page',
+        tags: ['course_interest']
+      });
+    } catch (error) {
+      console.log('Email already exists or error saving');
+    }
+
+    toast({
+      title: "Thanks for your interest!",
+      description: "Let's get you started.",
+    });
+    navigate("/signup", { state: { email: result.data.email } });
   };
 
   return (
@@ -127,6 +146,7 @@ const Landing = () => {
                 onChange={(e) => setEmail(e.target.value)}
                 className="bg-white text-foreground flex-1 h-12 text-lg"
                 required
+                maxLength={255}
               />
               <Button type="submit" size="lg" className="h-12 px-8 bg-white text-primary hover:bg-white/90 font-semibold shadow-lg">
                 Start Free →

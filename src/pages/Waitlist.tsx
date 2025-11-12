@@ -5,6 +5,7 @@ import { Card } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Rocket, Check } from 'lucide-react';
+import { z } from 'zod';
 
 const Waitlist = () => {
   const [email, setEmail] = useState('');
@@ -12,9 +13,28 @@ const Waitlist = () => {
   const [submitted, setSubmitted] = useState(false);
   const { toast } = useToast();
 
+  const emailSchema = z.object({
+    email: z.string()
+      .trim()
+      .toLowerCase()
+      .email({ message: 'Please enter a valid email address' })
+      .max(255, { message: 'Email must be less than 255 characters' })
+  });
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.trim()) return;
+
+    // Validate email input
+    const result = emailSchema.safeParse({ email });
+    if (!result.success) {
+      toast({
+        title: 'Invalid email',
+        description: result.error.errors[0].message,
+        variant: 'destructive'
+      });
+      return;
+    }
 
     setIsSubmitting(true);
 
@@ -33,11 +53,11 @@ const Waitlist = () => {
 
         if (error) throw error;
       } else {
-        // Just capture email
+        // Just capture validated email
         const { error } = await supabase
           .from('email_subscribers')
           .insert({
-            email,
+            email: result.data.email,
             source: 'waitlist',
             tags: ['waitlist', 'early_access'],
           });
@@ -150,6 +170,7 @@ const Waitlist = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
+                maxLength={255}
                 className="h-12 text-lg"
               />
               <Button 
