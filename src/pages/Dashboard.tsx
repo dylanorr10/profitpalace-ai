@@ -23,6 +23,8 @@ import { StreakCard } from "@/components/StreakCard";
 import { SeasonalLessonsCard } from "@/components/SeasonalLessonsCard";
 import { logDailyActivity, getStreakInfo } from "@/utils/streakTracking";
 import { getSeasonalLessons, SeasonalLessonGroup } from "@/utils/seasonalLessons";
+import { getLessonsDueForReview, ReviewLesson } from "@/utils/reviewSchedule";
+import { ReviewCard } from "@/components/ReviewCard";
 
 interface Lesson {
   id: string;
@@ -86,6 +88,7 @@ const Dashboard = () => {
     lastActivityDate: undefined as string | undefined,
   });
   const [seasonalLessonGroups, setSeasonalLessonGroups] = useState<SeasonalLessonGroup[]>([]);
+  const [reviewLessons, setReviewLessons] = useState<ReviewLesson[]>([]);
 
   useEffect(() => {
     checkUser();
@@ -222,6 +225,10 @@ const Dashboard = () => {
     if (user) {
       const streak = await getStreakInfo(user.id);
       setStreakInfo(streak);
+      
+      // Fetch lessons due for review
+      const reviewDue = await getLessonsDueForReview(user.id);
+      setReviewLessons(reviewDue);
     }
   };
 
@@ -510,6 +517,11 @@ const Dashboard = () => {
               )}
             </div>
           </Card>
+        </div>
+
+        {/* Review Mode - Spaced Repetition */}
+        <div className="mb-8">
+          <ReviewCard reviewLessons={reviewLessons} />
         </div>
 
         {/* Journey Path Visualization */}

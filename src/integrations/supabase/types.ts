@@ -637,10 +637,13 @@ export type Database = {
           completion_rate: number | null
           id: string
           lesson_id: string
+          mastery_level: number | null
+          next_review_date: string | null
           notes: string | null
           quiz_attempts: number | null
           quiz_completed_at: string | null
           quiz_score: number | null
+          review_count: number | null
           started_at: string | null
           time_spent: number | null
           user_id: string
@@ -650,10 +653,13 @@ export type Database = {
           completion_rate?: number | null
           id?: string
           lesson_id: string
+          mastery_level?: number | null
+          next_review_date?: string | null
           notes?: string | null
           quiz_attempts?: number | null
           quiz_completed_at?: string | null
           quiz_score?: number | null
+          review_count?: number | null
           started_at?: string | null
           time_spent?: number | null
           user_id: string
@@ -663,10 +669,13 @@ export type Database = {
           completion_rate?: number | null
           id?: string
           lesson_id?: string
+          mastery_level?: number | null
+          next_review_date?: string | null
           notes?: string | null
           quiz_attempts?: number | null
           quiz_completed_at?: string | null
           quiz_score?: number | null
+          review_count?: number | null
           started_at?: string | null
           time_spent?: number | null
           user_id?: string
@@ -686,7 +695,15 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      calculate_next_review_date: {
+        Args: {
+          completion_date: string
+          current_mastery: number
+          lesson_category: string
+          quiz_score: number
+        }
+        Returns: string
+      }
     }
     Enums: {
       glossary_category:
