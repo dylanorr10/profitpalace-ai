@@ -170,7 +170,7 @@ const Progress = () => {
               <div className="text-2xl font-bold">{Math.round(completionPercentage)}%</div>
               <ProgressBar value={completionPercentage} className="mt-2" />
               <p className="text-xs text-muted-foreground mt-2">
-                {data.lessonsCompleted} of {data.totalLessons} lessons
+                {data.lessonsCompleted} {data.lessonsCompleted === 1 ? 'lesson' : 'lessons'} completed
               </p>
             </CardContent>
           </Card>

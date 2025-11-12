@@ -514,13 +514,19 @@ const Dashboard = () => {
             </div>
             <Progress value={progress} className="h-3 mb-3" />
             <div className="flex items-center justify-between text-sm text-muted-foreground">
-              <span>{completedCount} of {lessons.length} lessons</span>
-              {completedCount > 0 && (
-                <Badge variant="secondary" className="gap-1">
-                  <Award className="w-3 h-3" />
-                  {completedCount === lessons.length ? 'Complete!' : 'In Progress'}
-                </Badge>
-              )}
+              <span>{completedCount} {completedCount === 1 ? 'lesson' : 'lessons'} completed</span>
+              <div className="flex items-center gap-1">
+                {completedCount >= 5 && <Badge variant="secondary" className="text-xs">🏆 5+</Badge>}
+                {completedCount >= 10 && <Badge variant="secondary" className="text-xs">⭐ 10+</Badge>}
+                {completedCount >= 25 && <Badge variant="secondary" className="text-xs">💎 25+</Badge>}
+                {completedCount >= 50 && <Badge variant="secondary" className="text-xs">👑 50+</Badge>}
+                {completedCount > 0 && completedCount < 5 && (
+                  <Badge variant="secondary" className="gap-1">
+                    <Award className="w-3 h-3" />
+                    {completedCount === lessons.length ? 'Complete!' : 'In Progress'}
+                  </Badge>
+                )}
+              </div>
             </div>
           </Card>
         </div>
