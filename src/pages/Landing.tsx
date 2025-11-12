@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Check, Clock, TrendingUp, Users, Zap } from "lucide-react";
@@ -10,6 +10,72 @@ const Landing = () => {
   const [email, setEmail] = useState("");
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  useEffect(() => {
+    // SEO: Update page metadata
+    document.title = "Reelin - UK Business Finance Made Simple | Learn Tax & Bookkeeping";
+    const metaDescription = document.querySelector('meta[name="description"]');
+    if (metaDescription) {
+      metaDescription.setAttribute(
+        "content",
+        "Master UK business finances with bite-sized lessons on tax, bookkeeping, VAT & expenses. Built by an ex-accountant. Start with 3 free lessons. £9.99/month."
+      );
+    }
+
+    // Add structured data for SEO
+    const structuredData = {
+      "@context": "https://schema.org",
+      "@type": "Course",
+      "name": "UK Business Finance Mastery Course",
+      "description": "Comprehensive course on UK business finances covering tax, bookkeeping, VAT, expenses, and financial management for self-employed individuals and business owners",
+      "provider": {
+        "@type": "Organization",
+        "name": "Reelin",
+        "description": "UK Business Finance Education Platform"
+      },
+      "coursePrerequisites": "None - suitable for beginners",
+      "educationalLevel": "Beginner to Intermediate",
+      "inLanguage": "en-GB",
+      "hasCourseInstance": {
+        "@type": "CourseInstance",
+        "courseMode": "online",
+        "courseWorkload": "PT20H"
+      },
+      "offers": [
+        {
+          "@type": "Offer",
+          "category": "Subscription",
+          "price": "9.99",
+          "priceCurrency": "GBP",
+          "availability": "https://schema.org/InStock",
+          "validFrom": new Date().toISOString().split('T')[0]
+        },
+        {
+          "@type": "Offer",
+          "category": "Subscription",
+          "price": "79.99",
+          "priceCurrency": "GBP",
+          "availability": "https://schema.org/InStock",
+          "validFrom": new Date().toISOString().split('T')[0],
+          "priceValidUntil": new Date(Date.now() + 365*24*60*60*1000).toISOString().split('T')[0]
+        }
+      ],
+      "audience": {
+        "@type": "EducationalAudience",
+        "educationalRole": "Business Owner",
+        "audienceType": "Self-employed, Sole traders, Limited companies"
+      }
+    };
+
+    const script = document.createElement('script');
+    script.type = 'application/ld+json';
+    script.text = JSON.stringify(structuredData);
+    document.head.appendChild(script);
+
+    return () => {
+      document.head.removeChild(script);
+    };
+  }, []);
 
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,9 +100,9 @@ const Landing = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <main className="min-h-screen bg-background">
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-hero py-20 px-4">
+      <header className="relative overflow-hidden bg-gradient-hero py-20 px-4" role="banner">
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMSIgb3BhY2l0eT0iMC4xIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2dyaWQpIi8+PC9zdmc+')] opacity-20"></div>
         
         <div className="container mx-auto max-w-6xl relative z-10">
@@ -72,13 +138,13 @@ const Landing = () => {
             </p>
           </div>
         </div>
-      </section>
+      </header>
 
       {/* About the Creator */}
-      <section className="py-20 px-4 bg-secondary/20">
+      <section className="py-20 px-4 bg-secondary/20" aria-labelledby="about-creator">
         <div className="container mx-auto max-w-4xl">
-          <div className="text-center space-y-6">
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">
+          <article className="text-center space-y-6">
+            <h2 id="about-creator" className="text-4xl md:text-5xl font-bold mb-4">
               Built by Someone Who's <span className="text-primary">Been There</span>
             </h2>
             <div className="max-w-3xl mx-auto space-y-4 text-lg text-muted-foreground">
@@ -97,15 +163,15 @@ const Landing = () => {
                 money, and stress - without overwhelming you with jargon.
               </p>
             </div>
-          </div>
+          </article>
         </div>
       </section>
 
       {/* Value Proposition */}
-      <section className="py-20 px-4">
+      <section className="py-20 px-4" aria-labelledby="value-proposition">
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">
+            <h2 id="value-proposition" className="text-4xl md:text-5xl font-bold mb-4">
               Built for <span className="text-primary">UK Business Owners</span>
             </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
@@ -143,10 +209,10 @@ const Landing = () => {
       </section>
 
       {/* What You'll Learn */}
-      <section className="py-20 px-4 bg-secondary/20">
+      <section className="py-20 px-4 bg-secondary/20" aria-labelledby="curriculum">
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">
+            <h2 id="curriculum" className="text-4xl md:text-5xl font-bold mb-4">
               Master UK Business Finances
             </h2>
             <p className="text-xl text-muted-foreground">
@@ -179,10 +245,10 @@ const Landing = () => {
       </section>
 
       {/* Pricing */}
-      <section className="py-20 px-4">
+      <section className="py-20 px-4" aria-labelledby="pricing">
         <div className="container mx-auto max-w-4xl">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">
+            <h2 id="pricing" className="text-4xl md:text-5xl font-bold mb-4">
               Simple, Transparent Pricing
             </h2>
             <p className="text-xl text-muted-foreground">
@@ -252,9 +318,9 @@ const Landing = () => {
       </section>
 
       {/* Final CTA */}
-      <section className="py-20 px-4 bg-gradient-primary text-white">
+      <section className="py-20 px-4 bg-gradient-primary text-white" aria-labelledby="cta">
         <div className="container mx-auto max-w-4xl text-center">
-          <h2 className="text-4xl md:text-5xl font-bold mb-6">
+          <h2 id="cta" className="text-4xl md:text-5xl font-bold mb-6">
             Ready to Master Your Business Finances?
           </h2>
           <p className="text-xl mb-8 text-white/90">
@@ -272,7 +338,7 @@ const Landing = () => {
       </section>
 
       {/* Footer */}
-      <footer className="bg-card border-t py-8 px-4">
+      <footer className="bg-card border-t py-8 px-4" role="contentinfo">
         <div className="container mx-auto max-w-6xl">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-sm text-muted-foreground">
@@ -295,7 +361,7 @@ const Landing = () => {
           </div>
         </div>
       </footer>
-    </div>
+    </main>
   );
 };
 
