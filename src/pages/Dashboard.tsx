@@ -4,10 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { Clock, TrendingUp, Award, LogOut, Settings, Lock, Sparkles, Users, Mail, BookOpen } from "lucide-react";
+import { LogOut, Settings, Sparkles, Users, Mail, BookOpen, Award, TrendingUp } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { hasAccessToLesson } from "@/utils/accessControl";
 import { UrgentBanner } from "@/components/UrgentBanner";
 import { MonthlyFocusCard } from "@/components/MonthlyFocusCard";
 import ProfilePrompt from "@/components/ProfilePrompt";
@@ -15,6 +14,11 @@ import { getActiveSeasonalTriggers, SeasonalTrigger } from "@/utils/seasonalTrig
 import { getActiveProactiveTriggers, ThresholdTrigger } from "@/utils/proactiveTriggers";
 import { calculateLessonPriority } from "@/utils/lessonPriority";
 import { getMonthlyFocus } from "@/utils/monthlyFocus";
+import { getRecommendedLessons } from "@/utils/lessonRecommendations";
+import { OnboardingWelcome } from "@/components/OnboardingWelcome";
+import { NextUpCard } from "@/components/NextUpCard";
+import { JourneyPath } from "@/components/JourneyPath";
+import { MilestoneModal } from "@/components/MilestoneModal";
 
 interface Lesson {
   id: string;
@@ -45,6 +49,15 @@ interface UserProfile {
   mtd_status?: string;
   next_vat_return_due?: string | null;
   turnover_last_updated?: string | null;
+  onboarding_completed?: boolean;
+  time_commitment?: string;
+  last_milestone_celebrated?: string;
+}
+
+interface UserProgress {
+  lesson_id: string;
+  completion_rate: number;
+  completed_at?: string;
 }
 
 const Dashboard = () => {
@@ -53,9 +66,15 @@ const Dashboard = () => {
   const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [lessons, setLessons] = useState<Lesson[]>([]);
+  const [userProgress, setUserProgress] = useState<UserProgress[]>([]);
   const [progress, setProgress] = useState(0);
   const [completedCount, setCompletedCount] = useState(0);
   const [triggers, setTriggers] = useState<(SeasonalTrigger | ThresholdTrigger)[]>([]);
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [nextUpLesson, setNextUpLesson] = useState<Lesson | null>(null);
+  const [upcomingLessons, setUpcomingLessons] = useState<Lesson[]>([]);
+  const [showMilestone, setShowMilestone] = useState(false);
+  const [currentMilestone, setCurrentMilestone] = useState<'first_lesson' | '25_percent' | '50_percent' | '75_percent' | '100_percent'>('first_lesson');
 
   useEffect(() => {
     checkUser();
@@ -89,6 +108,16 @@ const Dashboard = () => {
     
     setProfile(profileData);
 
+    // Fetch user progress
+    const { data: progressData } = await supabase
+      .from('user_progress')
+      .select('lesson_id, completion_rate, completed_at')
+      .eq('user_id', user.id);
+
+    setUserProgress(progressData || []);
+    const completed = (progressData || []).filter(p => p.completion_rate === 100).length;
+    setCompletedCount(completed);
+
     // Fetch lessons with seasonal tags
     const { data: lessonsData } = await supabase
       .from('lessons')
@@ -114,7 +143,16 @@ const Dashboard = () => {
       const allTriggers = [...seasonalTriggers, ...proactiveTriggers];
       setTriggers(allTriggers);
 
-      // Use new prioritization logic
+      // Use recommendation engine
+      const recommendations = await getRecommendedLessons(user.id, profileData);
+      
+      // Set next up lesson
+      if (recommendations.primary) {
+        const foundLesson = lessonsData.find(l => l.id === recommendations.primary?.id);
+        setNextUpLesson(foundLesson ? foundLesson as Lesson : null);
+      }
+
+      // Use prioritization for upcoming lessons
       const prioritized = calculateLessonPriority(lessonsData, {
         business_structure: profileData.business_structure,
         industry: profileData.industry,
@@ -129,19 +167,66 @@ const Dashboard = () => {
         turnover_last_updated: profileData.turnover_last_updated ? new Date(profileData.turnover_last_updated) : null,
       });
 
-      // Map prioritized lessons back to lesson objects
+      // Map prioritized lessons
       const sortedLessons = prioritized.map(p => 
         lessonsData.find(l => l.id === p.lessonId)
       ).filter(Boolean) as Lesson[];
 
       setLessons(sortedLessons);
-    }
+      
+      // Set upcoming lessons (next 3 after primary)
+      const foundLesson = lessonsData.find(l => l.id === recommendations.primary?.id);
+      const upcoming = sortedLessons.filter(l => l.id !== foundLesson?.id).slice(0, 3);
+      setUpcomingLessons(upcoming);
 
-    // Calculate progress (simplified - would track actual completion)
-    const completed = 0; // TODO: Track real completion
-    const total = lessonsData?.length || 1;
-    setProgress((completed / total) * 100);
-    setCompletedCount(completed);
+      // Calculate progress
+      const total = lessonsData?.length || 1;
+      const progressPercent = (completed / total) * 100;
+      setProgress(progressPercent);
+
+      // Check for milestones (once migration is approved, this field will exist)
+      checkMilestones(completed, total, (profileData as any).last_milestone_celebrated);
+
+      // Show onboarding for new users
+      if (!profileData.onboarding_completed && completed === 0 && progressData?.length === 0) {
+        setShowOnboarding(true);
+      }
+    }
+  };
+
+  const checkMilestones = (completed: number, total: number, lastCelebrated?: string) => {
+    const percent = (completed / total) * 100;
+    
+    if (completed === 1 && lastCelebrated !== 'first_lesson') {
+      setCurrentMilestone('first_lesson');
+      setShowMilestone(true);
+      updateMilestoneCelebrated('first_lesson');
+    } else if (percent >= 25 && percent < 50 && lastCelebrated !== '25_percent' && !['50_percent', '75_percent', '100_percent'].includes(lastCelebrated || '')) {
+      setCurrentMilestone('25_percent');
+      setShowMilestone(true);
+      updateMilestoneCelebrated('25_percent');
+    } else if (percent >= 50 && percent < 75 && lastCelebrated !== '50_percent' && !['75_percent', '100_percent'].includes(lastCelebrated || '')) {
+      setCurrentMilestone('50_percent');
+      setShowMilestone(true);
+      updateMilestoneCelebrated('50_percent');
+    } else if (percent >= 75 && percent < 100 && lastCelebrated !== '75_percent' && lastCelebrated !== '100_percent') {
+      setCurrentMilestone('75_percent');
+      setShowMilestone(true);
+      updateMilestoneCelebrated('75_percent');
+    } else if (percent === 100 && lastCelebrated !== '100_percent') {
+      setCurrentMilestone('100_percent');
+      setShowMilestone(true);
+      updateMilestoneCelebrated('100_percent');
+    }
+  };
+
+  const updateMilestoneCelebrated = async (milestone: string) => {
+    if (user) {
+      await (supabase as any)
+        .from('user_profiles')
+        .update({ last_milestone_celebrated: milestone })
+        .eq('user_id', user.id);
+    }
   };
 
   const handleLogout = async () => {
@@ -151,16 +236,6 @@ const Dashboard = () => {
       description: "See you next time!",
     });
     navigate("/");
-  };
-
-  const difficultyColors = {
-    Beginner: "bg-success/10 text-success",
-    Intermediate: "bg-primary/10 text-primary",
-    Advanced: "bg-destructive/10 text-destructive",
-  };
-
-  const canAccessLesson = (orderIndex: number) => {
-    return hasAccessToLesson(orderIndex, profile?.subscription_status || undefined);
   };
 
   const handleManageSubscription = async () => {
@@ -180,6 +255,17 @@ const Dashboard = () => {
     }
   };
 
+  const handleStartJourney = async () => {
+    setShowOnboarding(false);
+    if (user) {
+      await (supabase as any)
+        .from('user_profiles')
+        .update({ onboarding_completed: true })
+        .eq('user_id', user.id);
+    }
+    navigate("/first-day");
+  };
+
   const getBusinessTypeLabel = () => {
     if (!profile) return 'Business Owner';
     const labels: { [key: string]: string } = {
@@ -197,40 +283,77 @@ const Dashboard = () => {
     accounting_year_end: profile.accounting_year_end,
   }) : null;
 
+  // Determine lesson status for journey path
+  const getJourneyPathLessons = () => {
+    return lessons.slice(0, 8).map(lesson => {
+      const progressItem = userProgress.find(p => p.lesson_id === lesson.id);
+      let status: 'completed' | 'current' | 'next' | 'locked' = 'locked';
+      
+      if (progressItem?.completion_rate === 100) {
+        status = 'completed';
+      } else if (lesson.id === nextUpLesson?.id) {
+        status = 'current';
+      } else if (upcomingLessons.some(l => l.id === lesson.id)) {
+        status = 'next';
+      }
+
+      return {
+        id: lesson.id,
+        title: lesson.title,
+        emoji: lesson.emoji,
+        status,
+      };
+    });
+  };
+
+  const getNextUpProgress = () => {
+    if (!nextUpLesson) return 0;
+    const progressItem = userProgress.find(p => p.lesson_id === nextUpLesson.id);
+    return progressItem?.completion_rate || 0;
+  };
+
   return (
     <div className="min-h-screen bg-background">
+      {/* Onboarding Modal */}
+      <OnboardingWelcome 
+        isOpen={showOnboarding}
+        onClose={() => setShowOnboarding(false)}
+        onStartJourney={handleStartJourney}
+      />
+
+      {/* Milestone Modal */}
+      <MilestoneModal
+        isOpen={showMilestone}
+        onClose={() => setShowMilestone(false)}
+        milestone={currentMilestone}
+        lessonsCompleted={completedCount}
+        totalLessons={lessons.length}
+      />
+
       {/* Header */}
-      <header className="border-b bg-card">
+      <header className="border-b bg-card sticky top-0 z-10">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="text-2xl">🎣</span>
             <h1 className="text-xl font-bold">Reelin</h1>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="sm" onClick={() => navigate('/glossary')}>
+            <Button variant="ghost" size="sm" onClick={() => navigate('/curriculum')}>
               <BookOpen className="w-4 h-4 mr-2" />
+              Curriculum
+            </Button>
+            <Button variant="ghost" size="sm" onClick={() => navigate('/glossary')}>
               Glossary
             </Button>
             <Button variant="ghost" size="sm" onClick={() => navigate('/community')}>
               <Users className="w-4 h-4 mr-2" />
               Community
             </Button>
-            <Button variant="ghost" size="sm" onClick={() => navigate('/newsletter')}>
-              <Mail className="w-4 h-4 mr-2" />
-              Newsletter
-            </Button>
             <Button variant="ghost" size="sm" onClick={() => navigate('/settings')}>
-              <Settings className="w-4 h-4 mr-2" />
-              Settings
+              <Settings className="w-4 h-4" />
             </Button>
-            {profile?.subscription_status !== 'active' && !profile?.has_purchased && (
-              <Button size="sm" onClick={() => navigate('/pricing')}>
-                Subscribe
-              </Button>
-            )}
             <Button variant="ghost" size="sm" onClick={handleLogout}>
-              <LogOut className="w-4 h-4 mr-2" />
-              Logout
+              <LogOut className="w-4 h-4" />
             </Button>
           </div>
         </div>
@@ -252,7 +375,7 @@ const Dashboard = () => {
           <ProfilePrompt profile={profile} userId={user.id} />
         )}
 
-        {/* Urgent Banner (Seasonal/Proactive Triggers) */}
+        {/* Urgent Banner */}
         <UrgentBanner 
           triggers={triggers} 
           onActionClick={(lessonId) => navigate(`/lesson/${lessonId}`)}
@@ -268,164 +391,108 @@ const Dashboard = () => {
           />
         )}
 
-        {/* Subscription Status Banner */}
-        {profile?.subscription_status === 'active' && (
-          <Card className="p-6 bg-gradient-to-r from-success to-success/70 text-white mb-8">
-            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-              <div>
-                <h3 className="text-xl font-bold mb-1">
-                  Active Subscription - {profile.subscription_type === 'annual' ? 'Annual Plan' : 'Monthly Plan'}
-                </h3>
-                <p className="text-white/90">
-                  Full access to all lessons and features
-                  {profile.subscription_ends_at && ` • Renews on ${new Date(profile.subscription_ends_at).toLocaleDateString()}`}
-                </p>
-              </div>
-              <Button 
-                size="lg" 
-                className="bg-white text-primary hover:bg-white/90 whitespace-nowrap"
-                onClick={handleManageSubscription}
-              >
-                Manage Subscription
-              </Button>
-            </div>
-          </Card>
-        )}
-
-        {/* Upgrade Banner (for free users) */}
+        {/* Subscription Banner (compact) */}
         {profile?.subscription_status !== 'active' && (
-          <Card className="p-6 bg-gradient-to-r from-primary to-primary/70 text-white mb-8">
-            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-              <div>
-                <h3 className="text-xl font-bold mb-1">Reel in Full Access</h3>
-                <p className="text-white/90">£9.99/month or £79.99/year • Save 33% with annual</p>
+          <Card className="p-4 bg-gradient-to-r from-primary/10 to-primary/5 border-primary/20 mb-8">
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-5 h-5 text-primary" />
+                <p className="text-sm font-medium">Unlock all lessons for £9.99/month</p>
               </div>
-              <Button 
-                size="lg" 
-                className="bg-white text-primary hover:bg-white/90 whitespace-nowrap"
-                onClick={() => navigate("/pricing")}
-              >
-                Subscribe Now
+              <Button size="sm" onClick={() => navigate("/pricing")}>
+                Subscribe
               </Button>
             </div>
           </Card>
         )}
 
-        {/* Stats Cards */}
-        <div className="grid md:grid-cols-3 gap-6 mb-8">
-          <Card className="p-6 bg-gradient-card">
+        {/* Compact Progress Card */}
+        <Card className="p-6 mb-8 bg-gradient-card">
+          <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-4">
-              <div className="p-3 bg-primary/10 rounded-full">
-                <TrendingUp className="w-6 h-6 text-primary" />
+              <div className="flex items-center gap-2">
+                <TrendingUp className="w-5 h-5 text-primary" />
+                <span className="font-bold text-2xl">{Math.round(progress)}%</span>
               </div>
-              <div>
-                <div className="text-2xl font-bold">{Math.round(progress)}%</div>
-                <div className="text-sm text-muted-foreground">Course Progress</div>
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <span className="text-sm">{completedCount}/{lessons.length} lessons</span>
               </div>
+              {completedCount > 0 && (
+                <Badge variant="secondary" className="gap-1">
+                  🔥 {completedCount} day streak
+                </Badge>
+              )}
             </div>
-            <Progress value={progress} className="mt-4" />
-          </Card>
+            <Button variant="outline" size="sm" onClick={() => navigate('/progress')}>
+              View Details
+            </Button>
+          </div>
+          <Progress value={progress} className="h-3" />
+        </Card>
 
-          <Card className="p-6 bg-gradient-card">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-success/10 rounded-full">
-                <Clock className="w-6 h-6 text-success" />
-              </div>
-              <div>
-                <div className="text-2xl font-bold">{completedCount}/{lessons.length}</div>
-                <div className="text-sm text-muted-foreground">Lessons Complete</div>
-              </div>
-            </div>
-          </Card>
+        {/* Journey Path Visualization */}
+        {lessons.length > 0 && (
+          <JourneyPath lessons={getJourneyPathLessons()} />
+        )}
 
-          <Card className="p-6 bg-gradient-card">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-accent/10 rounded-full">
-                <Award className="w-6 h-6 text-accent" />
-              </div>
-              <div>
-                <div className="text-2xl font-bold">{completedCount > 0 ? 1 : 0}</div>
-                <div className="text-sm text-muted-foreground">Badges Earned</div>
-              </div>
-            </div>
-          </Card>
-        </div>
-
-        {/* First Day CTA (for new users) */}
-        {completedCount === 0 && (
-          <Card className="p-6 mb-8 bg-gradient-to-r from-primary via-primary to-primary/80 text-white">
-            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-              <div>
-                <div className="text-5xl mb-3">🎯</div>
+        {/* First Day CTA (for brand new users) */}
+        {completedCount === 0 && userProgress.length === 0 && (
+          <Card className="p-8 mb-8 bg-gradient-to-br from-primary/10 via-primary/5 to-background border-2 border-primary/20">
+            <div className="flex flex-col md:flex-row items-center gap-6">
+              <div className="text-6xl">🎯</div>
+              <div className="flex-1 text-center md:text-left">
                 <h3 className="text-2xl font-bold mb-2">Start Here: Your First Day in Business</h3>
-                <p className="text-white/90 text-lg">
+                <p className="text-muted-foreground mb-4">
                   Complete beginner? This 10-minute lesson covers the absolute essentials for day 1.
                 </p>
+                <Button 
+                  size="lg" 
+                  onClick={() => navigate("/first-day")}
+                  className="w-full md:w-auto"
+                >
+                  Start Your Journey →
+                </Button>
               </div>
-              <Button 
-                size="lg" 
-                className="bg-white text-primary hover:bg-white/90 whitespace-nowrap text-lg px-8"
-                onClick={() => navigate("/first-day")}
-              >
-                Start Now →
-              </Button>
             </div>
           </Card>
         )}
 
-        {/* Lessons Grid */}
-        <div className="mb-8">
-          <h3 className="text-2xl font-bold mb-6">
-            Your Lessons
-            {profile?.pain_point && profile?.subscription_status !== 'active' && (
-              <span className="text-base font-normal text-muted-foreground ml-2">
-                (prioritized for: {profile.pain_point})
-              </span>
-            )}
-          </h3>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {lessons.map((lesson) => {
-              const hasAccess = canAccessLesson(lesson.order_index);
-              
-              return (
+        {/* Next Up Card (Primary Recommendation) */}
+        {nextUpLesson && completedCount > 0 && (
+          <NextUpCard 
+            lesson={nextUpLesson}
+            reason={profile?.pain_point ? `Based on: ${profile.pain_point}` : undefined}
+            isInProgress={getNextUpProgress() > 0}
+            progressPercent={getNextUpProgress()}
+          />
+        )}
+
+        {/* Upcoming Preview */}
+        {upcomingLessons.length > 0 && (
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-bold">Coming Up Next</h3>
+              <Button variant="ghost" size="sm" onClick={() => navigate('/curriculum')}>
+                View Full Curriculum →
+              </Button>
+            </div>
+            <div className="grid md:grid-cols-3 gap-4">
+              {upcomingLessons.map((lesson) => (
                 <Card 
                   key={lesson.id}
-                  className={`p-6 hover:shadow-lg transition-all relative overflow-hidden ${
-                    hasAccess ? 'cursor-pointer group' : 'opacity-60 cursor-not-allowed'
-                  }`}
-                  onClick={() => hasAccess && navigate(`/lesson/${lesson.id}`)}
+                  className="p-4 opacity-60 hover:opacity-80 transition-opacity"
                 >
-                  {!hasAccess && (
-                    <div className="absolute inset-0 bg-background/50 backdrop-blur-sm flex items-center justify-center z-10">
-                      <div className="text-center">
-                        <Lock className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
-                        <p className="text-sm font-medium">Upgrade to unlock</p>
-                      </div>
-                    </div>
-                  )}
-                  
-                  <div className="text-5xl mb-4 group-hover:scale-110 transition-transform">
-                    {lesson.emoji}
-                  </div>
-                  
-                  <h4 className="font-bold text-lg mb-2 line-clamp-2">{lesson.title}</h4>
-                  
-                  <div className="flex items-center gap-2 mb-3 text-sm text-muted-foreground">
-                    <Clock className="w-4 h-4" />
-                    <span>{lesson.duration} min</span>
-                  </div>
-
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <Badge className={difficultyColors[lesson.difficulty]}>
-                      {lesson.difficulty}
-                    </Badge>
-                    <Badge variant="outline">{lesson.category}</Badge>
+                  <div className="text-4xl mb-3">{lesson.emoji}</div>
+                  <h4 className="font-semibold text-sm mb-2 line-clamp-2">{lesson.title}</h4>
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <Badge variant="outline" className="text-xs">{lesson.duration} min</Badge>
+                    <Badge variant="outline" className="text-xs">{lesson.difficulty}</Badge>
                   </div>
                 </Card>
-              );
-            })}
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* AI Study Buddy CTA */}
         <Card className="p-6 bg-gradient-primary text-white">
@@ -436,7 +503,6 @@ const Dashboard = () => {
                 <h3 className="text-xl font-bold mb-1">AI Study Buddy</h3>
                 <p className="text-white/90">
                   Get instant answers to your UK business finance questions
-                  {profile?.subscription_status !== 'active' && ' (10 free questions)'}
                 </p>
               </div>
             </div>
