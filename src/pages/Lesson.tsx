@@ -83,13 +83,15 @@ const Lesson = () => {
     // Fetch user profile
     const { data: profile } = await supabase
       .from('user_profiles')
-      .select('industry, subscription_status')
+      .select('industry, subscription_status, has_purchased')
       .eq('user_id', user.id)
       .single();
 
+    let isActive = false;
     if (profile) {
       setUserIndustry(profile.industry?.toLowerCase() || 'general');
-      setSubscriptionStatus(profile.subscription_status || undefined);
+      isActive = (profile.subscription_status === 'active') || !!profile.has_purchased;
+      setSubscriptionStatus(isActive ? 'active' : undefined);
     }
 
     // Fetch lesson
@@ -109,8 +111,9 @@ const Lesson = () => {
       return;
     }
 
-    // Check access
-    if (!hasAccessToLesson(lessonData.order_index, subscriptionStatus)) {
+    // Check access (use latest profile value)
+    const effectiveStatus = isActive ? 'active' : undefined;
+    if (!hasAccessToLesson(lessonData.order_index, effectiveStatus)) {
       toast({
         title: 'Upgrade Required',
         description: 'This lesson requires a premium account.',
