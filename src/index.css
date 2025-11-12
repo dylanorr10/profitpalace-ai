@@ -46,7 +46,7 @@ All colors MUST be HSL.
 
     /* Gradients */
     --gradient-primary: linear-gradient(135deg, hsl(178 100% 40%), hsl(179 100% 51%));
-    --gradient-hero: linear-gradient(135deg, hsl(178 100% 40%) 0%, hsl(179 100% 51%) 50%, hsl(180 100% 60%) 100%);
+    --gradient-hero: linear-gradient(135deg, hsl(203 13% 42%) 0%, hsl(203 13% 47%) 50%, hsl(203 13% 52%) 100%);
     --gradient-card: linear-gradient(to bottom, hsl(0 0% 100%), hsl(180 50% 98%));
     
     /* Shadows with cyan tint */

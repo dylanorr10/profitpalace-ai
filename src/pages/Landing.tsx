@@ -124,9 +124,9 @@ const Landing = () => {
       <header className="relative overflow-hidden bg-gradient-hero min-h-[90vh] flex items-center px-4 py-12" role="banner">
         {/* Animated Background Elements */}
         <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute top-20 left-10 w-72 h-72 bg-white/5 rounded-full blur-3xl animate-float"></div>
-          <div className="absolute bottom-20 right-10 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }}></div>
-          <div className="absolute top-1/2 left-1/3 w-64 h-64 bg-primary/5 rounded-full blur-3xl animate-float" style={{ animationDelay: '4s' }}></div>
+          <div className="absolute top-20 left-10 w-72 h-72 bg-[#03fff6]/5 rounded-full blur-3xl animate-float"></div>
+          <div className="absolute bottom-20 right-10 w-96 h-96 bg-[#03fff6]/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }}></div>
+          <div className="absolute top-1/2 left-1/3 w-64 h-64 bg-[#03fff6]/5 rounded-full blur-3xl animate-float" style={{ animationDelay: '4s' }}></div>
         </div>
         
         <div className="container mx-auto max-w-7xl relative z-10">
@@ -134,11 +134,11 @@ const Landing = () => {
           <div className="flex justify-between items-center mb-12 md:mb-16">
             <div className="flex items-center gap-3">
               <div className="text-3xl">🎣</div>
-              <span className="text-white font-bold text-xl hidden sm:inline">Reelin</span>
+              <span className="text-[#03fff6] font-bold text-xl hidden sm:inline">Reelin</span>
             </div>
             <Button 
               variant="ghost" 
-              className="text-white hover:bg-white/10 border border-white/20 backdrop-blur-sm"
+              className="text-[#03fff6] hover:bg-[#03fff6]/10 border border-[#03fff6]/20 backdrop-blur-sm"
               onClick={() => navigate("/login")}
             >
               Sign In
@@ -147,51 +147,51 @@ const Landing = () => {
 
           <div className="text-center space-y-8 max-w-5xl mx-auto">
             {/* Badge */}
-            <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-white/15 backdrop-blur-md rounded-full text-white text-sm font-medium border border-white/20 shadow-lg animate-slide-up">
+            <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#03fff6]/15 backdrop-blur-md rounded-full text-[#03fff6] text-sm font-medium border border-[#03fff6]/20 shadow-lg animate-slide-up">
               💡 <span>Created by an ex-ACCA accountant — built for real self-employed people</span>
             </div>
             
             {/* Main Headline */}
-            <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold text-white leading-[1.1] animate-slide-up" style={{ animationDelay: '0.1s' }}>
+            <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold text-[#03fff6] leading-[1.1] animate-slide-up" style={{ animationDelay: '0.1s' }}>
               Take Control of Your
               <br />
-              <span className="text-white/90">Self-Employed Finances</span>
+              <span className="text-[#03fff6]/90">Self-Employed Finances</span>
             </h1>
             
             {/* Subheadline */}
-            <p className="text-xl md:text-2xl text-white/90 max-w-3xl mx-auto leading-relaxed animate-slide-up" style={{ animationDelay: '0.2s' }}>
-              Master tax, bookkeeping, and money management with your <span className="font-semibold text-white">personal AI finance coach</span>.
+            <p className="text-xl md:text-2xl text-[#03fff6]/90 max-w-3xl mx-auto leading-relaxed animate-slide-up" style={{ animationDelay: '0.2s' }}>
+              Master tax, bookkeeping, and money management with your <span className="font-semibold text-[#03fff6]">personal AI finance coach</span>.
             </p>
 
             {/* CTA Form */}
             <form onSubmit={handleEmailSubmit} className="max-w-xl mx-auto mt-10 animate-slide-up" style={{ animationDelay: '0.3s' }}>
               <div className="flex flex-col gap-4">
-                <div className="flex flex-col sm:flex-row gap-4 p-2 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 shadow-2xl">
+                <div className="flex flex-col sm:flex-row gap-4 p-2 bg-[#03fff6]/10 backdrop-blur-md rounded-2xl border border-[#03fff6]/20 shadow-2xl">
                   <Input
                     type="email"
                     placeholder="Enter your email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="bg-white/95 text-foreground flex-1 h-14 text-lg border-0 rounded-xl focus:ring-2 focus:ring-white/50"
+                    className="bg-white/95 text-foreground flex-1 h-14 text-lg border-0 rounded-xl focus:ring-2 focus:ring-[#03fff6]/50"
                     required
                     maxLength={255}
                   />
-                  <Button type="submit" size="lg" className="h-14 px-10 bg-white text-primary hover:bg-white/95 font-bold text-lg rounded-xl shadow-xl hover:scale-105 transition-transform">
+                  <Button type="submit" size="lg" className="h-14 px-10 bg-[#03fff6] text-[#687b88] hover:bg-[#03fff6]/90 font-bold text-lg rounded-xl shadow-xl hover:scale-105 transition-transform">
                     Start Free →
                   </Button>
                 </div>
-                <p className="text-white/90 text-base font-medium">
+                <p className="text-[#03fff6]/90 text-base font-medium">
                   Skip the jargon. Learn smarter, not harder.
                 </p>
               </div>
             </form>
 
             {/* Trust Indicators */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mt-6 text-white/90 animate-slide-up" style={{ animationDelay: '0.4s' }}>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mt-6 text-[#03fff6]/90 animate-slide-up" style={{ animationDelay: '0.4s' }}>
               <span className="text-sm font-medium">3 free lessons</span>
-              <div className="hidden sm:block w-1 h-1 bg-white/50 rounded-full"></div>
+              <div className="hidden sm:block w-1 h-1 bg-[#03fff6]/50 rounded-full"></div>
               <span className="text-sm font-medium">Cancel anytime</span>
-              <div className="hidden sm:block w-1 h-1 bg-white/50 rounded-full"></div>
+              <div className="hidden sm:block w-1 h-1 bg-[#03fff6]/50 rounded-full"></div>
               <span className="text-sm font-medium">No card required</span>
             </div>
           </div>
