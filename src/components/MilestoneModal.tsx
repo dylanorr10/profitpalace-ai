@@ -75,16 +75,18 @@ export const MilestoneModal = ({ isOpen, onClose, milestone, lessonsCompleted, t
           <div className="bg-muted/50 rounded-lg p-4">
             <p className="text-sm text-muted-foreground mb-2">Your Progress</p>
             <p className="text-3xl font-bold">
-              {lessonsCompleted} / {totalLessons}
+              {lessonsCompleted}
             </p>
-            <p className="text-sm text-muted-foreground">Lessons Complete</p>
+            <p className="text-sm text-muted-foreground">
+              {lessonsCompleted === 1 ? 'Lesson' : 'Lessons'} Completed
+            </p>
           </div>
 
           <div className="space-y-2">
             <p className="text-sm text-muted-foreground">
               {milestone === '100_percent' 
                 ? "You've mastered all the fundamentals of UK business finance!"
-                : `${totalLessons - lessonsCompleted} ${totalLessons - lessonsCompleted === 1 ? 'lesson' : 'lessons'} remaining`}
+                : "Keep learning at your own pace!"}
             </p>
           </div>
 
