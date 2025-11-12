@@ -8,6 +8,12 @@ import { Clock, TrendingUp, Award, LogOut, Settings, Lock, Sparkles } from "luci
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { hasAccessToLesson } from "@/utils/accessControl";
+import { UrgentBanner } from "@/components/UrgentBanner";
+import { MonthlyFocusCard } from "@/components/MonthlyFocusCard";
+import { getActiveSeasonalTriggers, SeasonalTrigger } from "@/utils/seasonalTriggers";
+import { getActiveProactiveTriggers, ThresholdTrigger } from "@/utils/proactiveTriggers";
+import { calculateLessonPriority } from "@/utils/lessonPriority";
+import { getMonthlyFocus } from "@/utils/monthlyFocus";
 
 interface Lesson {
   id: string;
@@ -17,6 +23,7 @@ interface Lesson {
   duration: number;
   emoji: string;
   order_index: number;
+  seasonal_tags?: string[];
 }
 
 interface UserProfile {
@@ -30,6 +37,13 @@ interface UserProfile {
   subscription_status: string | null;
   subscription_type: string | null;
   subscription_ends_at: string | null;
+  business_start_date?: string;
+  accounting_year_end?: string;
+  annual_turnover?: string;
+  vat_registered?: boolean;
+  mtd_status?: string;
+  next_vat_return_due?: string | null;
+  turnover_last_updated?: string | null;
 }
 
 const Dashboard = () => {
@@ -40,6 +54,7 @@ const Dashboard = () => {
   const [lessons, setLessons] = useState<Lesson[]>([]);
   const [progress, setProgress] = useState(0);
   const [completedCount, setCompletedCount] = useState(0);
+  const [triggers, setTriggers] = useState<(SeasonalTrigger | ThresholdTrigger)[]>([]);
 
   useEffect(() => {
     checkUser();
@@ -73,15 +88,51 @@ const Dashboard = () => {
     
     setProfile(profileData);
 
-    // Fetch lessons
+    // Fetch lessons with seasonal tags
     const { data: lessonsData } = await supabase
       .from('lessons')
-      .select('id, title, category, difficulty, duration, emoji, order_index')
+      .select('id, title, category, difficulty, duration, emoji, order_index, seasonal_tags')
       .order('order_index');
 
-    if (lessonsData) {
-      // Prioritize lessons based on user's pain point
-      const sortedLessons = prioritizeLessons(lessonsData, profileData);
+    if (lessonsData && profileData) {
+      // Calculate seasonal and proactive triggers
+      const seasonalTriggers = getActiveSeasonalTriggers({
+        business_structure: profileData.business_structure,
+        accounting_year_end: profileData.accounting_year_end,
+        next_vat_return_due: profileData.next_vat_return_due ? new Date(profileData.next_vat_return_due) : null,
+        vat_registered: profileData.vat_registered,
+      });
+
+      const proactiveTriggers = getActiveProactiveTriggers({
+        annual_turnover: profileData.annual_turnover,
+        vat_registered: profileData.vat_registered,
+        mtd_status: profileData.mtd_status,
+        turnover_last_updated: profileData.turnover_last_updated ? new Date(profileData.turnover_last_updated) : null,
+      });
+
+      const allTriggers = [...seasonalTriggers, ...proactiveTriggers];
+      setTriggers(allTriggers);
+
+      // Use new prioritization logic
+      const prioritized = calculateLessonPriority(lessonsData, {
+        business_structure: profileData.business_structure,
+        industry: profileData.industry,
+        experience_level: profileData.experience_level,
+        pain_point: profileData.pain_point,
+        learning_goal: profileData.learning_goal,
+        accounting_year_end: profileData.accounting_year_end,
+        next_vat_return_due: profileData.next_vat_return_due ? new Date(profileData.next_vat_return_due) : null,
+        vat_registered: profileData.vat_registered,
+        annual_turnover: profileData.annual_turnover,
+        mtd_status: profileData.mtd_status,
+        turnover_last_updated: profileData.turnover_last_updated ? new Date(profileData.turnover_last_updated) : null,
+      });
+
+      // Map prioritized lessons back to lesson objects
+      const sortedLessons = prioritized.map(p => 
+        lessonsData.find(l => l.id === p.lessonId)
+      ).filter(Boolean) as Lesson[];
+
       setLessons(sortedLessons);
     }
 
@@ -90,29 +141,6 @@ const Dashboard = () => {
     const total = lessonsData?.length || 1;
     setProgress((completed / total) * 100);
     setCompletedCount(completed);
-  };
-
-  const prioritizeLessons = (lessons: any[], profile: UserProfile | null) => {
-    if (!profile) return lessons;
-
-    // Sort by pain point relevance
-    const painPointMapping: { [key: string]: string[] } = {
-      'Tax confusion': ['Tax', 'VAT'],
-      'Bookkeeping takes too long': ['Admin', 'Automation'],
-      'Understanding expenses': ['Expenses'],
-      'Cash flow issues': ['Admin', 'Tax'],
-    };
-
-    const priorityCategories = painPointMapping[profile.pain_point] || [];
-    
-    return lessons.sort((a, b) => {
-      const aIsPriority = priorityCategories.includes(a.category);
-      const bIsPriority = priorityCategories.includes(b.category);
-      
-      if (aIsPriority && !bIsPriority) return -1;
-      if (!aIsPriority && bIsPriority) return 1;
-      return a.order_index - b.order_index;
-    });
   };
 
   const handleLogout = async () => {
@@ -162,6 +190,12 @@ const Dashboard = () => {
     return labels[profile.business_structure] || 'Business Owner';
   };
 
+  const monthlyFocus = profile ? getMonthlyFocus({
+    business_structure: profile.business_structure,
+    vat_registered: profile.vat_registered,
+    accounting_year_end: profile.accounting_year_end,
+  }) : null;
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -201,6 +235,21 @@ const Dashboard = () => {
             {profile?.learning_goal || 'Continue your learning journey'}
           </p>
         </div>
+
+        {/* Urgent Banner (Seasonal/Proactive Triggers) */}
+        <UrgentBanner 
+          triggers={triggers} 
+          onActionClick={(lessonId) => navigate(`/lesson/${lessonId}`)} 
+        />
+
+        {/* Monthly Focus Card */}
+        {monthlyFocus && (
+          <MonthlyFocusCard
+            currentMonth={monthlyFocus.currentMonth}
+            focusAreas={monthlyFocus.focusAreas}
+            upcomingDeadlines={monthlyFocus.upcomingDeadlines}
+          />
+        )}
 
         {/* Subscription Status Banner */}
         {profile?.subscription_status === 'active' && (

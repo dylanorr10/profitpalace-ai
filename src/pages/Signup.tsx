@@ -8,7 +8,7 @@ import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
-type QuizStep = "account" | "business" | "industry" | "experience" | "pain" | "goal" | "schedule" | "study_time";
+type QuizStep = "account" | "business" | "industry" | "experience" | "pain" | "goal" | "schedule" | "study_time" | "business_details" | "turnover" | "vat_status";
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -29,6 +29,10 @@ const Signup = () => {
     timeCommitment: "",
     preferredStudyTime: "",
     studyDays: [] as string[],
+    businessStartDate: "",
+    accountingYearEnd: "april_5",
+    annualTurnover: "",
+    vatRegistered: false,
   });
 
   const handleSignup = async () => {
@@ -67,6 +71,11 @@ const Signup = () => {
             time_commitment: formData.timeCommitment,
             preferred_study_time: formData.preferredStudyTime,
             study_days: formData.studyDays,
+            business_start_date: formData.businessStartDate || null,
+            accounting_year_end: formData.accountingYearEnd,
+            annual_turnover: formData.annualTurnover,
+            vat_registered: formData.vatRegistered,
+            turnover_last_updated: formData.annualTurnover ? new Date().toISOString() : null,
             onboarding_completed: true,
           });
 
@@ -93,7 +102,7 @@ const Signup = () => {
   };
 
   const handleNext = () => {
-    const steps: QuizStep[] = ["account", "business", "industry", "experience", "pain", "goal", "schedule", "study_time"];
+    const steps: QuizStep[] = ["account", "business", "industry", "experience", "pain", "goal", "schedule", "study_time", "business_details", "turnover", "vat_status"];
     const currentIndex = steps.indexOf(step);
     
     if (currentIndex === 0 && (!formData.email || !formData.password)) {
@@ -370,10 +379,107 @@ const Signup = () => {
             </div>
           </div>
         );
+
+      case "business_details":
+        return (
+          <div className="space-y-4">
+            <Label htmlFor="start-date">When did you start trading?</Label>
+            <Input
+              id="start-date"
+              type="date"
+              value={formData.businessStartDate}
+              onChange={(e) => setFormData({ ...formData, businessStartDate: e.target.value })}
+            />
+            <p className="text-xs text-muted-foreground">
+              💡 This helps us give you timely tax reminders
+            </p>
+
+            {formData.businessStructure === "limited" && (
+              <div className="space-y-2 pt-4">
+                <Label>What's your accounting year-end?</Label>
+                <RadioGroup
+                  value={formData.accountingYearEnd}
+                  onValueChange={(value) => setFormData({ ...formData, accountingYearEnd: value })}
+                >
+                  <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-secondary/50 cursor-pointer">
+                    <RadioGroupItem value="april_5" id="april_5" />
+                    <Label htmlFor="april_5" className="cursor-pointer flex-1">April 5 (UK Tax Year)</Label>
+                  </div>
+                  <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-secondary/50 cursor-pointer">
+                    <RadioGroupItem value="march_31" id="march_31" />
+                    <Label htmlFor="march_31" className="cursor-pointer flex-1">March 31</Label>
+                  </div>
+                  <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-secondary/50 cursor-pointer">
+                    <RadioGroupItem value="december_31" id="december_31" />
+                    <Label htmlFor="december_31" className="cursor-pointer flex-1">December 31</Label>
+                  </div>
+                </RadioGroup>
+              </div>
+            )}
+          </div>
+        );
+
+      case "turnover":
+        return (
+          <div className="space-y-4">
+            <Label>What's your estimated annual turnover?</Label>
+            <p className="text-sm text-muted-foreground">
+              This helps us give you timely VAT and MTD recommendations
+            </p>
+            <RadioGroup
+              value={formData.annualTurnover}
+              onValueChange={(value) => setFormData({ ...formData, annualTurnover: value })}
+            >
+              <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-secondary/50 cursor-pointer">
+                <RadioGroupItem value="0-30000" id="0-30k" />
+                <Label htmlFor="0-30k" className="cursor-pointer flex-1">Under £30,000</Label>
+              </div>
+              <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-secondary/50 cursor-pointer">
+                <RadioGroupItem value="30000-50000" id="30-50k" />
+                <Label htmlFor="30-50k" className="cursor-pointer flex-1">£30,000 - £50,000</Label>
+              </div>
+              <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-secondary/50 cursor-pointer">
+                <RadioGroupItem value="50000-80000" id="50-80k" />
+                <Label htmlFor="50-80k" className="cursor-pointer flex-1">£50,000 - £80,000</Label>
+              </div>
+              <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-secondary/50 cursor-pointer">
+                <RadioGroupItem value="80000-90000" id="80-90k" />
+                <Label htmlFor="80-90k" className="cursor-pointer flex-1">£80,000 - £90,000 ⚠️</Label>
+              </div>
+              <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-secondary/50 cursor-pointer">
+                <RadioGroupItem value="90000+" id="90k-plus" />
+                <Label htmlFor="90k-plus" className="cursor-pointer flex-1">Over £90,000 (VAT threshold)</Label>
+              </div>
+            </RadioGroup>
+          </div>
+        );
+
+      case "vat_status":
+        return (
+          <div className="space-y-4">
+            <Label>Are you currently VAT registered?</Label>
+            <RadioGroup
+              value={formData.vatRegistered ? "yes" : "no"}
+              onValueChange={(value) => setFormData({ ...formData, vatRegistered: value === "yes" })}
+            >
+              <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-secondary/50 cursor-pointer">
+                <RadioGroupItem value="yes" id="vat-yes" />
+                <Label htmlFor="vat-yes" className="cursor-pointer flex-1">Yes, I'm VAT registered</Label>
+              </div>
+              <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-secondary/50 cursor-pointer">
+                <RadioGroupItem value="no" id="vat-no" />
+                <Label htmlFor="vat-no" className="cursor-pointer flex-1">No, not yet</Label>
+              </div>
+            </RadioGroup>
+            <p className="text-xs text-muted-foreground">
+              💡 We'll recommend VAT lessons if you're approaching the £90k threshold
+            </p>
+          </div>
+        );
     }
   };
 
-  const stepTitles = {
+  const stepTitles: Record<QuizStep, string> = {
     account: "Create Your Account",
     business: "Let's Personalize Your Experience",
     industry: "What Industry Are You In?",
@@ -382,6 +488,9 @@ const Signup = () => {
     goal: "Your Learning Goal",
     schedule: "Your Learning Schedule",
     study_time: "Best Time to Study",
+    business_details: "Business Timeline",
+    turnover: "Annual Turnover",
+    vat_status: "VAT Registration Status",
   };
 
   return (
@@ -401,7 +510,7 @@ const Signup = () => {
           <Button 
             variant="outline" 
             onClick={() => {
-              const steps: QuizStep[] = ["account", "business", "industry", "experience", "pain", "goal", "schedule", "study_time"];
+              const steps: QuizStep[] = ["account", "business", "industry", "experience", "pain", "goal", "schedule", "study_time", "business_details", "turnover", "vat_status"];
               const currentIndex = steps.indexOf(step);
               if (currentIndex > 0) setStep(steps[currentIndex - 1]);
             }}
@@ -415,7 +524,7 @@ const Signup = () => {
             disabled={loading}
             className="flex-1"
           >
-            {step === "study_time" ? (loading ? "Creating..." : "Complete Signup") : "Continue"}
+            {step === "vat_status" ? (loading ? "Creating..." : "Complete Signup") : "Continue"}
           </Button>
         </div>
 

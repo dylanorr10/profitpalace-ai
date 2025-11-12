@@ -181,8 +181,11 @@ export type Database = {
           next_lesson_id: string | null
           order_index: number
           parent_lesson_id: string | null
+          priority_boost: number | null
           quiz_required: boolean | null
+          seasonal_tags: string[] | null
           title: string
+          trigger_conditions: Json | null
           updated_at: string | null
         }
         Insert: {
@@ -197,8 +200,11 @@ export type Database = {
           next_lesson_id?: string | null
           order_index: number
           parent_lesson_id?: string | null
+          priority_boost?: number | null
           quiz_required?: boolean | null
+          seasonal_tags?: string[] | null
           title: string
+          trigger_conditions?: Json | null
           updated_at?: string | null
         }
         Update: {
@@ -213,8 +219,11 @@ export type Database = {
           next_lesson_id?: string | null
           order_index?: number
           parent_lesson_id?: string | null
+          priority_boost?: number | null
           quiz_required?: boolean | null
+          seasonal_tags?: string[] | null
           title?: string
+          trigger_conditions?: Json | null
           updated_at?: string | null
         }
         Relationships: [
@@ -234,10 +243,78 @@ export type Database = {
           },
         ]
       }
+      seasonal_notifications: {
+        Row: {
+          action_url: string | null
+          id: string
+          message: string
+          notification_type: string
+          priority: string | null
+          read_at: string | null
+          sent_at: string | null
+          title: string
+          user_id: string
+        }
+        Insert: {
+          action_url?: string | null
+          id?: string
+          message: string
+          notification_type: string
+          priority?: string | null
+          read_at?: string | null
+          sent_at?: string | null
+          title: string
+          user_id: string
+        }
+        Update: {
+          action_url?: string | null
+          id?: string
+          message?: string
+          notification_type?: string
+          priority?: string | null
+          read_at?: string | null
+          sent_at?: string | null
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_milestones: {
+        Row: {
+          acknowledged: boolean | null
+          expires_at: string | null
+          id: string
+          metadata: Json | null
+          milestone_type: string
+          triggered_at: string | null
+          user_id: string
+        }
+        Insert: {
+          acknowledged?: boolean | null
+          expires_at?: string | null
+          id?: string
+          metadata?: Json | null
+          milestone_type: string
+          triggered_at?: string | null
+          user_id: string
+        }
+        Update: {
+          acknowledged?: boolean | null
+          expires_at?: string | null
+          id?: string
+          metadata?: Json | null
+          milestone_type?: string
+          triggered_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_profiles: {
         Row: {
+          accounting_year_end: string | null
           annual_turnover: string | null
           business_goals: string[] | null
+          business_start_date: string | null
           business_structure: string | null
           created_at: string | null
           employees_count: string | null
@@ -246,7 +323,9 @@ export type Database = {
           id: string
           industry: string | null
           learning_goal: string | null
+          mtd_status: string | null
           newsletter_subscribed: boolean | null
+          next_vat_return_due: string | null
           onboarding_completed: boolean | null
           pain_point: string | null
           payment_method: string | null
@@ -260,6 +339,7 @@ export type Database = {
           subscription_status: string | null
           subscription_type: string | null
           time_commitment: string | null
+          turnover_last_updated: string | null
           updated_at: string | null
           user_id: string
           vat_registered: boolean | null
@@ -268,8 +348,10 @@ export type Database = {
           waitlist_joined_at: string | null
         }
         Insert: {
+          accounting_year_end?: string | null
           annual_turnover?: string | null
           business_goals?: string[] | null
+          business_start_date?: string | null
           business_structure?: string | null
           created_at?: string | null
           employees_count?: string | null
@@ -278,7 +360,9 @@ export type Database = {
           id?: string
           industry?: string | null
           learning_goal?: string | null
+          mtd_status?: string | null
           newsletter_subscribed?: boolean | null
+          next_vat_return_due?: string | null
           onboarding_completed?: boolean | null
           pain_point?: string | null
           payment_method?: string | null
@@ -292,6 +376,7 @@ export type Database = {
           subscription_status?: string | null
           subscription_type?: string | null
           time_commitment?: string | null
+          turnover_last_updated?: string | null
           updated_at?: string | null
           user_id: string
           vat_registered?: boolean | null
@@ -300,8 +385,10 @@ export type Database = {
           waitlist_joined_at?: string | null
         }
         Update: {
+          accounting_year_end?: string | null
           annual_turnover?: string | null
           business_goals?: string[] | null
+          business_start_date?: string | null
           business_structure?: string | null
           created_at?: string | null
           employees_count?: string | null
@@ -310,7 +397,9 @@ export type Database = {
           id?: string
           industry?: string | null
           learning_goal?: string | null
+          mtd_status?: string | null
           newsletter_subscribed?: boolean | null
+          next_vat_return_due?: string | null
           onboarding_completed?: boolean | null
           pain_point?: string | null
           payment_method?: string | null
@@ -324,6 +413,7 @@ export type Database = {
           subscription_status?: string | null
           subscription_type?: string | null
           time_commitment?: string | null
+          turnover_last_updated?: string | null
           updated_at?: string | null
           user_id?: string
           vat_registered?: boolean | null
