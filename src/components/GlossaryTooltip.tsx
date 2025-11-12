@@ -6,7 +6,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { ExternalLink } from "lucide-react";
 
 interface GlossaryTooltipProps {
@@ -21,6 +21,7 @@ interface TermData {
 }
 
 export const GlossaryTooltip = ({ term, children }: GlossaryTooltipProps) => {
+  const navigate = useNavigate();
   const [termData, setTermData] = useState<TermData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -40,6 +41,10 @@ export const GlossaryTooltip = ({ term, children }: GlossaryTooltipProps) => {
     setIsLoading(false);
   };
 
+  const handleClick = () => {
+    navigate(`/glossary?search=${encodeURIComponent(term)}`);
+  };
+
   if (isLoading || !termData) {
     return <span className="underline decoration-dotted cursor-help">{children || term}</span>;
   }
@@ -48,21 +53,21 @@ export const GlossaryTooltip = ({ term, children }: GlossaryTooltipProps) => {
     <TooltipProvider delayDuration={300}>
       <Tooltip>
         <TooltipTrigger asChild>
-          <span className="underline decoration-dotted decoration-primary/50 cursor-help text-primary font-medium">
+          <span 
+            onClick={handleClick}
+            className="underline decoration-dotted decoration-primary/50 cursor-pointer text-primary font-medium hover:text-primary/80 transition-colors"
+          >
             {children || term}
           </span>
         </TooltipTrigger>
-        <TooltipContent className="max-w-sm p-4" side="top">
+        <TooltipContent className="max-w-sm p-4 bg-popover z-50" side="top">
           <div>
             <div className="flex items-center justify-between mb-2">
               <h4 className="font-bold text-sm">{termData.term}</h4>
-              <Link 
-                to={`/glossary?search=${encodeURIComponent(term)}`}
-                className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1"
-              >
+              <span className="text-xs text-muted-foreground flex items-center gap-1">
                 <ExternalLink className="w-3 h-3" />
-                View full
-              </Link>
+                Click to view full
+              </span>
             </div>
             <p className="text-sm text-muted-foreground">{termData.simple_explanation}</p>
           </div>
