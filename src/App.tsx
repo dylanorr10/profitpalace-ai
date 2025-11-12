@@ -17,6 +17,8 @@ import Settings from "./pages/Settings";
 import Community from "./pages/Community";
 import CommunityQuestion from "./pages/CommunityQuestion";
 import Newsletter from "./pages/Newsletter";
+import Glossary from "./pages/Glossary";
+import FirstDay from "./pages/FirstDay";
 
 const queryClient = new QueryClient();
 
@@ -40,6 +42,8 @@ const App = () => (
           <Route path="/community" element={<Community />} />
           <Route path="/community/question/:id" element={<CommunityQuestion />} />
           <Route path="/newsletter" element={<Newsletter />} />
+          <Route path="/glossary" element={<Glossary />} />
+          <Route path="/first-day" element={<FirstDay />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
