@@ -31,14 +31,25 @@ export const GlossaryTooltip = ({ term, children }: GlossaryTooltipProps) => {
 
   const fetchTerm = async () => {
     setIsLoading(true);
-    const { data } = await supabase
-      .from('glossary_terms')
-      .select('term, simple_explanation, category')
-      .ilike('term', term)
-      .single();
-    
-    setTermData(data);
-    setIsLoading(false);
+    try {
+      const { data, error } = await (supabase as any)
+        .from('glossary_terms')
+        .select('term, simple_explanation, category')
+        .ilike('term', term)
+        .maybeSingle();
+      
+      if (error) {
+        console.error('Error fetching glossary term:', error);
+        setTermData(null);
+      } else {
+        setTermData(data);
+      }
+    } catch (err) {
+      console.error('Glossary fetch exception:', err);
+      setTermData(null);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleClick = () => {

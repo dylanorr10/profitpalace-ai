@@ -19,6 +19,7 @@ import CommunityQuestion from "./pages/CommunityQuestion";
 import Newsletter from "./pages/Newsletter";
 import Glossary from "./pages/Glossary";
 import FirstDay from "./pages/FirstDay";
+import Curriculum from "./pages/Curriculum";
 
 const queryClient = new QueryClient();
 
@@ -44,6 +45,7 @@ const App = () => (
           <Route path="/newsletter" element={<Newsletter />} />
           <Route path="/glossary" element={<Glossary />} />
           <Route path="/first-day" element={<FirstDay />} />
+          <Route path="/curriculum" element={<Curriculum />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
