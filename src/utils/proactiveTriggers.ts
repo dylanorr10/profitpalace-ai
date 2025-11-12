@@ -157,25 +157,27 @@ export function getActiveProactiveTriggers(profile: {
 }): ThresholdTrigger[] {
   const triggers: ThresholdTrigger[] = [];
 
-  // Check VAT threshold
-  const vatTrigger = checkVATThresholdProximity(
-    profile.annual_turnover,
-    profile.vat_registered || false
-  );
-  if (vatTrigger) triggers.push(vatTrigger);
+  // Only show proactive triggers if we have some data
+  // Don't check VAT threshold if no turnover data
+  if (profile.annual_turnover) {
+    const vatTrigger = checkVATThresholdProximity(
+      profile.annual_turnover,
+      profile.vat_registered || false
+    );
+    if (vatTrigger) triggers.push(vatTrigger);
 
-  // Check MTD requirement
-  const mtdTrigger = checkMTDRequirement(
-    profile.annual_turnover,
-    profile.vat_registered || false,
-    profile.mtd_status
-  );
-  if (mtdTrigger) triggers.push(mtdTrigger);
+    // Check MTD requirement
+    const mtdTrigger = checkMTDRequirement(
+      profile.annual_turnover,
+      profile.vat_registered || false,
+      profile.mtd_status
+    );
+    if (mtdTrigger) triggers.push(mtdTrigger);
+  }
 
-  // Check turnover review
-  const turnoverTrigger = checkTurnoverReviewNeeded(profile.turnover_last_updated);
-  if (turnoverTrigger) triggers.push(turnoverTrigger);
-
+  // Only prompt for turnover update after 3 months, not immediately
+  // This gives users time to explore without being prompted
+  
   return triggers;
 }
 

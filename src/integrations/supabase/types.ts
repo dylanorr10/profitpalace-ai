@@ -103,6 +103,104 @@ export type Database = {
           },
         ]
       }
+      community_answers: {
+        Row: {
+          content: string
+          created_at: string | null
+          id: string
+          is_verified: boolean | null
+          question_id: string
+          upvotes: number | null
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          id?: string
+          is_verified?: boolean | null
+          question_id: string
+          upvotes?: number | null
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          id?: string
+          is_verified?: boolean | null
+          question_id?: string
+          upvotes?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "community_answers_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "community_questions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      community_questions: {
+        Row: {
+          answer_count: number | null
+          content: string
+          created_at: string | null
+          id: string
+          is_answered: boolean | null
+          tags: string[] | null
+          title: string
+          updated_at: string | null
+          upvotes: number | null
+          user_id: string
+        }
+        Insert: {
+          answer_count?: number | null
+          content: string
+          created_at?: string | null
+          id?: string
+          is_answered?: boolean | null
+          tags?: string[] | null
+          title: string
+          updated_at?: string | null
+          upvotes?: number | null
+          user_id: string
+        }
+        Update: {
+          answer_count?: number | null
+          content?: string
+          created_at?: string | null
+          id?: string
+          is_answered?: boolean | null
+          tags?: string[] | null
+          title?: string
+          updated_at?: string | null
+          upvotes?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      community_votes: {
+        Row: {
+          created_at: string | null
+          target_id: string
+          user_id: string
+          vote_type: string
+        }
+        Insert: {
+          created_at?: string | null
+          target_id: string
+          user_id: string
+          vote_type: string
+        }
+        Update: {
+          created_at?: string | null
+          target_id?: string
+          user_id?: string
+          vote_type?: string
+        }
+        Relationships: []
+      }
       daily_goals: {
         Row: {
           completed: boolean | null
@@ -330,6 +428,7 @@ export type Database = {
           pain_point: string | null
           payment_method: string | null
           preferred_study_time: string | null
+          prompts_dismissed: Json | null
           purchased_at: string | null
           stripe_customer_id: string | null
           stripe_subscription_id: string | null
@@ -367,6 +466,7 @@ export type Database = {
           pain_point?: string | null
           payment_method?: string | null
           preferred_study_time?: string | null
+          prompts_dismissed?: Json | null
           purchased_at?: string | null
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
@@ -404,6 +504,7 @@ export type Database = {
           pain_point?: string | null
           payment_method?: string | null
           preferred_study_time?: string | null
+          prompts_dismissed?: Json | null
           purchased_at?: string | null
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null

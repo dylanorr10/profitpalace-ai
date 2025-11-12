@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { Clock, TrendingUp, Award, LogOut, Settings, Lock, Sparkles } from "lucide-react";
+import { Clock, TrendingUp, Award, LogOut, Settings, Lock, Sparkles, Users } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { hasAccessToLesson } from "@/utils/accessControl";
@@ -206,15 +206,17 @@ const Dashboard = () => {
             <h1 className="text-xl font-bold">Reelin</h1>
           </div>
           <div className="flex items-center gap-2">
-            {profile?.subscription_status === 'active' && (
-              <Button variant="ghost" size="sm" onClick={handleManageSubscription}>
-                <Settings className="w-4 h-4 mr-2" />
-                Manage Subscription
-              </Button>
-            )}
+            <Button variant="ghost" size="sm" onClick={() => navigate('/community')}>
+              <Users className="w-4 h-4 mr-2" />
+              Community
+            </Button>
+            <Button variant="ghost" size="sm" onClick={() => navigate('/settings')}>
+              <Settings className="w-4 h-4 mr-2" />
+              Settings
+            </Button>
             {profile?.subscription_status !== 'active' && (
               <Button size="sm" onClick={() => navigate('/pricing')}>
-                Subscribe Now
+                Subscribe
               </Button>
             )}
             <Button variant="ghost" size="sm" onClick={handleLogout}>
@@ -239,7 +241,8 @@ const Dashboard = () => {
         {/* Urgent Banner (Seasonal/Proactive Triggers) */}
         <UrgentBanner 
           triggers={triggers} 
-          onActionClick={(lessonId) => navigate(`/lesson/${lessonId}`)} 
+          onActionClick={(lessonId) => navigate(`/lesson/${lessonId}`)}
+          isSubscribed={profile?.subscription_status === 'active'}
         />
 
         {/* Monthly Focus Card */}

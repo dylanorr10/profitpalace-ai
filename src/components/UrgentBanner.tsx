@@ -7,9 +7,10 @@ import { ThresholdTrigger } from "@/utils/proactiveTriggers";
 interface UrgentBannerProps {
   triggers: (SeasonalTrigger | ThresholdTrigger)[];
   onActionClick?: (lessonId: string) => void;
+  isSubscribed?: boolean;
 }
 
-export const UrgentBanner = ({ triggers, onActionClick }: UrgentBannerProps) => {
+export const UrgentBanner = ({ triggers, onActionClick, isSubscribed = true }: UrgentBannerProps) => {
   if (triggers.length === 0) return null;
 
   const urgentTrigger = triggers[0]; // Show the most urgent one
@@ -41,7 +42,7 @@ export const UrgentBanner = ({ triggers, onActionClick }: UrgentBannerProps) => 
             variant={urgentTrigger.priority === "urgent" ? "secondary" : "outline"}
             onClick={() => onActionClick(urgentTrigger.lessonIds[0])}
           >
-            Start Lesson
+            {isSubscribed ? "Start Lesson" : "Unlock Lesson"}
           </Button>
         )}
       </AlertDescription>

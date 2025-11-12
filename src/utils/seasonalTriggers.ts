@@ -190,10 +190,22 @@ export function getActiveSeasonalTriggers(profile: {
 }): SeasonalTrigger[] {
   const triggers: SeasonalTrigger[] = [];
 
-  // Check Self Assessment
+  // Check Self Assessment (show generic if no business structure)
   if (profile.business_structure) {
     const saTrigger = checkSelfAssessmentProximity(profile.business_structure);
     if (saTrigger) triggers.push(saTrigger);
+  } else {
+    // Show generic Self Assessment alert during season
+    const season = getCurrentTaxSeason();
+    if (season === "self_assessment_deadline") {
+      triggers.push({
+        triggerId: "self_assessment_generic",
+        priority: "info",
+        title: "Self Assessment Season",
+        message: "It's Self Assessment season. Complete your profile for personalized reminders.",
+        lessonIds: [],
+      });
+    }
   }
 
   // Check VAT returns

@@ -13,6 +13,9 @@ import Waitlist from "./pages/Waitlist";
 import Chat from "./pages/Chat";
 import Progress from "./pages/Progress";
 import NotFound from "./pages/NotFound";
+import Settings from "./pages/Settings";
+import Community from "./pages/Community";
+import CommunityQuestion from "./pages/CommunityQuestion";
 
 const queryClient = new QueryClient();
 
@@ -32,6 +35,9 @@ const App = () => (
           <Route path="/waitlist" element={<Waitlist />} />
           <Route path="/chat" element={<Chat />} />
           <Route path="/progress" element={<Progress />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/community" element={<Community />} />
+          <Route path="/community/question/:id" element={<CommunityQuestion />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

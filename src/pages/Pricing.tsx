@@ -91,7 +91,11 @@ const Pricing = () => {
               </div>
               <div className="flex items-start gap-2">
                 <Check className="w-5 h-5 text-primary mt-0.5" />
-                <span>Personalized learning path</span>
+                <span>Seasonal alerts & recommendations</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <Check className="w-5 h-5 text-primary mt-0.5" />
+                <span>Community Q&A (read-only)</span>
               </div>
               <div className="flex items-start gap-2">
                 <Check className="w-5 h-5 text-primary mt-0.5" />
@@ -103,11 +107,11 @@ const Pricing = () => {
               </div>
               <div className="flex items-start gap-2">
                 <X className="w-5 h-5 text-muted-foreground mt-0.5" />
-                <span className="text-muted-foreground">Unlimited AI questions</span>
+                <span className="text-muted-foreground">Post in Community Q&A</span>
               </div>
               <div className="flex items-start gap-2">
                 <X className="w-5 h-5 text-muted-foreground mt-0.5" />
-                <span className="text-muted-foreground">Downloadable templates</span>
+                <span className="text-muted-foreground">Weekly personalized newsletter</span>
               </div>
             </div>
           </Card>
@@ -141,7 +145,15 @@ const Pricing = () => {
               </div>
               <div className="flex items-start gap-2">
                 <Check className="w-5 h-5 text-primary mt-0.5" />
-                <span>Personalized learning path</span>
+                <span className="font-semibold">Seasonal smart suggestions</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <Check className="w-5 h-5 text-primary mt-0.5" />
+                <span className="font-semibold">Post in Community Q&A</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <Check className="w-5 h-5 text-primary mt-0.5" />
+                <span className="font-semibold">Weekly personalized newsletter</span>
               </div>
               <div className="flex items-start gap-2">
                 <Check className="w-5 h-5 text-primary mt-0.5" />
@@ -154,10 +166,6 @@ const Pricing = () => {
               <div className="flex items-start gap-2">
                 <Check className="w-5 h-5 text-primary mt-0.5" />
                 <span>Downloadable templates</span>
-              </div>
-              <div className="flex items-start gap-2">
-                <Check className="w-5 h-5 text-primary mt-0.5" />
-                <span>Progress tracking</span>
               </div>
               <div className="flex items-start gap-2">
                 <Check className="w-5 h-5 text-primary mt-0.5" />

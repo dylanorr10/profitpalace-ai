@@ -8,7 +8,7 @@ import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
-type QuizStep = "account" | "business" | "industry" | "experience" | "pain" | "goal" | "schedule" | "study_time" | "business_details" | "turnover" | "vat_status";
+type QuizStep = "account" | "business" | "industry" | "experience" | "pain" | "goal" | "schedule" | "study_time";
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -29,10 +29,6 @@ const Signup = () => {
     timeCommitment: "",
     preferredStudyTime: "",
     studyDays: [] as string[],
-    businessStartDate: "",
-    accountingYearEnd: "april_5",
-    annualTurnover: "",
-    vatRegistered: false,
   });
 
   const handleSignup = async () => {
@@ -71,11 +67,6 @@ const Signup = () => {
             time_commitment: formData.timeCommitment,
             preferred_study_time: formData.preferredStudyTime,
             study_days: formData.studyDays,
-            business_start_date: formData.businessStartDate || null,
-            accounting_year_end: formData.accountingYearEnd,
-            annual_turnover: formData.annualTurnover,
-            vat_registered: formData.vatRegistered,
-            turnover_last_updated: formData.annualTurnover ? new Date().toISOString() : null,
             onboarding_completed: true,
           });
 
