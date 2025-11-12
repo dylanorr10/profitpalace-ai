@@ -1,18 +1,26 @@
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { Check, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useState } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import { SUBSCRIPTION_TIERS } from '@/lib/subscriptions';
 
-const MONTHLY_PRICE_ID = 'price_1SScT85d5AuxGTtPEyWiYHSB';
-const ANNUAL_PRICE_ID = 'price_1SScTO5d5AuxGTtP2DzspPES';
+const MONTHLY_PRICE_ID = SUBSCRIPTION_TIERS.MONTHLY.price_id;
+const ANNUAL_PRICE_ID = SUBSCRIPTION_TIERS.ANNUAL.price_id;
 
 const Pricing = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { subscription } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
+
+  const isCurrentPlan = (productId: string) => {
+    return subscription.isSubscribed && subscription.productId === productId;
+  };
 
   const handleCheckout = async (priceId: string, subscriptionType: string) => {
     setIsLoading(true);
@@ -117,7 +125,10 @@ const Pricing = () => {
           </Card>
 
           {/* Monthly Plan */}
-          <Card className="p-8 relative">
+          <Card className={`p-8 relative ${isCurrentPlan(SUBSCRIPTION_TIERS.MONTHLY.product_id) ? 'border-2 border-green-500' : ''}`}>
+            {isCurrentPlan(SUBSCRIPTION_TIERS.MONTHLY.product_id) && (
+              <Badge className="absolute -top-3 right-4 bg-green-500">Current Plan</Badge>
+            )}
             <div className="mb-6">
               <h3 className="text-2xl font-bold mb-2">Monthly</h3>
               <p className="text-muted-foreground">
@@ -133,9 +144,11 @@ const Pricing = () => {
             <Button 
               className="w-full mb-6"
               onClick={() => handleCheckout(MONTHLY_PRICE_ID, 'monthly')}
-              disabled={isLoading}
+              disabled={isLoading || isCurrentPlan(SUBSCRIPTION_TIERS.MONTHLY.product_id)}
             >
-              {isLoading ? 'Loading...' : 'Get Started'}
+              {isCurrentPlan(SUBSCRIPTION_TIERS.MONTHLY.product_id) 
+                ? 'Current Plan' 
+                : isLoading ? 'Loading...' : 'Get Started'}
             </Button>
 
             <div className="space-y-3">
@@ -175,10 +188,14 @@ const Pricing = () => {
           </Card>
 
           {/* Annual Plan */}
-          <Card className="p-8 relative border-2 border-primary shadow-lg">
-            <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground px-4 py-1 rounded-full text-sm font-semibold">
-              BEST VALUE - SAVE 33%
-            </div>
+          <Card className={`p-8 relative ${isCurrentPlan(SUBSCRIPTION_TIERS.ANNUAL.product_id) ? 'border-2 border-green-500 shadow-lg' : 'border-2 border-primary shadow-lg'}`}>
+            {isCurrentPlan(SUBSCRIPTION_TIERS.ANNUAL.product_id) ? (
+              <Badge className="absolute -top-3 right-4 bg-green-500">Current Plan</Badge>
+            ) : (
+              <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground px-4 py-1 rounded-full text-sm font-semibold">
+                BEST VALUE - SAVE 33%
+              </div>
+            )}
 
             <div className="mb-6">
               <h3 className="text-2xl font-bold mb-2">Annual</h3>
@@ -198,9 +215,11 @@ const Pricing = () => {
             <Button 
               className="w-full mb-6"
               onClick={() => handleCheckout(ANNUAL_PRICE_ID, 'annual')}
-              disabled={isLoading}
+              disabled={isLoading || isCurrentPlan(SUBSCRIPTION_TIERS.ANNUAL.product_id)}
             >
-              {isLoading ? 'Loading...' : 'Get Full Access'}
+              {isCurrentPlan(SUBSCRIPTION_TIERS.ANNUAL.product_id)
+                ? 'Current Plan'
+                : isLoading ? 'Loading...' : 'Get Started'}
             </Button>
 
             <div className="space-y-3">

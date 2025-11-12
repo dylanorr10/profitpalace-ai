@@ -7,23 +7,27 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Switch } from "@/components/ui/switch";
-import { ArrowLeft, Save } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { ArrowLeft, Save, ExternalLink, LogOut } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
+import { SUBSCRIPTION_TIERS, getSubscriptionTierByProductId } from "@/lib/subscriptions";
 
 const Settings = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user, subscription, signOut } = useAuth();
   const [userId, setUserId] = useState<string>("");
   const [profile, setProfile] = useState<any>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [isLoadingPortal, setIsLoadingPortal] = useState(false);
 
   useEffect(() => {
     fetchProfile();
   }, []);
 
   const fetchProfile = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
       navigate('/login');
       return;
@@ -77,6 +81,43 @@ const Settings = () => {
     }
   };
 
+  const handleManageSubscription = async () => {
+    setIsLoadingPortal(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error('Not authenticated');
+
+      const { data, error } = await supabase.functions.invoke('customer-portal', {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
+      });
+
+      if (error) throw error;
+
+      if (data?.url) {
+        window.open(data.url, '_blank');
+      }
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to open customer portal",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoadingPortal(false);
+    }
+  };
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/');
+  };
+
+  const currentTier = subscription.productId 
+    ? getSubscriptionTierByProductId(subscription.productId)
+    : null;
+
   if (!profile) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -100,8 +141,9 @@ const Settings = () => {
         <h1 className="text-3xl font-bold mb-8">Settings</h1>
 
         <Tabs defaultValue="financial" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="financial">Financial Profile</TabsTrigger>
+            <TabsTrigger value="subscription">Subscription</TabsTrigger>
             <TabsTrigger value="notifications">Notifications</TabsTrigger>
             <TabsTrigger value="account">Account</TabsTrigger>
           </TabsList>
@@ -228,6 +270,84 @@ const Settings = () => {
             </Card>
           </TabsContent>
 
+          <TabsContent value="subscription" className="space-y-6">
+            <Card className="p-6">
+              <h3 className="text-xl font-semibold mb-4">Subscription Status</h3>
+              
+              {subscription.isSubscribed ? (
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-muted-foreground">Current Plan</p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <p className="text-lg font-semibold">
+                          {currentTier ? SUBSCRIPTION_TIERS[currentTier].name : 'Active'}
+                        </p>
+                        <Badge variant="default">Active</Badge>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      {currentTier && (
+                        <p className="text-2xl font-bold">
+                          {SUBSCRIPTION_TIERS[currentTier].price}
+                          <span className="text-sm font-normal text-muted-foreground">
+                            /{SUBSCRIPTION_TIERS[currentTier].interval}
+                          </span>
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  {subscription.subscriptionEnd && (
+                    <div>
+                      <p className="text-sm text-muted-foreground">Next billing date</p>
+                      <p className="font-medium">
+                        {new Date(subscription.subscriptionEnd).toLocaleDateString('en-GB', {
+                          day: 'numeric',
+                          month: 'long',
+                          year: 'numeric'
+                        })}
+                      </p>
+                    </div>
+                  )}
+
+                  <div className="pt-4 border-t">
+                    <Button 
+                      onClick={handleManageSubscription} 
+                      disabled={isLoadingPortal}
+                      variant="outline"
+                      className="w-full"
+                    >
+                      <ExternalLink className="w-4 h-4 mr-2" />
+                      {isLoadingPortal ? "Loading..." : "Manage Subscription"}
+                    </Button>
+                    <p className="text-xs text-muted-foreground mt-2 text-center">
+                      Update payment method, cancel subscription, or view invoices
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <div className="bg-muted p-4 rounded-lg">
+                    <p className="text-sm text-muted-foreground mb-2">
+                      You're currently on the free trial
+                    </p>
+                    <p className="text-sm">
+                      Upgrade to unlock all lessons and features
+                    </p>
+                  </div>
+                  
+                  <Button 
+                    onClick={() => navigate('/pricing')}
+                    className="w-full"
+                  >
+                    View Pricing Plans
+                  </Button>
+                </div>
+              )}
+            </Card>
+          </TabsContent>
+
           <TabsContent value="notifications" className="space-y-6">
             <Card className="p-6">
               <h3 className="text-xl font-semibold mb-4">Email Preferences</h3>
@@ -260,9 +380,29 @@ const Settings = () => {
           <TabsContent value="account" className="space-y-6">
             <Card className="p-6">
               <h3 className="text-xl font-semibold mb-4">Account Information</h3>
-              <p className="text-muted-foreground">
-                For account changes, please log out and use the password reset feature.
-              </p>
+              <div className="space-y-4">
+                <div>
+                  <Label className="text-sm text-muted-foreground">Email</Label>
+                  <p className="font-medium">{user?.email}</p>
+                </div>
+                
+                <div className="pt-4 border-t">
+                  <p className="text-sm text-muted-foreground mb-2">
+                    For password reset, please use the "Forgot Password" option on the login page.
+                  </p>
+                </div>
+
+                <div className="pt-4 border-t">
+                  <Button 
+                    onClick={handleSignOut}
+                    variant="destructive"
+                    className="w-full"
+                  >
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Sign Out
+                  </Button>
+                </div>
+              </div>
             </Card>
           </TabsContent>
         </Tabs>

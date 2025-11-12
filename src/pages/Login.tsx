@@ -6,10 +6,12 @@ import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Login = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { checkSubscription } = useAuth();
   
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -31,6 +33,9 @@ const Login = () => {
         title: "Welcome back!",
         description: "You've successfully logged in.",
       });
+      
+      // Trigger subscription check
+      await checkSubscription();
       
       navigate("/dashboard");
     } catch (error: any) {

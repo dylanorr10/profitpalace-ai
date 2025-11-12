@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { LogOut, Settings, Sparkles, Users, Mail, BookOpen, Award, TrendingUp } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 import { UrgentBanner } from "@/components/UrgentBanner";
 import { MonthlyFocusCard } from "@/components/MonthlyFocusCard";
 import ProfilePrompt from "@/components/ProfilePrompt";
@@ -69,7 +70,7 @@ interface UserProgress {
 const Dashboard = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [user, setUser] = useState<any>(null);
+  const { user, signOut } = useAuth();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [lessons, setLessons] = useState<Lesson[]>([]);
   const [userProgress, setUserProgress] = useState<UserProgress[]>([]);
@@ -91,27 +92,13 @@ const Dashboard = () => {
   const [reviewLessons, setReviewLessons] = useState<ReviewLesson[]>([]);
 
   useEffect(() => {
-    checkUser();
-    checkSubscription();
-  }, []);
-
-  const checkSubscription = async () => {
-    try {
-      const { data, error } = await supabase.functions.invoke('check-subscription');
-      if (error) throw error;
-      console.log('Subscription status:', data);
-    } catch (error) {
-      console.error('Error checking subscription:', error);
+    if (user) {
+      loadData();
     }
-  };
+  }, [user]);
 
-  const checkUser = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      navigate("/login");
-      return;
-    }
-    setUser(user);
+  const loadData = async () => {
+    if (!user) return;
     
     // Fetch user profile
     const { data: profileData } = await supabase
@@ -255,11 +242,7 @@ const Dashboard = () => {
   };
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
-    toast({
-      title: "Logged out",
-      description: "See you next time!",
-    });
+    await signOut();
     navigate("/");
   };
 
