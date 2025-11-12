@@ -64,16 +64,16 @@ export const MilestoneModal = ({ isOpen, onClose, milestone, lessonsCompleted, t
       {showConfetti && <Confetti numberOfPieces={200} recycle={false} />}
       
       <DialogContent className="max-w-md text-center">
-        <div className={`bg-gradient-to-br ${data.color} text-white rounded-t-lg -m-6 mb-6 p-8`}>
-          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-white/20 mb-4 backdrop-blur-sm">
+        <div className={`bg-gradient-to-br ${data.color} text-white rounded-t-lg -m-6 mb-6 p-6 md:p-8`}>
+          <div className="inline-flex items-center justify-center w-16 h-16 md:w-20 md:h-20 rounded-full bg-white/20 mb-4 backdrop-blur-sm">
             {Icon ? (
-              <Icon className="w-10 h-10 text-white" />
+              <Icon className="w-8 h-8 md:w-10 md:h-10 text-white" />
             ) : (
-              <img src={reelinLogo} alt="Reelin Logo" className="w-16 h-16 rounded-full object-contain" />
+              <img src={reelinLogo} alt="Reelin Logo" className="w-12 h-12 md:w-16 md:h-16 rounded-full object-contain" />
             )}
           </div>
-          <h2 className="text-3xl font-bold mb-3">{data.title}</h2>
-          <p className="text-lg text-white/90">{data.message}</p>
+          <h2 className="text-2xl md:text-3xl font-bold mb-2 md:mb-3">{data.title}</h2>
+          <p className="text-base md:text-lg text-white/90">{data.message}</p>
         </div>
 
         <div className="space-y-4">

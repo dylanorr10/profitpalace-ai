@@ -125,6 +125,17 @@ const Landing = () => {
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMSIgb3BhY2l0eT0iMC4xIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2dyaWQpIi8+PC9zdmc+')] opacity-20"></div>
         
         <div className="container mx-auto max-w-6xl relative z-10">
+          {/* Sign In Button for Existing Users */}
+          <div className="flex justify-end mb-4">
+            <Button 
+              variant="outline" 
+              className="bg-white/10 text-white border-white/30 hover:bg-white/20 backdrop-blur-sm"
+              onClick={() => navigate("/login")}
+            >
+              Already a member? Sign In
+            </Button>
+          </div>
+
           <div className="text-center space-y-6 animate-slide-up">
             <div className="inline-block px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-white text-sm font-medium mb-4">
               ⚡ Save 10+ hours per month on bookkeeping
@@ -138,7 +149,7 @@ const Landing = () => {
               Helping the self-employed reel in their finances. Learn tax, bookkeeping, and business finances in bite-sized lessons.
             </p>
 
-            <form onSubmit={handleEmailSubmit} className="max-w-md mx-auto mt-8 flex gap-3">
+            <form onSubmit={handleEmailSubmit} className="max-w-md mx-auto mt-8 flex flex-col sm:flex-row gap-3">
               <Input
                 type="email"
                 placeholder="Enter your email"
@@ -153,8 +164,8 @@ const Landing = () => {
               </Button>
             </form>
 
-            <div className="mt-6 inline-block px-6 py-3 bg-white/10 backdrop-blur-sm rounded-lg border-2 border-white/30">
-              <p className="text-white text-lg font-semibold">
+            <div className="mt-6 inline-block px-4 sm:px-6 py-3 bg-white/10 backdrop-blur-sm rounded-lg border-2 border-white/30">
+              <p className="text-white text-base sm:text-lg font-semibold">
                 Get 3 free lessons • £9.99/month or £79.99/year
               </p>
             </div>

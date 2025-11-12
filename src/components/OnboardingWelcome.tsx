@@ -20,11 +20,11 @@ export const OnboardingWelcome = ({ isOpen, onClose, onStartJourney }: Onboardin
         
         <div className="space-y-6">
           <div className="text-center">
-            <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-primary/10 mb-4">
-              <img src={reelinLogo} alt="Reelin Logo" className="w-16 h-16 rounded-full object-contain" />
+            <div className="inline-flex items-center justify-center w-16 h-16 md:w-20 md:h-20 rounded-full bg-primary/10 mb-4">
+              <img src={reelinLogo} alt="Reelin Logo" className="w-12 h-12 md:w-16 md:h-16 rounded-full object-contain" />
             </div>
-            <h3 className="text-2xl font-bold mb-3">Your 30-Day Journey Starts Here</h3>
-            <p className="text-lg text-muted-foreground">
+            <h3 className="text-xl md:text-2xl font-bold mb-3">Your 30-Day Journey Starts Here</h3>
+            <p className="text-base md:text-lg text-muted-foreground">
               We'll guide you step-by-step through UK business finance. No overwhelm, just progress.
             </p>
           </div>
