@@ -55,7 +55,7 @@ const Lesson = () => {
   const { toast } = useToast();
   const [lesson, setLesson] = useState<LessonData | null>(null);
   const [userIndustry, setUserIndustry] = useState<string>('general');
-  const [hasPurchased, setHasPurchased] = useState(false);
+  const [subscriptionStatus, setSubscriptionStatus] = useState<string>();
   const [userId, setUserId] = useState<string>('');
   const [notes, setNotes] = useState<string>('');
   const [showQuiz, setShowQuiz] = useState(false);
@@ -83,13 +83,13 @@ const Lesson = () => {
     // Fetch user profile
     const { data: profile } = await supabase
       .from('user_profiles')
-      .select('industry, has_purchased')
+      .select('industry, subscription_status')
       .eq('user_id', user.id)
       .single();
 
     if (profile) {
       setUserIndustry(profile.industry?.toLowerCase() || 'general');
-      setHasPurchased(profile.has_purchased || false);
+      setSubscriptionStatus(profile.subscription_status || undefined);
     }
 
     // Fetch lesson
@@ -110,7 +110,7 @@ const Lesson = () => {
     }
 
     // Check access
-    if (!hasAccessToLesson(lessonData.order_index, profile?.has_purchased || false)) {
+    if (!hasAccessToLesson(lessonData.order_index, subscriptionStatus)) {
       toast({
         title: 'Upgrade Required',
         description: 'This lesson requires a premium account.',

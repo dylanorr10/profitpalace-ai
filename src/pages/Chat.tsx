@@ -10,7 +10,7 @@ import { getRemainingFreeQuestions } from '@/utils/accessControl';
 const Chat = () => {
   const navigate = useNavigate();
   const [remainingQuestions, setRemainingQuestions] = useState<number | undefined>();
-  const [hasPurchased, setHasPurchased] = useState(false);
+  const [subscriptionStatus, setSubscriptionStatus] = useState<string>();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -22,21 +22,21 @@ const Chat = () => {
 
       const { data: profile } = await supabase
         .from('user_profiles')
-        .select('has_purchased')
+        .select('subscription_status')
         .eq('user_id', user.id)
         .single();
 
-      const purchased = profile?.has_purchased || false;
-      setHasPurchased(purchased);
+      const status = profile?.subscription_status || undefined;
+      setSubscriptionStatus(status);
 
-      if (!purchased) {
+      if (status !== 'active') {
         const { data: usage } = await supabase
           .from('ai_usage')
           .select('messages_count')
           .eq('user_id', user.id)
           .single();
 
-        setRemainingQuestions(getRemainingFreeQuestions(usage?.messages_count || 0, purchased));
+        setRemainingQuestions(getRemainingFreeQuestions(usage?.messages_count || 0, status));
       }
     };
 
@@ -60,7 +60,7 @@ const Chat = () => {
               <h1 className="text-xl font-bold">AI Study Buddy</h1>
             </div>
           </div>
-          {!hasPurchased && (
+          {subscriptionStatus !== 'active' && (
             <Button
               size="sm"
               onClick={() => navigate('/pricing')}

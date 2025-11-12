@@ -1,9 +1,9 @@
 export const hasAccessToLesson = (
   lessonOrderIndex: number,
-  hasPurchased: boolean
+  subscriptionStatus?: string
 ): boolean => {
-  // Paid users get full access
-  if (hasPurchased) return true;
+  // Active subscribers get full access
+  if (subscriptionStatus === 'active') return true;
   
   // Free users only get first 3 lessons
   return lessonOrderIndex <= 3;
@@ -11,8 +11,8 @@ export const hasAccessToLesson = (
 
 export const getRemainingFreeQuestions = (
   messagesCount: number,
-  hasPurchased: boolean
+  subscriptionStatus?: string
 ): number => {
-  if (hasPurchased) return Infinity;
+  if (subscriptionStatus === 'active') return Infinity;
   return Math.max(0, 10 - messagesCount);
 };

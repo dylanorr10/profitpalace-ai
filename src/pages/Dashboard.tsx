@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { Clock, TrendingUp, Award, LogOut, BookOpen, CheckCircle2, Lock, Sparkles, Rocket } from "lucide-react";
+import { Clock, TrendingUp, Award, LogOut, Settings, Lock, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { hasAccessToLesson } from "@/utils/accessControl";
@@ -27,6 +27,9 @@ interface UserProfile {
   learning_goal: string;
   has_purchased: boolean;
   waitlist_joined: boolean;
+  subscription_status: string | null;
+  subscription_type: string | null;
+  subscription_ends_at: string | null;
 }
 
 const Dashboard = () => {
@@ -40,7 +43,18 @@ const Dashboard = () => {
 
   useEffect(() => {
     checkUser();
+    checkSubscription();
   }, []);
+
+  const checkSubscription = async () => {
+    try {
+      const { data, error } = await supabase.functions.invoke('check-subscription');
+      if (error) throw error;
+      console.log('Subscription status:', data);
+    } catch (error) {
+      console.error('Error checking subscription:', error);
+    }
+  };
 
   const checkUser = async () => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -117,7 +131,24 @@ const Dashboard = () => {
   };
 
   const canAccessLesson = (orderIndex: number) => {
-    return hasAccessToLesson(orderIndex, profile?.has_purchased || false);
+    return hasAccessToLesson(orderIndex, profile?.subscription_status || undefined);
+  };
+
+  const handleManageSubscription = async () => {
+    try {
+      const { data, error } = await supabase.functions.invoke('customer-portal');
+      if (error) throw error;
+      if (data?.url) {
+        window.open(data.url, '_blank');
+      }
+    } catch (error) {
+      console.error('Error opening customer portal:', error);
+      toast({
+        title: "Error",
+        description: "Failed to open subscription management.",
+        variant: "destructive"
+      });
+    }
   };
 
   const getBusinessTypeLabel = () => {
@@ -137,13 +168,19 @@ const Dashboard = () => {
       <header className="border-b bg-card">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <BookOpen className="w-6 h-6 text-primary" />
-            <h1 className="text-xl font-bold">UK Business Academy</h1>
+            <span className="text-2xl">🎣</span>
+            <h1 className="text-xl font-bold">Reelin</h1>
           </div>
           <div className="flex items-center gap-2">
-            {!profile?.has_purchased && (
+            {profile?.subscription_status === 'active' && (
+              <Button variant="ghost" size="sm" onClick={handleManageSubscription}>
+                <Settings className="w-4 h-4 mr-2" />
+                Manage Subscription
+              </Button>
+            )}
+            {profile?.subscription_status !== 'active' && (
               <Button size="sm" onClick={() => navigate('/pricing')}>
-                Upgrade to Full Access
+                Subscribe Now
               </Button>
             )}
             <Button variant="ghost" size="sm" onClick={handleLogout}>
@@ -165,42 +202,44 @@ const Dashboard = () => {
           </p>
         </div>
 
-        {/* Waitlist CTA Banner (for purchasers) */}
-        {profile?.has_purchased && !profile?.waitlist_joined && (
-          <Card className="p-6 bg-gradient-to-r from-primary to-primary/70 text-white mb-8">
+        {/* Subscription Status Banner */}
+        {profile?.subscription_status === 'active' && (
+          <Card className="p-6 bg-gradient-to-r from-success to-success/70 text-white mb-8">
             <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-              <div className="flex items-center gap-3">
-                <Rocket className="w-8 h-8" />
-                <div>
-                  <h3 className="text-xl font-bold">Coming Soon: Your All-in-One Business Platform</h3>
-                  <p className="text-white/90">Join the waitlist for early access + exclusive pricing</p>
-                </div>
+              <div>
+                <h3 className="text-xl font-bold mb-1">
+                  Active Subscription - {profile.subscription_type === 'annual' ? 'Annual Plan' : 'Monthly Plan'}
+                </h3>
+                <p className="text-white/90">
+                  Full access to all lessons and features
+                  {profile.subscription_ends_at && ` • Renews on ${new Date(profile.subscription_ends_at).toLocaleDateString()}`}
+                </p>
               </div>
               <Button 
                 size="lg" 
                 className="bg-white text-primary hover:bg-white/90 whitespace-nowrap"
-                onClick={() => navigate("/waitlist")}
+                onClick={handleManageSubscription}
               >
-                Join Waitlist →
+                Manage Subscription
               </Button>
             </div>
           </Card>
         )}
 
         {/* Upgrade Banner (for free users) */}
-        {!profile?.has_purchased && (
+        {profile?.subscription_status !== 'active' && (
           <Card className="p-6 bg-gradient-to-r from-primary to-primary/70 text-white mb-8">
             <div className="flex flex-col md:flex-row items-center justify-between gap-4">
               <div>
-                <h3 className="text-xl font-bold mb-1">Unlock All 20+ Lessons</h3>
-                <p className="text-white/90">One-time payment • Lifetime access • Save time & money</p>
+                <h3 className="text-xl font-bold mb-1">Reel in Full Access</h3>
+                <p className="text-white/90">£9.99/month or £79.99/year • Save 33% with annual</p>
               </div>
               <Button 
                 size="lg" 
                 className="bg-white text-primary hover:bg-white/90 whitespace-nowrap"
                 onClick={() => navigate("/pricing")}
               >
-                Get Full Access - £149
+                Subscribe Now
               </Button>
             </div>
           </Card>
@@ -250,7 +289,7 @@ const Dashboard = () => {
         <div className="mb-8">
           <h3 className="text-2xl font-bold mb-6">
             Your Lessons
-            {profile?.pain_point && !profile?.has_purchased && (
+            {profile?.pain_point && profile?.subscription_status !== 'active' && (
               <span className="text-base font-normal text-muted-foreground ml-2">
                 (prioritized for: {profile.pain_point})
               </span>
@@ -309,7 +348,7 @@ const Dashboard = () => {
                 <h3 className="text-xl font-bold mb-1">AI Study Buddy</h3>
                 <p className="text-white/90">
                   Get instant answers to your UK business finance questions
-                  {!profile?.has_purchased && ' (10 free questions)'}
+                  {profile?.subscription_status !== 'active' && ' (10 free questions)'}
                 </p>
               </div>
             </div>

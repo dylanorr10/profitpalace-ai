@@ -2,19 +2,63 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Check, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+import { useState } from 'react';
+
+const MONTHLY_PRICE_ID = 'price_1SScT85d5AuxGTtPEyWiYHSB';
+const ANNUAL_PRICE_ID = 'price_1SScTO5d5AuxGTtP2DzspPES';
 
 const Pricing = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleCheckout = async (priceId: string, subscriptionType: string) => {
+    setIsLoading(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        toast({
+          title: "Authentication required",
+          description: "Please sign up or log in to continue",
+          variant: "destructive"
+        });
+        navigate('/signup');
+        return;
+      }
+
+      const { data, error } = await supabase.functions.invoke('create-checkout', {
+        body: { priceId, subscriptionType }
+      });
+
+      if (error) throw error;
+
+      if (data?.url) {
+        window.location.href = data.url;
+      }
+    } catch (error) {
+      console.error('Checkout error:', error);
+      toast({
+        title: "Error",
+        description: "Failed to start checkout. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-secondary/20">
       <div className="container mx-auto px-4 py-16">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold mb-4">
-            Master UK Business Finances
+            Reel in Your Finances
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            One-time payment. Lifetime access. Learn at your own pace.
+            Helping the self-employed reel in their finances. Choose your plan and start learning today.
           </p>
         </div>
 
@@ -37,7 +81,7 @@ const Pricing = () => {
               className="w-full mb-6"
               onClick={() => navigate('/signup')}
             >
-              Start Free
+              Start Free Trial
             </Button>
 
             <div className="space-y-3">
@@ -68,37 +112,87 @@ const Pricing = () => {
             </div>
           </Card>
 
-          {/* Premium Tier */}
+          {/* Monthly Plan */}
+          <Card className="p-8 relative">
+            <div className="mb-6">
+              <h3 className="text-2xl font-bold mb-2">Monthly</h3>
+              <p className="text-muted-foreground">
+                Perfect for getting started
+              </p>
+            </div>
+
+            <div className="text-4xl font-bold mb-6">
+              £9.99
+              <span className="text-lg font-normal text-muted-foreground">/month</span>
+            </div>
+
+            <Button 
+              className="w-full mb-6"
+              onClick={() => handleCheckout(MONTHLY_PRICE_ID, 'monthly')}
+              disabled={isLoading}
+            >
+              {isLoading ? 'Loading...' : 'Get Started'}
+            </Button>
+
+            <div className="space-y-3">
+              <div className="flex items-start gap-2">
+                <Check className="w-5 h-5 text-primary mt-0.5" />
+                <span className="font-semibold">All 20+ lessons</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <Check className="w-5 h-5 text-primary mt-0.5" />
+                <span>Personalized learning path</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <Check className="w-5 h-5 text-primary mt-0.5" />
+                <span className="font-semibold">Unlimited AI Study Buddy</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <Check className="w-5 h-5 text-primary mt-0.5" />
+                <span>Industry-specific examples</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <Check className="w-5 h-5 text-primary mt-0.5" />
+                <span>Downloadable templates</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <Check className="w-5 h-5 text-primary mt-0.5" />
+                <span>Progress tracking</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <Check className="w-5 h-5 text-primary mt-0.5" />
+                <span>Cancel anytime</span>
+              </div>
+            </div>
+          </Card>
+
+          {/* Annual Plan */}
           <Card className="p-8 relative border-2 border-primary shadow-lg">
             <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground px-4 py-1 rounded-full text-sm font-semibold">
-              BEST VALUE
+              BEST VALUE - SAVE 33%
             </div>
 
             <div className="mb-6">
-              <h3 className="text-2xl font-bold mb-2">Full Course</h3>
+              <h3 className="text-2xl font-bold mb-2">Annual</h3>
               <p className="text-muted-foreground">
-                Everything you need to master UK business finances
+                Save £40 per year
               </p>
             </div>
 
             <div className="text-4xl font-bold mb-2">
-              £149
-              <span className="text-lg font-normal text-muted-foreground line-through ml-2">
-                £199
-              </span>
+              £79.99
+              <span className="text-lg font-normal text-muted-foreground">/year</span>
             </div>
             <p className="text-sm text-muted-foreground mb-6">
-              One-time payment • Lifetime access
+              That's just £6.67/month
             </p>
 
             <Button 
               className="w-full mb-6"
-              onClick={() => {
-                // Placeholder for payment - manual for now
-                alert('Payment integration coming soon! Please contact support@ukbusinessacademy.com to purchase.');
-              }}
+              onClick={() => handleCheckout(ANNUAL_PRICE_ID, 'annual')}
+              disabled={isLoading}
             >
-              Get Full Access
+              {isLoading ? 'Loading...' : 'Get Full Access'}
             </Button>
 
             <div className="space-y-3">
@@ -137,9 +231,9 @@ const Pricing = () => {
             </div>
 
             <div className="mt-8 p-4 bg-primary/10 rounded-lg">
-              <p className="text-sm font-semibold mb-1">🎁 Launch Bonus</p>
+              <p className="text-sm font-semibold mb-1">🎣 Launch Bonus</p>
               <p className="text-sm text-muted-foreground">
-                First 100 customers get early access to our upcoming business management app
+                First 100 customers get exclusive templates and priority support
               </p>
             </div>
           </Card>

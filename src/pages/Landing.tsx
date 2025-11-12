@@ -46,13 +46,11 @@ const Landing = () => {
             </div>
             
             <h1 className="text-5xl md:text-7xl font-bold text-white leading-tight">
-              UK Business Finance,<br />
-              <span className="text-white/90">Made Simple</span>
+              Reel in Your Finances 🎣
             </h1>
             
             <p className="text-xl md:text-2xl text-white/90 max-w-3xl mx-auto">
-              Learn tax, bookkeeping, and business finances in bite-sized lessons.
-              <span className="font-semibold"> One-time payment. Lifetime access.</span>
+              Helping the self-employed reel in their finances. Learn tax, bookkeeping, and business finances in bite-sized lessons.
             </p>
 
             <form onSubmit={handleEmailSubmit} className="max-w-md mx-auto mt-8 flex gap-3">
@@ -70,7 +68,7 @@ const Landing = () => {
             </form>
 
             <p className="text-white/70 text-sm">
-              Get 3 free lessons • £149 for full course • Lifetime access
+              Get 3 free lessons • £9.99/month or £79.99/year
             </p>
           </div>
         </div>
@@ -181,7 +179,7 @@ const Landing = () => {
               Simple, Transparent Pricing
             </h2>
             <p className="text-xl text-muted-foreground">
-              One price. Everything included. Cancel anytime.
+              Choose your plan. Everything included. Cancel anytime.
             </p>
           </div>
 
@@ -189,16 +187,16 @@ const Landing = () => {
             <div className="bg-card border-2 border-border p-8 rounded-2xl shadow-md">
               <h3 className="text-2xl font-bold mb-2">Monthly</h3>
               <div className="mb-6">
-                <span className="text-5xl font-bold">£19</span>
+                <span className="text-5xl font-bold">£9.99</span>
                 <span className="text-muted-foreground">/month</span>
               </div>
               <ul className="space-y-3 mb-8">
                 {[
                   "Access to all 20+ lessons",
                   "Interactive calculators",
-                  "AI Study Buddy",
+                  "Unlimited AI Study Buddy",
                   "Downloadable resources",
-                  "New lessons monthly",
+                  "Cancel anytime",
                 ].map((feature) => (
                   <li key={feature} className="flex items-center gap-2">
                     <Check className="w-5 h-5 text-success" />
@@ -213,20 +211,20 @@ const Landing = () => {
 
             <div className="bg-gradient-primary p-8 rounded-2xl shadow-glow text-white relative overflow-hidden">
               <div className="absolute top-4 right-4 bg-white/20 px-3 py-1 rounded-full text-sm font-semibold">
-                SAVE £79
+                SAVE 33%
               </div>
               <h3 className="text-2xl font-bold mb-2">Annual</h3>
               <div className="mb-6">
-                <span className="text-5xl font-bold">£149</span>
+                <span className="text-5xl font-bold">£79.99</span>
                 <span className="text-white/80">/year</span>
               </div>
               <ul className="space-y-3 mb-8">
                 {[
                   "Everything in Monthly",
-                  "2 months free (£228 value)",
+                  "Just £6.67/month",
                   "Priority email support",
-                  "Lifetime updates",
-                  "Certificate of completion",
+                  "Exclusive templates",
+                  "Save £40 per year",
                 ].map((feature) => (
                   <li key={feature} className="flex items-center gap-2">
                     <Check className="w-5 h-5 text-white" />
@@ -241,7 +239,7 @@ const Landing = () => {
           </div>
 
           <p className="text-center text-muted-foreground mt-8">
-            30-day money-back guarantee • Cancel anytime • No hidden fees
+            3 free lessons to start • Cancel anytime • No hidden fees
           </p>
         </div>
       </section>
