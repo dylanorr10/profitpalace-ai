@@ -54,23 +54,23 @@ const FirstDay = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container max-w-4xl mx-auto px-4 py-12">
+      <div className="container max-w-4xl mx-auto px-4 py-8 md:py-12">
         {/* Hero Section */}
-        <div className="text-center mb-12">
-          <div className="text-6xl mb-4">🎯</div>
-          <h1 className="text-4xl font-bold mb-4">Your First Day in Business</h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+        <div className="text-center mb-8 md:mb-12">
+          <div className="text-5xl md:text-6xl mb-4">🎯</div>
+          <h1 className="text-3xl md:text-4xl font-bold mb-3 md:mb-4">Your First Day in Business</h1>
+          <p className="text-base md:text-xl text-muted-foreground max-w-2xl mx-auto">
             Congratulations on starting your journey! These are the 5 essential tasks for your first month.
           </p>
         </div>
 
         {/* Deadline Alert */}
-        <Card className="p-6 mb-8 bg-orange-500/10 border-orange-500/50">
-          <div className="flex items-start gap-4">
-            <AlertCircle className="w-6 h-6 text-orange-500 flex-shrink-0 mt-1" />
+        <Card className="p-4 md:p-6 mb-6 md:mb-8 bg-orange-500/10 border-orange-500/50">
+          <div className="flex items-start gap-3 md:gap-4">
+            <AlertCircle className="w-5 h-5 md:w-6 md:h-6 text-orange-500 flex-shrink-0 mt-1" />
             <div>
-              <h3 className="font-bold text-lg mb-2">3-Month Registration Deadline</h3>
-              <p className="text-muted-foreground">
+              <h3 className="font-bold text-base md:text-lg mb-2">3-Month Registration Deadline</h3>
+              <p className="text-sm md:text-base text-muted-foreground">
                 You MUST register with <GlossaryTooltip term="HMRC">HMRC</GlossaryTooltip> as{" "}
                 <GlossaryTooltip term="Self-Employed">self-employed</GlossaryTooltip> within 3 months of
                 starting. Late registration = automatic £100 penalty. Don't wait!
@@ -80,7 +80,7 @@ const FirstDay = () => {
         </Card>
 
         {/* Progress */}
-        <div className="mb-8">
+        <div className="mb-6 md:mb-8">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm font-medium">Your Progress</span>
             <span className="text-sm text-muted-foreground">
@@ -96,39 +96,39 @@ const FirstDay = () => {
         </div>
 
         {/* Checklist */}
-        <div className="space-y-4 mb-12">
+        <div className="space-y-3 md:space-y-4 mb-8 md:mb-12">
           {steps.map(step => (
             <Card
               key={step.id}
-              className={`p-6 cursor-pointer transition-all hover:shadow-lg ${
+              className={`p-4 md:p-6 cursor-pointer transition-all hover:shadow-lg ${
                 completedSteps.includes(step.id) ? 'bg-primary/5 border-primary' : ''
               }`}
               onClick={() => toggleStep(step.id)}
             >
-              <div className="flex items-start gap-4">
+              <div className="flex items-start gap-3 md:gap-4">
                 <div
-                  className={`w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all ${
+                  className={`w-5 h-5 md:w-6 md:h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all ${
                     completedSteps.includes(step.id)
                       ? 'bg-primary border-primary'
                       : 'border-muted-foreground'
                   }`}
                 >
                   {completedSteps.includes(step.id) && (
-                    <CheckCircle2 className="w-4 h-4 text-primary-foreground" />
+                    <CheckCircle2 className="w-3 h-3 md:w-4 md:h-4 text-primary-foreground" />
                   )}
                 </div>
                 
-                <div className="flex-1">
+                <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
-                    <h3 className="font-bold text-lg">{step.title}</h3>
+                    <h3 className="font-bold text-base md:text-lg">{step.title}</h3>
                     {step.urgent && (
-                      <span className="text-xs bg-orange-500/20 text-orange-700 dark:text-orange-400 px-2 py-1 rounded">
+                      <span className="text-xs bg-orange-500/20 text-orange-700 dark:text-orange-400 px-2 py-0.5 md:py-1 rounded flex-shrink-0">
                         URGENT
                       </span>
                     )}
                   </div>
-                  <p className="text-muted-foreground mb-2">{step.description}</p>
-                  <p className="text-sm font-medium text-primary">{step.action}</p>
+                  <p className="text-sm md:text-base text-muted-foreground mb-1 md:mb-2">{step.description}</p>
+                  <p className="text-xs md:text-sm font-medium text-primary">{step.action}</p>
                 </div>
               </div>
             </Card>
@@ -136,26 +136,26 @@ const FirstDay = () => {
         </div>
 
         {/* What Happens Next */}
-        <Card className="p-6 mb-8 bg-muted/50">
-          <h3 className="font-bold text-xl mb-4">What Happens After Registration?</h3>
-          <ul className="space-y-3">
-            <li className="flex gap-3">
-              <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-              <div>
+        <Card className="p-4 md:p-6 mb-6 md:mb-8 bg-muted/50">
+          <h3 className="font-bold text-lg md:text-xl mb-3 md:mb-4">What Happens After Registration?</h3>
+          <ul className="space-y-2 md:space-y-3">
+            <li className="flex gap-2 md:gap-3">
+              <CheckCircle2 className="w-4 h-4 md:w-5 md:h-5 text-primary flex-shrink-0 mt-0.5" />
+              <div className="text-sm md:text-base">
                 <span className="font-medium">Within 10 days:</span> You'll receive your{" "}
                 <GlossaryTooltip term="UTR">UTR number</GlossaryTooltip> by post - this is your tax ID
               </div>
             </li>
-            <li className="flex gap-3">
-              <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-              <div>
+            <li className="flex gap-2 md:gap-3">
+              <CheckCircle2 className="w-4 h-4 md:w-5 md:h-5 text-primary flex-shrink-0 mt-0.5" />
+              <div className="text-sm md:text-base">
                 <span className="font-medium">First tax return:</span> Due 31 January following your first{" "}
                 <GlossaryTooltip term="Tax Year">tax year</GlossaryTooltip> (16+ months away)
               </div>
             </li>
-            <li className="flex gap-3">
-              <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-              <div>
+            <li className="flex gap-2 md:gap-3">
+              <CheckCircle2 className="w-4 h-4 md:w-5 md:h-5 text-primary flex-shrink-0 mt-0.5" />
+              <div className="text-sm md:text-base">
                 <span className="font-medium">Tax savings:</span> Keep saving 30% of income weekly so tax bill is painless
               </div>
             </li>
@@ -163,17 +163,17 @@ const FirstDay = () => {
         </Card>
 
         {/* Next Steps */}
-        <div className="flex gap-4">
+        <div className="flex flex-col sm:flex-row gap-3 md:gap-4">
           <Button
             onClick={() => navigate('/dashboard')}
             variant="outline"
-            className="flex-1"
+            className="flex-1 w-full"
           >
             Back to Dashboard
           </Button>
           <Button
             onClick={() => navigate('/lesson/1')}
-            className="flex-1 gap-2"
+            className="flex-1 gap-2 w-full"
           >
             Next: Sole Trader vs Limited Company
             <ArrowRight className="w-4 h-4" />

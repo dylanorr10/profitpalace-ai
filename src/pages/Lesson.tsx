@@ -96,12 +96,30 @@ const Lesson = () => {
       setSubscriptionStatus(isActive ? 'active' : undefined);
     }
 
-    // Fetch lesson
-    const { data: lessonData, error } = await supabase
-      .from('lessons')
-      .select('*')
-      .eq('id', id)
-      .single();
+    // Fetch lesson - support both UUID and order_index
+    let lessonData;
+    let error;
+    
+    // Check if id is a number (order_index) or UUID
+    const isOrderIndex = !isNaN(Number(id));
+    
+    if (isOrderIndex) {
+      const result = await supabase
+        .from('lessons')
+        .select('*')
+        .eq('order_index', Number(id))
+        .maybeSingle();
+      lessonData = result.data;
+      error = result.error;
+    } else {
+      const result = await supabase
+        .from('lessons')
+        .select('*')
+        .eq('id', id)
+        .maybeSingle();
+      lessonData = result.data;
+      error = result.error;
+    }
 
     if (error || !lessonData) {
       toast({
@@ -135,7 +153,7 @@ const Lesson = () => {
       .from('user_progress')
       .select('notes, quiz_score')
       .eq('user_id', user.id)
-      .eq('lesson_id', id)
+      .eq('lesson_id', lessonData.id)
       .maybeSingle();
 
     if (progressData) {
@@ -147,7 +165,7 @@ const Lesson = () => {
       // Create progress record
       await supabase.from('user_progress').insert({
         user_id: user.id,
-        lesson_id: id,
+        lesson_id: lessonData.id,
         started_at: new Date().toISOString(),
       });
 
@@ -197,15 +215,31 @@ const Lesson = () => {
           time_spent: timeSpent,
         })
         .eq('user_id', userId)
-        .eq('lesson_id', id);
+        .eq('lesson_id', lesson?.id);
 
       // Log daily activity for streak tracking
       await logDailyActivity(userId, 1, timeSpentMinutes);
 
+      // Fetch next lesson for smooth navigation
+      const { data: nextLesson } = await supabase
+        .from('lessons')
+        .select('id, title, order_index')
+        .gt('order_index', lesson?.order_index || 0)
+        .order('order_index', { ascending: true })
+        .limit(1)
+        .maybeSingle();
+
       toast({
         title: 'Lesson Complete! 🎉',
-        description: `You scored ${score}% on the quiz. Keep your streak going!`,
+        description: `You scored ${score}% on the quiz. ${nextLesson ? 'Ready for the next one?' : 'Keep your streak going!'}`,
       });
+
+      // Smooth transition to next lesson after a moment
+      if (nextLesson) {
+        setTimeout(() => {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }, 500);
+      }
     } else {
       setShowQuiz(false);
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -228,10 +262,11 @@ const Lesson = () => {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="border-b bg-card sticky top-0 z-10">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <Button variant="ghost" onClick={() => navigate("/dashboard")}>
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Dashboard
+        <div className="container mx-auto px-4 py-3 md:py-4 flex items-center justify-between gap-2">
+          <Button variant="ghost" size="sm" onClick={() => navigate("/dashboard")} className="text-xs md:text-sm">
+            <ArrowLeft className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />
+            <span className="hidden sm:inline">Back to Dashboard</span>
+            <span className="sm:hidden">Back</span>
           </Button>
           <Button 
             variant="outline" 
@@ -245,9 +280,11 @@ const Lesson = () => {
                 }
               }
             })}
+            className="text-xs md:text-sm"
           >
-            <MessageSquare className="w-4 h-4 mr-2" />
-            Ask AI About This
+            <MessageSquare className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />
+            <span className="hidden sm:inline">Ask AI About This</span>
+            <span className="sm:hidden">Ask AI</span>
           </Button>
         </div>
       </header>
@@ -348,41 +385,41 @@ const Lesson = () => {
               <Lightbulb className="w-5 h-5 md:w-6 md:h-6" />
               <h2 className="text-xl md:text-2xl font-bold">Pro Tips 💡</h2>
             </div>
-            <ul className="space-y-3">
+            <ul className="space-y-2 md:space-y-3">
               {lesson.content.proTips.map((tip, idx) => (
-                <li key={idx} className="flex items-start gap-3">
-                  <Lightbulb className="w-5 h-5 mt-0.5 flex-shrink-0" />
+                <li key={idx} className="flex items-start gap-2 md:gap-3 text-sm md:text-base">
+                  <Lightbulb className="w-4 h-4 md:w-5 md:h-5 mt-0.5 flex-shrink-0" />
                   <span>{tip}</span>
                 </li>
               ))}
             </ul>
           </Card>
 
-          {/* Action Steps */}
-          <Card className="p-6">
-            <h2 className="text-2xl font-bold mb-4">Your Action Steps 🎯</h2>
-            <div className="space-y-3">
-              {lesson.content.actionSteps.map((step, idx) => (
-                <div key={idx} className="flex items-start gap-3 p-3 bg-secondary/30 rounded-lg">
-                  <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold flex-shrink-0">
-                    {idx + 1}
-                  </div>
-                  <span className="mt-1">{step}</span>
+        {/* Action Steps */}
+        <Card className="p-4 md:p-6">
+          <h2 className="text-xl md:text-2xl font-bold mb-4">Your Action Steps 🎯</h2>
+          <div className="space-y-3">
+            {lesson.content.actionSteps.map((step, idx) => (
+              <div key={idx} className="flex items-start gap-3 p-3 bg-secondary/30 rounded-lg">
+                <div className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold flex-shrink-0 text-sm md:text-base">
+                  {idx + 1}
                 </div>
-              ))}
-            </div>
-          </Card>
+                <span className="mt-1 text-sm md:text-base">{step}</span>
+              </div>
+            ))}
+          </div>
+        </Card>
         </div>
 
         {/* Notes Section */}
-        <Card className="p-6 mt-8">
-          <Label htmlFor="notes" className="text-lg font-semibold mb-2">Your Notes 📝</Label>
+        <Card className="p-4 md:p-6 mt-6 md:mt-8">
+          <Label htmlFor="notes" className="text-base md:text-lg font-semibold mb-2">Your Notes 📝</Label>
           <Textarea
             id="notes"
             placeholder="Write your thoughts, questions, or key takeaways..."
             value={notes}
             onChange={(e) => handleNotesChange(e.target.value)}
-            className="mt-2 min-h-[120px]"
+            className="mt-2 min-h-[120px] text-sm md:text-base"
           />
           <p className="text-xs text-muted-foreground mt-2">
             Auto-saved • Visible only to you
@@ -391,14 +428,14 @@ const Lesson = () => {
 
         {/* Quiz Section */}
         {lesson.content.quiz && !quizCompleted && (
-          <div className="mt-8">
+          <div className="mt-6 md:mt-8">
             {!showQuiz ? (
-              <Card className="p-8 text-center">
-                <h2 className="text-2xl font-bold mb-4">Ready to test your knowledge?</h2>
-                <p className="text-muted-foreground mb-6">
+              <Card className="p-6 md:p-8 text-center">
+                <h2 className="text-xl md:text-2xl font-bold mb-3 md:mb-4">Ready to test your knowledge?</h2>
+                <p className="text-sm md:text-base text-muted-foreground mb-4 md:mb-6">
                   Complete the quiz to finish this lesson
                 </p>
-                <Button size="lg" onClick={() => setShowQuiz(true)}>
+                <Button size="lg" onClick={() => setShowQuiz(true)} className="w-full sm:w-auto">
                   Start Quiz
                 </Button>
               </Card>
@@ -415,15 +452,30 @@ const Lesson = () => {
         )}
 
         {/* Lesson Navigation */}
-        <div className="mt-12 flex justify-between items-center">
-          <Button variant="outline" onClick={() => navigate("/dashboard")}>
+        <div className="mt-12 flex flex-col sm:flex-row gap-3 justify-between items-stretch sm:items-center">
+          <Button variant="outline" onClick={() => navigate("/dashboard")} className="w-full sm:w-auto">
             Back to Lessons
           </Button>
           {quizCompleted && (
             <Button 
               size="lg" 
-              className="bg-gradient-primary"
-              onClick={() => navigate("/dashboard")}
+              className="bg-gradient-primary w-full sm:w-auto"
+              onClick={async () => {
+                // Fetch next lesson
+                const { data: nextLesson } = await supabase
+                  .from('lessons')
+                  .select('id, order_index')
+                  .gt('order_index', lesson?.order_index || 0)
+                  .order('order_index', { ascending: true })
+                  .limit(1)
+                  .maybeSingle();
+
+                if (nextLesson) {
+                  navigate(`/lesson/${nextLesson.id}`);
+                } else {
+                  navigate("/dashboard");
+                }
+              }}
             >
               Continue Learning →
             </Button>
