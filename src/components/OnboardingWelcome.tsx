@@ -1,6 +1,6 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Sparkles } from "lucide-react";
+import reelinLogo from "@/assets/reelin-logo.jpg";
 
 interface OnboardingWelcomeProps {
   isOpen: boolean;
@@ -21,7 +21,7 @@ export const OnboardingWelcome = ({ isOpen, onClose, onStartJourney }: Onboardin
         <div className="space-y-6">
           <div className="text-center">
             <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-primary/10 mb-4">
-              <Sparkles className="w-10 h-10 text-primary" />
+              <img src={reelinLogo} alt="Reelin Logo" className="w-16 h-16 rounded-full object-contain" />
             </div>
             <h3 className="text-2xl font-bold mb-3">Your 30-Day Journey Starts Here</h3>
             <p className="text-lg text-muted-foreground">

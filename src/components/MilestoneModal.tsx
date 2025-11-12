@@ -1,8 +1,9 @@
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Trophy, Sparkles, Target, Award } from "lucide-react";
+import { Trophy, Target, Award } from "lucide-react";
 import Confetti from "react-confetti";
 import { useEffect, useState } from "react";
+import reelinLogo from "@/assets/reelin-logo.jpg";
 
 interface MilestoneModalProps {
   isOpen: boolean;
@@ -14,7 +15,7 @@ interface MilestoneModalProps {
 
 const milestoneData = {
   first_lesson: {
-    icon: Sparkles,
+    icon: 'logo',
     title: "🎉 You're Off to a Great Start!",
     message: "First lesson complete! You've taken the first step toward mastering UK business finance.",
     color: "from-primary to-primary/70",
@@ -48,7 +49,7 @@ const milestoneData = {
 export const MilestoneModal = ({ isOpen, onClose, milestone, lessonsCompleted, totalLessons }: MilestoneModalProps) => {
   const [showConfetti, setShowConfetti] = useState(false);
   const data = milestoneData[milestone];
-  const Icon = data.icon;
+  const Icon = data.icon === 'logo' ? null : data.icon;
 
   useEffect(() => {
     if (isOpen) {
@@ -65,7 +66,11 @@ export const MilestoneModal = ({ isOpen, onClose, milestone, lessonsCompleted, t
       <DialogContent className="max-w-md text-center">
         <div className={`bg-gradient-to-br ${data.color} text-white rounded-t-lg -m-6 mb-6 p-8`}>
           <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-white/20 mb-4 backdrop-blur-sm">
-            <Icon className="w-10 h-10 text-white" />
+            {Icon ? (
+              <Icon className="w-10 h-10 text-white" />
+            ) : (
+              <img src={reelinLogo} alt="Reelin Logo" className="w-16 h-16 rounded-full object-contain" />
+            )}
           </div>
           <h2 className="text-3xl font-bold mb-3">{data.title}</h2>
           <p className="text-lg text-white/90">{data.message}</p>

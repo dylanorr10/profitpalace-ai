@@ -1,8 +1,9 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Clock, TrendingUp, Sparkles } from "lucide-react";
+import { Clock, TrendingUp } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import reelinLogo from "@/assets/reelin-logo.jpg";
 
 interface Lesson {
   id: string;
@@ -31,8 +32,8 @@ export const NextUpCard = ({ lesson, reason, isInProgress = false, progressPerce
       
       <div className="relative p-8">
         <div className="flex items-start justify-between mb-4">
-          <Badge variant="secondary" className="mb-2">
-            <Sparkles className="w-3 h-3 mr-1" />
+          <Badge variant="secondary" className="mb-2 gap-1">
+            <img src={reelinLogo} alt="" className="w-4 h-4 rounded-full object-contain" />
             Next Up
           </Badge>
           {reason && (
