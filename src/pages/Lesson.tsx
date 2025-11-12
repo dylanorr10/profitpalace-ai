@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { hasAccessToLesson } from "@/utils/accessControl";
 import { LessonQuiz } from "@/components/LessonQuiz";
 import { checkAndAwardAchievements, checkTimeBasedAchievement } from "@/utils/achievements";
+import { GlossaryTooltip } from "@/components/GlossaryTooltip";
 
 interface QuizQuestion {
   id: number;
@@ -281,7 +282,15 @@ const Lesson = () => {
           {lesson.content.sections.map((section, idx) => (
             <Card key={idx} className="p-6 bg-gradient-card">
               <h2 className="text-2xl font-bold mb-4">{section.heading}</h2>
-              <p className="text-lg mb-4 whitespace-pre-line">{section.content}</p>
+              <p className="text-lg mb-4 whitespace-pre-line">
+                {section.content.split(/\b(HMRC|Self Assessment|VAT|PAYE|NI|National Insurance|UTR|Corporation Tax|Capital Allowances|Self-Employed|Limited Company|Sole Trader|Payment on Account|CIS|MTD|Making Tax Digital)\b/g).map((part, i) => {
+                  const glossaryTerms = ['HMRC', 'Self Assessment', 'VAT', 'PAYE', 'NI', 'National Insurance', 'UTR', 'Corporation Tax', 'Capital Allowances', 'Self-Employed', 'Limited Company', 'Sole Trader', 'Payment on Account', 'CIS', 'MTD', 'Making Tax Digital'];
+                  if (glossaryTerms.includes(part)) {
+                    return <GlossaryTooltip key={i} term={part}>{part}</GlossaryTooltip>;
+                  }
+                  return part;
+                })}
+              </p>
 
               {section.bullets && (
                 <ul className="space-y-2">

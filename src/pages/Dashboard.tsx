@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { Clock, TrendingUp, Award, LogOut, Settings, Lock, Sparkles, Users, Mail } from "lucide-react";
+import { Clock, TrendingUp, Award, LogOut, Settings, Lock, Sparkles, Users, Mail, BookOpen } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { hasAccessToLesson } from "@/utils/accessControl";
@@ -207,6 +207,10 @@ const Dashboard = () => {
             <h1 className="text-xl font-bold">Reelin</h1>
           </div>
           <div className="flex items-center gap-2">
+            <Button variant="ghost" size="sm" onClick={() => navigate('/glossary')}>
+              <BookOpen className="w-4 h-4 mr-2" />
+              Glossary
+            </Button>
             <Button variant="ghost" size="sm" onClick={() => navigate('/community')}>
               <Users className="w-4 h-4 mr-2" />
               Community
@@ -346,6 +350,28 @@ const Dashboard = () => {
             </div>
           </Card>
         </div>
+
+        {/* First Day CTA (for new users) */}
+        {completedCount === 0 && (
+          <Card className="p-6 mb-8 bg-gradient-to-r from-primary via-primary to-primary/80 text-white">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+              <div>
+                <div className="text-5xl mb-3">🎯</div>
+                <h3 className="text-2xl font-bold mb-2">Start Here: Your First Day in Business</h3>
+                <p className="text-white/90 text-lg">
+                  Complete beginner? This 10-minute lesson covers the absolute essentials for day 1.
+                </p>
+              </div>
+              <Button 
+                size="lg" 
+                className="bg-white text-primary hover:bg-white/90 whitespace-nowrap text-lg px-8"
+                onClick={() => navigate("/first-day")}
+              >
+                Start Now →
+              </Button>
+            </div>
+          </Card>
+        )}
 
         {/* Lessons Grid */}
         <div className="mb-8">
