@@ -504,8 +504,10 @@ const Dashboard = () => {
               <div className="flex items-center gap-2">
                 <TrendingUp className="w-5 h-5 text-primary" />
                 <div>
-                  <div className="font-bold text-3xl">{Math.round(progress)}%</div>
-                  <div className="text-sm text-muted-foreground">Complete</div>
+                  <div className="font-bold text-3xl">{completedCount}</div>
+                  <div className="text-sm text-muted-foreground">
+                    {completedCount === 1 ? 'Lesson' : 'Lessons'} Completed
+                  </div>
                 </div>
               </div>
               <Button variant="outline" size="sm" onClick={() => navigate('/progress')}>

@@ -167,11 +167,11 @@ const Progress = () => {
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{Math.round(completionPercentage)}%</div>
-              <ProgressBar value={completionPercentage} className="mt-2" />
+              <div className="text-2xl font-bold">{data.lessonsCompleted}</div>
               <p className="text-xs text-muted-foreground mt-2">
-                {data.lessonsCompleted} {data.lessonsCompleted === 1 ? 'lesson' : 'lessons'} completed
+                {data.lessonsCompleted === 1 ? 'Lesson' : 'Lessons'} Completed
               </p>
+              <ProgressBar value={completionPercentage} className="mt-2" />
             </CardContent>
           </Card>
 
