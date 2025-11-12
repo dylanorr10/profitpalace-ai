@@ -33,9 +33,45 @@ export const LessonQuiz = ({ lessonId, userId, questions, passingScore = 60, onC
   const [quizComplete, setQuizComplete] = useState(false);
   const [score, setScore] = useState(0);
 
+  // Swipe gesture state
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+
+  // Minimum swipe distance (in px) to trigger navigation
+  const minSwipeDistance = 50;
+
   const currentQuestion = questions[currentQuestionIndex];
   const isLastQuestion = currentQuestionIndex === questions.length - 1;
   const progressPercentage = ((currentQuestionIndex + 1) / questions.length) * 100;
+
+  // Touch event handlers for swipe gestures
+  const onTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+
+    // Left swipe = next question (if explanation is shown)
+    if (isLeftSwipe && showExplanation) {
+      handleNextQuestion();
+    }
+    
+    // Right swipe = previous question (only if not on first question and no answer selected)
+    if (isRightSwipe && currentQuestionIndex > 0 && !showExplanation) {
+      setCurrentQuestionIndex(currentQuestionIndex - 1);
+      setSelectedAnswer(null);
+    }
+  };
 
   const handleAnswerSelect = (answerIndex: number) => {
     if (showExplanation) return;
@@ -165,7 +201,12 @@ export const LessonQuiz = ({ lessonId, userId, questions, passingScore = 60, onC
   }
 
   return (
-    <Card className="mt-8">
+    <Card 
+      className="mt-8"
+      onTouchStart={onTouchStart}
+      onTouchMove={onTouchMove}
+      onTouchEnd={onTouchEnd}
+    >
       <CardHeader>
         <div className="flex items-center justify-between mb-2">
           <Badge variant="secondary">
@@ -175,6 +216,12 @@ export const LessonQuiz = ({ lessonId, userId, questions, passingScore = 60, onC
         </div>
         <Progress value={progressPercentage} className="h-2" />
         <CardTitle className="text-xl mt-4">{currentQuestion.question}</CardTitle>
+        {showExplanation && (
+          <p className="text-xs text-muted-foreground mt-2">💡 Swipe left for next question</p>
+        )}
+        {!showExplanation && currentQuestionIndex > 0 && (
+          <p className="text-xs text-muted-foreground mt-2">💡 Swipe right to go back</p>
+        )}
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-3">
@@ -189,14 +236,14 @@ export const LessonQuiz = ({ lessonId, userId, questions, passingScore = 60, onC
                 key={index}
                 onClick={() => handleAnswerSelect(index)}
                 disabled={showExplanation}
-                className={`w-full text-left p-4 rounded-lg border-2 transition-all ${
+                className={`w-full text-left p-4 rounded-lg border-2 transition-all min-h-[56px] ${
                   showCorrect
                     ? "border-success bg-success/10"
                     : showIncorrect
                     ? "border-destructive bg-destructive/10"
                     : isSelected
                     ? "border-primary bg-primary/5"
-                    : "border-border hover:border-primary/50 hover:bg-secondary/50"
+                    : "border-border hover:border-primary/50 hover:bg-secondary/50 active:scale-98"
                 } ${showExplanation ? "cursor-not-allowed" : "cursor-pointer"}`}
               >
                 <div className="flex items-center justify-between">

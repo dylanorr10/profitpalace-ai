@@ -252,42 +252,42 @@ const Lesson = () => {
         </div>
       </header>
 
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
+      <div className="container mx-auto px-4 py-6 md:py-8 max-w-4xl overflow-x-hidden">
         {/* Lesson Header */}
-        <div className="mb-8">
-          <div className="flex items-start gap-4 mb-4">
-            <div className="text-6xl">{lesson.emoji}</div>
-            <div className="flex-1">
+        <div className="mb-6 md:mb-8">
+          <div className="flex items-start gap-3 md:gap-4 mb-4">
+            <div className="text-4xl md:text-6xl">{lesson.emoji}</div>
+            <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-2 flex-wrap">
-                <Badge className="bg-success/10 text-success">{lesson.difficulty}</Badge>
-                <Badge variant="outline">{lesson.category}</Badge>
-                <div className="flex items-center gap-1 text-muted-foreground text-sm">
-                  <Clock className="w-4 h-4" />
+                <Badge className="bg-success/10 text-success text-xs md:text-sm">{lesson.difficulty}</Badge>
+                <Badge variant="outline" className="text-xs md:text-sm">{lesson.category}</Badge>
+                <div className="flex items-center gap-1 text-muted-foreground text-xs md:text-sm">
+                  <Clock className="w-3 h-3 md:w-4 md:h-4" />
                   <span>{lesson.duration} min</span>
                 </div>
               </div>
-              <h1 className="text-4xl font-bold mb-2">{lesson.title}</h1>
-              <p className="text-xl text-muted-foreground">{lesson.content.intro}</p>
+              <h1 className="text-2xl md:text-4xl font-bold mb-2 break-words">{lesson.title}</h1>
+              <p className="text-base md:text-xl text-muted-foreground">{lesson.content.intro}</p>
             </div>
           </div>
         </div>
 
         {/* Industry-Specific Example */}
         {industryExample && industryExample !== 'Example for your business type' && (
-          <Card className="p-6 bg-primary/10 border-primary mb-8">
-            <h3 className="font-semibold mb-2 flex items-center gap-2">
+          <Card className="p-4 md:p-6 bg-primary/10 border-primary mb-6 md:mb-8">
+            <h3 className="font-semibold mb-2 flex items-center gap-2 text-sm md:text-base">
               <span>💡</span> For Your Industry ({userIndustry})
             </h3>
-            <p>{industryExample}</p>
+            <p className="text-sm md:text-base">{industryExample}</p>
           </Card>
         )}
 
         {/* Main Content */}
-        <div className="space-y-8">
+        <div className="space-y-6 md:space-y-8">
           {lesson.content.sections.map((section, idx) => (
-            <Card key={idx} className="p-6 bg-gradient-card">
-              <h2 className="text-2xl font-bold mb-4">{section.heading}</h2>
-              <p className="text-lg mb-4 whitespace-pre-line">
+            <Card key={idx} className="p-4 md:p-6 bg-gradient-card">
+              <h2 className="text-xl md:text-2xl font-bold mb-3 md:mb-4">{section.heading}</h2>
+              <p className="text-base md:text-lg mb-3 md:mb-4 whitespace-pre-line">
                 {section.content.split(/\b(HMRC|Self Assessment|VAT|PAYE|NI|National Insurance|UTR|Corporation Tax|Capital Allowances|Self-Employed|Limited Company|Sole Trader|Payment on Account|CIS|MTD|Making Tax Digital)\b/g).map((part, i) => {
                   const glossaryTerms = ['HMRC', 'Self Assessment', 'VAT', 'PAYE', 'NI', 'National Insurance', 'UTR', 'Corporation Tax', 'Capital Allowances', 'Self-Employed', 'Limited Company', 'Sole Trader', 'Payment on Account', 'CIS', 'MTD', 'Making Tax Digital'];
                   if (glossaryTerms.includes(part)) {
@@ -311,15 +311,15 @@ const Lesson = () => {
           ))}
 
           {/* What You CAN Do */}
-          <Card className="p-6 border-success">
-            <div className="flex items-center gap-2 mb-4">
-              <CheckCircle2 className="w-6 h-6 text-success" />
-              <h2 className="text-2xl font-bold">What You CAN Do ✅</h2>
+          <Card className="p-4 md:p-6 border-success">
+            <div className="flex items-center gap-2 mb-3 md:mb-4">
+              <CheckCircle2 className="w-5 h-5 md:w-6 md:h-6 text-success" />
+              <h2 className="text-xl md:text-2xl font-bold">What You CAN Do ✅</h2>
             </div>
-            <ul className="space-y-3">
+            <ul className="space-y-2 md:space-y-3">
               {lesson.content.canDo.map((item, idx) => (
-                <li key={idx} className="flex items-start gap-3">
-                  <CheckCircle2 className="w-5 h-5 text-success mt-0.5 flex-shrink-0" />
+                <li key={idx} className="flex items-start gap-2 md:gap-3 text-sm md:text-base">
+                  <CheckCircle2 className="w-4 h-4 md:w-5 md:h-5 text-success mt-0.5 flex-shrink-0" />
                   <span>{item}</span>
                 </li>
               ))}
@@ -327,15 +327,15 @@ const Lesson = () => {
           </Card>
 
           {/* Common Mistakes */}
-          <Card className="p-6 border-destructive">
-            <div className="flex items-center gap-2 mb-4">
-              <XCircle className="w-6 h-6 text-destructive" />
-              <h2 className="text-2xl font-bold">Common Mistakes to Avoid ❌</h2>
+          <Card className="p-4 md:p-6 border-destructive">
+            <div className="flex items-center gap-2 mb-3 md:mb-4">
+              <XCircle className="w-5 h-5 md:w-6 md:h-6 text-destructive" />
+              <h2 className="text-xl md:text-2xl font-bold">Common Mistakes to Avoid ❌</h2>
             </div>
-            <ul className="space-y-3">
+            <ul className="space-y-2 md:space-y-3">
               {lesson.content.cantDo.map((item, idx) => (
-                <li key={idx} className="flex items-start gap-3">
-                  <XCircle className="w-5 h-5 text-destructive mt-0.5 flex-shrink-0" />
+                <li key={idx} className="flex items-start gap-2 md:gap-3 text-sm md:text-base">
+                  <XCircle className="w-4 h-4 md:w-5 md:h-5 text-destructive mt-0.5 flex-shrink-0" />
                   <span>{item}</span>
                 </li>
               ))}
@@ -343,10 +343,10 @@ const Lesson = () => {
           </Card>
 
           {/* Pro Tips */}
-          <Card className="p-6 bg-gradient-primary text-white">
-            <div className="flex items-center gap-2 mb-4">
-              <Lightbulb className="w-6 h-6" />
-              <h2 className="text-2xl font-bold">Pro Tips 💡</h2>
+          <Card className="p-4 md:p-6 bg-gradient-primary text-white">
+            <div className="flex items-center gap-2 mb-3 md:mb-4">
+              <Lightbulb className="w-5 h-5 md:w-6 md:h-6" />
+              <h2 className="text-xl md:text-2xl font-bold">Pro Tips 💡</h2>
             </div>
             <ul className="space-y-3">
               {lesson.content.proTips.map((tip, idx) => (

@@ -397,23 +397,29 @@ const Dashboard = () => {
       />
 
       {/* Header */}
-      <header className="border-b bg-card sticky top-0 z-10">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
+      <header className="border-b bg-card sticky top-0 z-10 h-14 md:h-16">
+        <div className="container mx-auto px-4 h-full flex items-center justify-between">
+          <div className="flex items-center gap-2 touch-manipulation">
             <span className="text-2xl">🎣</span>
             <h1 className="text-xl font-bold">Reelin</h1>
           </div>
-          <div className="flex items-center gap-2">
-            <Button variant="ghost" size="sm" onClick={() => navigate('/curriculum')}>
+          <div className="flex items-center gap-1 md:gap-2">
+            <Button variant="ghost" size="sm" onClick={() => navigate('/curriculum')} className="hidden md:flex">
               <BookOpen className="w-4 h-4 mr-2" />
               Curriculum
             </Button>
-            <Button variant="ghost" size="sm" onClick={() => navigate('/glossary')}>
+            <Button variant="ghost" size="sm" onClick={() => navigate('/curriculum')} className="md:hidden">
+              <BookOpen className="w-4 h-4" />
+            </Button>
+            <Button variant="ghost" size="sm" onClick={() => navigate('/glossary')} className="hidden md:inline-flex">
               Glossary
             </Button>
-            <Button variant="ghost" size="sm" onClick={() => navigate('/community')}>
+            <Button variant="ghost" size="sm" onClick={() => navigate('/community')} className="hidden md:flex">
               <Users className="w-4 h-4 mr-2" />
               Community
+            </Button>
+            <Button variant="ghost" size="sm" onClick={() => navigate('/community')} className="md:hidden">
+              <Users className="w-4 h-4" />
             </Button>
             <Button variant="ghost" size="sm" onClick={() => navigate('/settings')}>
               <Settings className="w-4 h-4" />
@@ -425,13 +431,13 @@ const Dashboard = () => {
         </div>
       </header>
 
-      <div className="container mx-auto px-4 py-8 max-w-6xl">
+      <div className="container mx-auto px-4 py-6 md:py-8 max-w-6xl overflow-x-hidden">
         {/* Welcome Section */}
-        <div className="mb-8">
-          <h2 className="text-3xl font-bold mb-2">
+        <div className="mb-6 md:mb-8">
+          <h2 className="text-2xl md:text-3xl font-bold mb-2">
             Welcome back, {getBusinessTypeLabel()}! 👋
           </h2>
-          <p className="text-muted-foreground">
+          <p className="text-muted-foreground text-sm md:text-base">
             {profile?.learning_goal || 'Continue your learning journey'}
           </p>
         </div>
@@ -459,13 +465,13 @@ const Dashboard = () => {
 
         {/* Subscription Banner (compact) */}
         {profile?.subscription_status !== 'active' && (
-          <Card className="p-4 bg-gradient-to-r from-primary/10 to-primary/5 border-primary/20 mb-8">
-            <div className="flex items-center justify-between gap-4">
+          <Card className="p-3 md:p-4 bg-gradient-to-r from-primary/10 to-primary/5 border-primary/20 mb-6 md:mb-8">
+            <div className="flex items-center justify-between gap-3 md:gap-4">
               <div className="flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-primary" />
-                <p className="text-sm font-medium">Unlock all lessons for £9.99/month</p>
+                <Sparkles className="w-4 h-4 md:w-5 md:h-5 text-primary flex-shrink-0" />
+                <p className="text-xs md:text-sm font-medium">Unlock all lessons for £9.99/month</p>
               </div>
-              <Button size="sm" onClick={() => navigate("/pricing")}>
+              <Button size="sm" onClick={() => navigate("/pricing")} className="flex-shrink-0">
                 Subscribe
               </Button>
             </div>
@@ -483,7 +489,7 @@ const Dashboard = () => {
         )}
 
         {/* Streak Card & Progress */}
-        <div className="grid md:grid-cols-2 gap-6 mb-8">
+        <div className="grid md:grid-cols-2 gap-4 md:gap-6 mb-6 md:mb-8">
           {/* Streak Tracking */}
           <StreakCard
             currentStreak={streakInfo.currentStreak}
