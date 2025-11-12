@@ -425,6 +425,18 @@ const Dashboard = () => {
           </p>
         </div>
 
+        {/* Next Up Card (Primary Recommendation) - Prioritized at top */}
+        {nextUpLesson && completedCount > 0 && (
+          <div className="mb-6 md:mb-8">
+            <NextUpCard 
+              lesson={nextUpLesson}
+              reason={profile?.pain_point ? `Based on: ${profile.pain_point}` : undefined}
+              isInProgress={getNextUpProgress() > 0}
+              progressPercent={getNextUpProgress()}
+            />
+          </div>
+        )}
+
         {/* Profile Completion Prompt */}
         {profile && user && (
           <ProfilePrompt profile={profile} userId={user.id} />
@@ -548,15 +560,6 @@ const Dashboard = () => {
           </Card>
         )}
 
-        {/* Next Up Card (Primary Recommendation) */}
-        {nextUpLesson && completedCount > 0 && (
-          <NextUpCard 
-            lesson={nextUpLesson}
-            reason={profile?.pain_point ? `Based on: ${profile.pain_point}` : undefined}
-            isInProgress={getNextUpProgress() > 0}
-            progressPercent={getNextUpProgress()}
-          />
-        )}
 
         {/* Upcoming Preview */}
         {upcomingLessons.length > 0 && (
