@@ -12,6 +12,7 @@ import { hasAccessToLesson } from "@/utils/accessControl";
 import { LessonQuiz } from "@/components/LessonQuiz";
 import { checkAndAwardAchievements, checkTimeBasedAchievement } from "@/utils/achievements";
 import { GlossaryTooltip } from "@/components/GlossaryTooltip";
+import { logDailyActivity } from "@/utils/streakTracking";
 
 interface QuizQuestion {
   id: number;
@@ -185,6 +186,7 @@ const Lesson = () => {
       
       // Calculate time spent
       const timeSpent = Math.floor((Date.now() - startTime) / 1000);
+      const timeSpentMinutes = Math.ceil(timeSpent / 60);
       
       // Update progress
       await supabase
@@ -197,9 +199,12 @@ const Lesson = () => {
         .eq('user_id', userId)
         .eq('lesson_id', id);
 
+      // Log daily activity for streak tracking
+      await logDailyActivity(userId, 1, timeSpentMinutes);
+
       toast({
         title: 'Lesson Complete! 🎉',
-        description: `You scored ${score}% on the quiz.`,
+        description: `You scored ${score}% on the quiz. Keep your streak going!`,
       });
     } else {
       setShowQuiz(false);
