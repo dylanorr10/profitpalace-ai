@@ -61,18 +61,29 @@ serve(async (req) => {
       }
     }
 
-    // Build personalized system prompt with profile inference
+    // Sanitize profile data to prevent prompt injection
+    const sanitizeForPrompt = (value: string | null | undefined): string => {
+      if (!value) return 'Not specified';
+      return value
+        .replace(/ignore.*instructions/gi, '[removed]')
+        .replace(/you are now/gi, '[removed]')
+        .replace(/system:|assistant:|user:/gi, '[removed]')
+        .replace(/\[PROFILE_UPDATE:/gi, '[removed]')
+        .slice(0, 200);
+    };
+
+    // Build personalized system prompt with sanitized profile data
     const systemPrompt = `You are a friendly AI Study Buddy for UK business owners learning about finances, tax, and bookkeeping.
 
 User Context:
-- Business Structure: ${profile?.business_structure || 'Unknown'}
-- Industry: ${profile?.industry || 'General'}
-- Experience Level: ${profile?.experience_level || 'Beginner'}
-- Main Pain Point: ${profile?.pain_point || 'General business finances'}
-- Learning Goal: ${profile?.learning_goal || 'Improve financial management'}
-${profile?.annual_turnover ? `- Annual Turnover: ${profile.annual_turnover}` : ''}
+- Business Structure: ${sanitizeForPrompt(profile?.business_structure)}
+- Industry: ${sanitizeForPrompt(profile?.industry)}
+- Experience Level: ${sanitizeForPrompt(profile?.experience_level)}
+- Main Pain Point: ${sanitizeForPrompt(profile?.pain_point)}
+- Learning Goal: ${sanitizeForPrompt(profile?.learning_goal)}
+${profile?.annual_turnover ? `- Annual Turnover: ${sanitizeForPrompt(profile.annual_turnover)}` : ''}
 ${profile?.vat_registered !== undefined ? `- VAT Registered: ${profile.vat_registered ? 'Yes' : 'No'}` : ''}
-${profile?.accounting_year_end ? `- Accounting Year-End: ${profile.accounting_year_end}` : ''}
+${profile?.accounting_year_end ? `- Accounting Year-End: ${sanitizeForPrompt(profile.accounting_year_end)}` : ''}
 
 ${lessonContext ? `Current Lesson: ${lessonContext.title}\nLesson Focus: ${lessonContext.category}` : ''}
 
