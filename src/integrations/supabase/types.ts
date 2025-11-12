@@ -513,6 +513,8 @@ export type Database = {
           current_streak: number | null
           employees_count: string | null
           experience_level: string | null
+          first_name: string | null
+          full_name: string | null
           has_purchased: boolean | null
           id: string
           industry: string | null
@@ -555,6 +557,8 @@ export type Database = {
           current_streak?: number | null
           employees_count?: string | null
           experience_level?: string | null
+          first_name?: string | null
+          full_name?: string | null
           has_purchased?: boolean | null
           id?: string
           industry?: string | null
@@ -597,6 +601,8 @@ export type Database = {
           current_streak?: number | null
           employees_count?: string | null
           experience_level?: string | null
+          first_name?: string | null
+          full_name?: string | null
           has_purchased?: boolean | null
           id?: string
           industry?: string | null

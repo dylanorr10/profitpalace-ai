@@ -39,6 +39,8 @@ interface Lesson {
 }
 
 interface UserProfile {
+  first_name?: string;
+  full_name?: string;
   business_structure: string;
   industry: string;
   experience_level: string;
@@ -418,7 +420,7 @@ const Dashboard = () => {
         {/* Welcome Section */}
         <div className="mb-6 md:mb-8">
           <h2 className="text-2xl md:text-3xl font-bold mb-2">
-            Welcome back, {getBusinessTypeLabel()}! 👋
+            Welcome back{profile?.first_name ? `, ${profile.first_name}` : ''}! 👋
           </h2>
           <p className="text-muted-foreground text-sm md:text-base">
             {profile?.learning_goal || 'Continue your learning journey'}

@@ -19,6 +19,7 @@ const Signup = () => {
   const [loading, setLoading] = useState(false);
   
   const [formData, setFormData] = useState({
+    name: "",
     email: location.state?.email || "",
     password: "",
     businessStructure: "",
@@ -32,10 +33,10 @@ const Signup = () => {
   });
 
   const handleSignup = async () => {
-    if (!formData.email || !formData.password) {
+    if (!formData.name || !formData.email || !formData.password) {
       toast({
         title: "Missing information",
-        description: "Please provide email and password.",
+        description: "Please provide your name, email and password.",
         variant: "destructive",
       });
       return;
@@ -54,11 +55,16 @@ const Signup = () => {
       if (error) throw error;
 
       if (data.user) {
+        // Extract first name from full name
+        const firstName = formData.name.split(' ')[0];
+        
         // Save quiz answers to profile
         const { error: profileError } = await supabase
           .from("user_profiles")
           .insert({
             user_id: data.user.id,
+            full_name: formData.name,
+            first_name: firstName,
             business_structure: formData.businessStructure,
             industry: formData.industry,
             experience_level: formData.experience,
@@ -75,7 +81,7 @@ const Signup = () => {
         }
 
         toast({
-          title: "Welcome aboard! 🎉",
+          title: `Welcome aboard, ${firstName}! 🎉`,
           description: "Your account has been created. Let's start learning!",
         });
         
@@ -96,10 +102,10 @@ const Signup = () => {
     const steps: QuizStep[] = ["account", "business", "industry", "experience", "pain", "goal", "schedule", "study_time"];
     const currentIndex = steps.indexOf(step);
     
-    if (currentIndex === 0 && (!formData.email || !formData.password)) {
+    if (currentIndex === 0 && (!formData.name || !formData.email || !formData.password)) {
       toast({
         title: "Missing information",
-        description: "Please provide email and password.",
+        description: "Please provide your name, email and password.",
         variant: "destructive",
       });
       return;
@@ -117,6 +123,20 @@ const Signup = () => {
       case "account":
         return (
           <div className="space-y-4">
+            <div>
+              <Label htmlFor="name">Your Name</Label>
+              <Input
+                id="name"
+                type="text"
+                placeholder="e.g. Sarah Johnson"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                required
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                We'll use this to personalize your experience
+              </p>
+            </div>
             <div>
               <Label htmlFor="email">Email Address</Label>
               <Input
