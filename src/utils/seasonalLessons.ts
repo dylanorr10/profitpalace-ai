@@ -126,8 +126,28 @@ export function getSeasonalLessons(
   const isSoleTraderOrPartnership = businessStructure === 'soletrader' || businessStructure === 'partnership';
   const isLimitedCompany = businessStructure === 'limitedcompany';
 
-  // Self Assessment Season (Nov-Jan) - extended to Nov for early preparation
-  if ((currentSeason === "self_assessment_deadline" || (now.getMonth() === 10)) && isSoleTraderOrPartnership) {
+  // November Mid-Year Planning (all business types)
+  if (now.getMonth() === 10) { // November
+    const novemberLessons = incompleteLessons.filter(lesson =>
+      lesson.seasonal_tags?.includes("november")
+    );
+
+    if (novemberLessons.length > 0) {
+      groups.push({
+        id: `november_planning_${now.getFullYear()}`,
+        title: "Mid-Year Tax Planning",
+        emoji: "🩺",
+        message: "Perfect time for a tax health check before year-end",
+        urgency: "helpful",
+        lessons: novemberLessons,
+        daysRemaining: 30 - now.getDate(),
+        dismissible: true,
+      });
+    }
+  }
+
+  // Self Assessment Season (Dec-Jan)
+  if (currentSeason === "self_assessment_deadline" && isSoleTraderOrPartnership) {
     
     const saLessons = incompleteLessons.filter(lesson =>
       lesson.seasonal_tags?.includes("self_assessment_deadline")
