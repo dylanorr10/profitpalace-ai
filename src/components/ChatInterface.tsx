@@ -101,12 +101,36 @@ const ChatInterface = ({ lessonContext, remainingQuestions }: ChatInterfaceProps
             try {
               const parsed = JSON.parse(data);
               const content = parsed.choices?.[0]?.delta?.content;
+              const profileUpdated = parsed.choices?.[0]?.delta?.profile_updated;
+              const updates = parsed.choices?.[0]?.delta?.updates;
+              
               if (content) {
-                assistantMessage += content;
+                // Remove profile update markers from displayed content
+                const cleanContent = content.replace(/\[PROFILE_UPDATE:[^\]]+\]/g, '');
+                assistantMessage += cleanContent;
                 setMessages(prev => {
                   const newMessages = [...prev];
                   newMessages[newMessages.length - 1].content = assistantMessage;
                   return newMessages;
+                });
+              }
+              
+              if (profileUpdated && updates) {
+                // Show toast notification about profile update
+                const fieldNames: Record<string, string> = {
+                  annual_turnover: 'annual turnover',
+                  vat_registered: 'VAT registration status',
+                  accounting_year_end: 'accounting year-end',
+                  business_start_date: 'business start date'
+                };
+                
+                const updatedFields = Object.keys(updates)
+                  .map(key => fieldNames[key] || key)
+                  .join(', ');
+                
+                toast({
+                  title: 'Profile Updated',
+                  description: `I've updated your ${updatedFields} based on our conversation. You'll now get more personalized recommendations!`,
                 });
               }
             } catch (e) {

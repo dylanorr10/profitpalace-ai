@@ -61,7 +61,7 @@ serve(async (req) => {
       }
     }
 
-    // Build personalized system prompt
+    // Build personalized system prompt with profile inference
     const systemPrompt = `You are a friendly AI Study Buddy for UK business owners learning about finances, tax, and bookkeeping.
 
 User Context:
@@ -70,6 +70,9 @@ User Context:
 - Experience Level: ${profile?.experience_level || 'Beginner'}
 - Main Pain Point: ${profile?.pain_point || 'General business finances'}
 - Learning Goal: ${profile?.learning_goal || 'Improve financial management'}
+${profile?.annual_turnover ? `- Annual Turnover: ${profile.annual_turnover}` : ''}
+${profile?.vat_registered !== undefined ? `- VAT Registered: ${profile.vat_registered ? 'Yes' : 'No'}` : ''}
+${profile?.accounting_year_end ? `- Accounting Year-End: ${profile.accounting_year_end}` : ''}
 
 ${lessonContext ? `Current Lesson: ${lessonContext.title}\nLesson Focus: ${lessonContext.category}` : ''}
 
@@ -82,6 +85,21 @@ CRITICAL INSTRUCTIONS:
 - Suggest related lessons they should take
 - Use simple language - they're learning
 - Be encouraging and supportive
+
+PROFILE DATA EXTRACTION:
+When users mention financial details in conversation, extract and return them in a special format at the END of your response:
+- Annual turnover (e.g., "My turnover is £80,000" or "I make about 60k a year")
+- VAT registration status (e.g., "I'm VAT registered" or "Not registered for VAT yet")
+- Accounting year-end date (e.g., "My year-end is March 31st" or "I use April 5th")
+- Business start date (e.g., "I started in January 2023")
+
+Format extracted data as: [PROFILE_UPDATE:{"field":"value"}]
+Examples:
+- "My turnover is £85,000" → [PROFILE_UPDATE:{"annual_turnover":"£75,000-£100,000"}]
+- "I'm VAT registered" → [PROFILE_UPDATE:{"vat_registered":true}]
+- "My year-end is December 31st" → [PROFILE_UPDATE:{"accounting_year_end":"december_31"}]
+
+Only include this if user explicitly provides new information. Do NOT ask for this data proactively.
 
 Style: Friendly, professional, encouraging. Like a knowledgeable colleague helping out.`;
 
@@ -147,7 +165,60 @@ Style: Friendly, professional, encouraging. Like a knowledgeable colleague helpi
       }
     }
 
-    return new Response(response.body, {
+    // Create a transform stream to intercept profile updates
+    const { readable, writable } = new TransformStream();
+    const writer = writable.getWriter();
+    const reader = response.body!.getReader();
+    const decoder = new TextDecoder();
+    const encoder = new TextEncoder();
+    
+    let fullResponse = '';
+
+    (async () => {
+      try {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) {
+            // Check for profile updates in the complete response
+            const profileUpdateMatch = fullResponse.match(/\[PROFILE_UPDATE:({[^}]+})\]/);
+            if (profileUpdateMatch) {
+              try {
+                const updates = JSON.parse(profileUpdateMatch[1]);
+                console.log('Extracted profile updates:', updates);
+                
+                // Update user profile with extracted data
+                await supabase
+                  .from('user_profiles')
+                  .update({
+                    ...updates,
+                    turnover_last_updated: updates.annual_turnover ? new Date().toISOString() : undefined
+                  })
+                  .eq('user_id', user.id);
+                
+                // Send a signal to client about profile update
+                await writer.write(encoder.encode(`data: ${JSON.stringify({
+                  choices: [{ delta: { content: '', profile_updated: true, updates } }]
+                })}\n\n`));
+              } catch (e) {
+                console.error('Failed to parse profile update:', e);
+              }
+            }
+            
+            await writer.close();
+            break;
+          }
+          
+          const chunk = decoder.decode(value, { stream: true });
+          fullResponse += chunk;
+          await writer.write(value);
+        }
+      } catch (error) {
+        console.error('Stream processing error:', error);
+        await writer.abort(error);
+      }
+    })();
+
+    return new Response(readable, {
       headers: { ...corsHeaders, 'Content-Type': 'text/event-stream' },
     });
 

@@ -4,12 +4,13 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { Clock, TrendingUp, Award, LogOut, Settings, Lock, Sparkles, Users } from "lucide-react";
+import { Clock, TrendingUp, Award, LogOut, Settings, Lock, Sparkles, Users, Mail } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { hasAccessToLesson } from "@/utils/accessControl";
 import { UrgentBanner } from "@/components/UrgentBanner";
 import { MonthlyFocusCard } from "@/components/MonthlyFocusCard";
+import ProfilePrompt from "@/components/ProfilePrompt";
 import { getActiveSeasonalTriggers, SeasonalTrigger } from "@/utils/seasonalTriggers";
 import { getActiveProactiveTriggers, ThresholdTrigger } from "@/utils/proactiveTriggers";
 import { calculateLessonPriority } from "@/utils/lessonPriority";
@@ -210,6 +211,10 @@ const Dashboard = () => {
               <Users className="w-4 h-4 mr-2" />
               Community
             </Button>
+            <Button variant="ghost" size="sm" onClick={() => navigate('/newsletter')}>
+              <Mail className="w-4 h-4 mr-2" />
+              Newsletter
+            </Button>
             <Button variant="ghost" size="sm" onClick={() => navigate('/settings')}>
               <Settings className="w-4 h-4 mr-2" />
               Settings
@@ -237,6 +242,11 @@ const Dashboard = () => {
             {profile?.learning_goal || 'Continue your learning journey'}
           </p>
         </div>
+
+        {/* Profile Completion Prompt */}
+        {profile && user && (
+          <ProfilePrompt profile={profile} userId={user.id} />
+        )}
 
         {/* Urgent Banner (Seasonal/Proactive Triggers) */}
         <UrgentBanner 
