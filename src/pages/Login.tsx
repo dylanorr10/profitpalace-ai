@@ -97,6 +97,21 @@ const Login = () => {
               Sign up
             </button>
           </p>
+          <p className="text-xs text-muted-foreground mt-4">
+            <button
+              onClick={() => navigate("/terms")}
+              className="underline hover:text-foreground"
+            >
+              Terms of Service
+            </button>
+            {" "}•{" "}
+            <button
+              onClick={() => navigate("/privacy")}
+              className="underline hover:text-foreground"
+            >
+              Privacy Policy
+            </button>
+          </p>
         </div>
       </Card>
     </div>

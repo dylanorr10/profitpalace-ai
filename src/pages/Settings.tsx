@@ -402,6 +402,24 @@ const Settings = () => {
                     Sign Out
                   </Button>
                 </div>
+
+                <div className="pt-4 border-t">
+                  <p className="text-xs text-muted-foreground text-center">
+                    <button
+                      onClick={() => navigate("/terms")}
+                      className="underline hover:text-foreground"
+                    >
+                      Terms of Service
+                    </button>
+                    {" "}•{" "}
+                    <button
+                      onClick={() => navigate("/privacy")}
+                      className="underline hover:text-foreground"
+                    >
+                      Privacy Policy
+                    </button>
+                  </p>
+                </div>
               </div>
             </Card>
           </TabsContent>

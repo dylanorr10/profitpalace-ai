@@ -431,6 +431,22 @@ const Signup = () => {
               Log in
             </button>
           </p>
+          <p className="text-xs text-muted-foreground mt-4">
+            By signing up, you agree to our{" "}
+            <button
+              onClick={() => navigate("/terms")}
+              className="underline hover:text-foreground"
+            >
+              Terms of Service
+            </button>
+            {" "}and{" "}
+            <button
+              onClick={() => navigate("/privacy")}
+              className="underline hover:text-foreground"
+            >
+              Privacy Policy
+            </button>
+          </p>
         </div>
       </Card>
     </div>

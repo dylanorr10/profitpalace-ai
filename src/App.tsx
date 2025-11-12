@@ -23,6 +23,8 @@ import Newsletter from "./pages/Newsletter";
 import Glossary from "./pages/Glossary";
 import FirstDay from "./pages/FirstDay";
 import Curriculum from "./pages/Curriculum";
+import TermsOfService from "./pages/TermsOfService";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 
 const queryClient = new QueryClient();
 
@@ -38,6 +40,8 @@ const App = () => (
             <Route path="/" element={<Landing />} />
             <Route path="/pricing" element={<Pricing />} />
             <Route path="/waitlist" element={<Waitlist />} />
+            <Route path="/terms" element={<TermsOfService />} />
+            <Route path="/privacy" element={<PrivacyPolicy />} />
             
             {/* Auth routes - redirect to dashboard if already logged in */}
             <Route path="/signup" element={<PublicRoute><Signup /></PublicRoute>} />

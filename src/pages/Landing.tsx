@@ -262,6 +262,31 @@ const Landing = () => {
           </Button>
         </div>
       </section>
+
+      {/* Footer */}
+      <footer className="bg-card border-t py-8 px-4">
+        <div className="container mx-auto max-w-6xl">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+            <p className="text-sm text-muted-foreground">
+              © {new Date().getFullYear()} Reelin. All rights reserved.
+            </p>
+            <div className="flex gap-6">
+              <button
+                onClick={() => navigate("/terms")}
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Terms of Service
+              </button>
+              <button
+                onClick={() => navigate("/privacy")}
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Privacy Policy
+              </button>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 };
