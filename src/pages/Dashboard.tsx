@@ -219,7 +219,7 @@ const Dashboard = () => {
               <Settings className="w-4 h-4 mr-2" />
               Settings
             </Button>
-            {profile?.subscription_status !== 'active' && (
+            {profile?.subscription_status !== 'active' && !profile?.has_purchased && (
               <Button size="sm" onClick={() => navigate('/pricing')}>
                 Subscribe
               </Button>

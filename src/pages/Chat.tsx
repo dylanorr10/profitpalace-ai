@@ -22,14 +22,15 @@ const Chat = () => {
 
       const { data: profile } = await supabase
         .from('user_profiles')
-        .select('subscription_status')
+        .select('subscription_status, has_purchased')
         .eq('user_id', user.id)
         .single();
 
-      const status = profile?.subscription_status || undefined;
+      const isActive = profile?.subscription_status === 'active' || profile?.has_purchased;
+      const status = isActive ? 'active' : undefined;
       setSubscriptionStatus(status);
 
-      if (status !== 'active') {
+      if (!isActive) {
         const { data: usage } = await supabase
           .from('ai_usage')
           .select('messages_count')
