@@ -13,7 +13,7 @@ export const logDailyActivity = async (
   
   try {
     // Try to insert or update today's activity
-    const { data: existingActivity } = await supabase
+    const { data: existingActivity } = await (supabase as any)
       .from('daily_activity')
       .select('*')
       .eq('user_id', userId)
@@ -22,7 +22,7 @@ export const logDailyActivity = async (
 
     if (existingActivity) {
       // Update existing activity
-      await supabase
+      await (supabase as any)
         .from('daily_activity')
         .update({
           lessons_completed: existingActivity.lessons_completed + lessonsCompleted,
@@ -32,7 +32,7 @@ export const logDailyActivity = async (
         .eq('activity_date', today);
     } else {
       // Insert new activity
-      await supabase
+      await (supabase as any)
         .from('daily_activity')
         .insert({
           user_id: userId,
@@ -54,7 +54,7 @@ export const logDailyActivity = async (
  */
 export const getStreakInfo = async (userId: string) => {
   try {
-    const { data: profile } = await supabase
+    const { data: profile } = await (supabase as any)
       .from('user_profiles')
       .select('current_streak, longest_streak, total_study_days, last_activity_date')
       .eq('user_id', userId)
@@ -84,7 +84,7 @@ export const hasStudiedToday = async (userId: string): Promise<boolean> => {
   const today = new Date().toISOString().split('T')[0];
   
   try {
-    const { data } = await supabase
+    const { data } = await (supabase as any)
       .from('daily_activity')
       .select('id')
       .eq('user_id', userId)
@@ -105,7 +105,7 @@ export const getActivityCalendar = async (userId: string, days: number = 30) => 
   startDate.setDate(startDate.getDate() - days);
   
   try {
-    const { data } = await supabase
+    const { data } = await (supabase as any)
       .from('daily_activity')
       .select('activity_date, lessons_completed')
       .eq('user_id', userId)
