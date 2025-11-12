@@ -19,6 +19,8 @@ import { OnboardingWelcome } from "@/components/OnboardingWelcome";
 import { NextUpCard } from "@/components/NextUpCard";
 import { JourneyPath } from "@/components/JourneyPath";
 import { MilestoneModal } from "@/components/MilestoneModal";
+import { StreakCard } from "@/components/StreakCard";
+import { logDailyActivity, getStreakInfo } from "@/utils/streakTracking";
 
 interface Lesson {
   id: string;
@@ -75,6 +77,12 @@ const Dashboard = () => {
   const [upcomingLessons, setUpcomingLessons] = useState<Lesson[]>([]);
   const [showMilestone, setShowMilestone] = useState(false);
   const [currentMilestone, setCurrentMilestone] = useState<'first_lesson' | '25_percent' | '50_percent' | '75_percent' | '100_percent'>('first_lesson');
+  const [streakInfo, setStreakInfo] = useState({
+    currentStreak: 0,
+    longestStreak: 0,
+    totalStudyDays: 0,
+    lastActivityDate: undefined as string | undefined,
+  });
 
   useEffect(() => {
     checkUser();
@@ -191,6 +199,12 @@ const Dashboard = () => {
       if (!profileData.onboarding_completed && completed === 0 && progressData?.length === 0) {
         setShowOnboarding(true);
       }
+    }
+
+    // Fetch streak information
+    if (user) {
+      const streak = await getStreakInfo(user.id);
+      setStreakInfo(streak);
     }
   };
 
@@ -406,29 +420,42 @@ const Dashboard = () => {
           </Card>
         )}
 
-        {/* Compact Progress Card */}
-        <Card className="p-6 mb-8 bg-gradient-card">
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-4">
+        {/* Streak Card & Progress */}
+        <div className="grid md:grid-cols-2 gap-6 mb-8">
+          {/* Streak Tracking */}
+          <StreakCard
+            currentStreak={streakInfo.currentStreak}
+            longestStreak={streakInfo.longestStreak}
+            totalStudyDays={streakInfo.totalStudyDays}
+            lastActivityDate={streakInfo.lastActivityDate}
+          />
+
+          {/* Compact Progress Card */}
+          <Card className="p-6 bg-gradient-card">
+            <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <TrendingUp className="w-5 h-5 text-primary" />
-                <span className="font-bold text-2xl">{Math.round(progress)}%</span>
+                <div>
+                  <div className="font-bold text-3xl">{Math.round(progress)}%</div>
+                  <div className="text-sm text-muted-foreground">Complete</div>
+                </div>
               </div>
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <span className="text-sm">{completedCount}/{lessons.length} lessons</span>
-              </div>
+              <Button variant="outline" size="sm" onClick={() => navigate('/progress')}>
+                View Details
+              </Button>
+            </div>
+            <Progress value={progress} className="h-3 mb-3" />
+            <div className="flex items-center justify-between text-sm text-muted-foreground">
+              <span>{completedCount} of {lessons.length} lessons</span>
               {completedCount > 0 && (
                 <Badge variant="secondary" className="gap-1">
-                  🔥 {completedCount} day streak
+                  <Award className="w-3 h-3" />
+                  {completedCount === lessons.length ? 'Complete!' : 'In Progress'}
                 </Badge>
               )}
             </div>
-            <Button variant="outline" size="sm" onClick={() => navigate('/progress')}>
-              View Details
-            </Button>
-          </div>
-          <Progress value={progress} className="h-3" />
-        </Card>
+          </Card>
+        </div>
 
         {/* Journey Path Visualization */}
         {lessons.length > 0 && (
