@@ -174,12 +174,59 @@ const Signup = () => {
               value={formData.industry}
               onValueChange={(value) => setFormData({ ...formData, industry: value })}
             >
-              {["Trades (plumbing, building, etc.)", "Creative/Tech", "Professional Services", "Health/Beauty", "Transport/Delivery", "Other"].map((ind) => (
-                <div key={ind} className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-secondary/50 cursor-pointer">
-                  <RadioGroupItem value={ind} id={ind} />
-                  <Label htmlFor={ind} className="cursor-pointer flex-1">{ind}</Label>
-                </div>
-              ))}
+              <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-secondary/50 cursor-pointer">
+                <RadioGroupItem value="Trades" id="trades" />
+                <Label htmlFor="trades" className="cursor-pointer flex-1">
+                  <div className="font-medium">Trades</div>
+                  <div className="text-xs text-muted-foreground">Plumbing, building, electrical, carpentry</div>
+                </Label>
+              </div>
+              <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-secondary/50 cursor-pointer">
+                <RadioGroupItem value="Creative/Tech" id="creative" />
+                <Label htmlFor="creative" className="cursor-pointer flex-1">
+                  <div className="font-medium">Creative & Tech</div>
+                  <div className="text-xs text-muted-foreground">Design, development, marketing, photography</div>
+                </Label>
+              </div>
+              <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-secondary/50 cursor-pointer">
+                <RadioGroupItem value="Professional Services" id="professional" />
+                <Label htmlFor="professional" className="cursor-pointer flex-1">
+                  <div className="font-medium">Professional Services</div>
+                  <div className="text-xs text-muted-foreground">Consulting, accounting, legal, coaching</div>
+                </Label>
+              </div>
+              <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-secondary/50 cursor-pointer">
+                <RadioGroupItem value="Health/Beauty" id="health" />
+                <Label htmlFor="health" className="cursor-pointer flex-1">
+                  <div className="font-medium">Health & Beauty</div>
+                  <div className="text-xs text-muted-foreground">Hairdressing, beauty therapy, personal training, massage</div>
+                </Label>
+              </div>
+              <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-secondary/50 cursor-pointer">
+                <RadioGroupItem value="Transport/Delivery" id="transport" />
+                <Label htmlFor="transport" className="cursor-pointer flex-1">
+                  <div className="font-medium">Transport & Delivery</div>
+                  <div className="text-xs text-muted-foreground">Taxi, courier, removals, haulage</div>
+                </Label>
+              </div>
+              <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-secondary/50 cursor-pointer">
+                <RadioGroupItem value="Retail/Hospitality" id="retail" />
+                <Label htmlFor="retail" className="cursor-pointer flex-1">
+                  <div className="font-medium">Retail & Hospitality</div>
+                  <div className="text-xs text-muted-foreground">Shop owner, catering, events</div>
+                </Label>
+              </div>
+              <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-secondary/50 cursor-pointer">
+                <RadioGroupItem value="Property" id="property" />
+                <Label htmlFor="property" className="cursor-pointer flex-1">
+                  <div className="font-medium">Property</div>
+                  <div className="text-xs text-muted-foreground">Landlord, property management, estate agency</div>
+                </Label>
+              </div>
+              <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-secondary/50 cursor-pointer">
+                <RadioGroupItem value="Other" id="other-industry" />
+                <Label htmlFor="other-industry" className="cursor-pointer flex-1">Other</Label>
+              </div>
             </RadioGroup>
           </div>
         );
@@ -210,13 +257,31 @@ const Signup = () => {
               value={formData.painPoint}
               onValueChange={(value) => setFormData({ ...formData, painPoint: value })}
             >
-              {["Tax confusion", "Bookkeeping takes too long", "Missing deadlines", "Understanding expenses"].map((pain) => (
+              {[
+                "Tax confusion",
+                "Bookkeeping takes too long",
+                "Missing deadlines",
+                "Understanding expenses",
+                "Cash flow management",
+                "Pricing my services",
+                "Separating business and personal finances",
+                "VAT threshold concerns"
+              ].map((pain) => (
                 <div key={pain} className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-secondary/50 cursor-pointer">
                   <RadioGroupItem value={pain} id={pain} />
                   <Label htmlFor={pain} className="cursor-pointer flex-1">{pain}</Label>
                 </div>
               ))}
             </RadioGroup>
+            <div className="pt-2">
+              <Label htmlFor="custom-pain">Or describe your own challenge:</Label>
+              <Input
+                id="custom-pain"
+                placeholder="Type your biggest challenge..."
+                value={formData.painPoint.startsWith("Custom: ") ? formData.painPoint.replace("Custom: ", "") : ""}
+                onChange={(e) => setFormData({ ...formData, painPoint: e.target.value ? `Custom: ${e.target.value}` : "" })}
+              />
+            </div>
           </div>
         );
 
@@ -228,41 +293,51 @@ const Signup = () => {
               value={formData.goal}
               onValueChange={(value) => setFormData({ ...formData, goal: value })}
             >
-              {["Save time on bookkeeping", "Save money on taxes", "Understand my finances better", "Stay compliant with HMRC"].map((goal) => (
+              {[
+                "Save time on bookkeeping",
+                "Save money on taxes",
+                "Understand my finances better",
+                "Stay compliant with HMRC",
+                "Prepare for VAT registration",
+                "Build better financial habits"
+              ].map((goal) => (
                 <div key={goal} className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-secondary/50 cursor-pointer">
                   <RadioGroupItem value={goal} id={goal} />
                   <Label htmlFor={goal} className="cursor-pointer flex-1">{goal}</Label>
                 </div>
               ))}
             </RadioGroup>
+            <div className="pt-2">
+              <Label htmlFor="custom-goal">Or describe your own goal:</Label>
+              <Input
+                id="custom-goal"
+                placeholder="Type your learning goal..."
+                value={formData.goal.startsWith("Custom: ") ? formData.goal.replace("Custom: ", "") : ""}
+                onChange={(e) => setFormData({ ...formData, goal: e.target.value ? `Custom: ${e.target.value}` : "" })}
+              />
+            </div>
           </div>
         );
 
       case "schedule":
         return (
           <div className="space-y-4">
-            <Label>How much time can you dedicate to learning per day?</Label>
-            <RadioGroup
-              value={formData.timeCommitment}
-              onValueChange={(value) => setFormData({ ...formData, timeCommitment: value })}
-            >
-              <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-secondary/50 cursor-pointer">
-                <RadioGroupItem value="15min" id="15min" />
-                <Label htmlFor="15min" className="cursor-pointer flex-1">⚡ Quick learner - 15 minutes/day (1 lesson per week)</Label>
-              </div>
-              <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-secondary/50 cursor-pointer">
-                <RadioGroupItem value="30min" id="30min" />
-                <Label htmlFor="30min" className="cursor-pointer flex-1">📚 Steady pace - 30 minutes/day (2-3 lessons per week)</Label>
-              </div>
-              <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-secondary/50 cursor-pointer">
-                <RadioGroupItem value="1hour" id="1hour" />
-                <Label htmlFor="1hour" className="cursor-pointer flex-1">🚀 Intensive - 1 hour/day (1 lesson per day)</Label>
-              </div>
-              <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-secondary/50 cursor-pointer">
-                <RadioGroupItem value="2hours" id="2hours" />
-                <Label htmlFor="2hours" className="cursor-pointer flex-1">💪 Power mode - 2+ hours/day (Complete course in 1 week)</Label>
-              </div>
-            </RadioGroup>
+            <Label htmlFor="time-input">How many minutes per day can you dedicate to learning?</Label>
+            <div className="space-y-2">
+              <Input
+                id="time-input"
+                type="number"
+                min="5"
+                max="300"
+                placeholder="e.g. 15, 30, 60..."
+                value={formData.timeCommitment ? parseInt(formData.timeCommitment) : ""}
+                onChange={(e) => setFormData({ ...formData, timeCommitment: e.target.value })}
+                className="text-lg"
+              />
+              <p className="text-xs text-muted-foreground">
+                💡 Even 10-15 minutes a day can make a real difference
+              </p>
+            </div>
           </div>
         );
 
