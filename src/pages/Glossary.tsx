@@ -39,18 +39,22 @@ const Glossary = () => {
   }, [searchQuery, selectedCategory, terms, bookmarkedTermIds]);
 
   const fetchTerms = async () => {
-    const { data, error } = await supabase
-      .from('glossary_terms')
-      .select('*')
-      .order('term');
-    
-    if (error) {
-      console.error('Error fetching glossary:', error);
-      toast.error("Failed to load glossary terms");
-      return;
+    try {
+      const { data, error } = await (supabase as any)
+        .from('glossary_terms')
+        .select('*')
+        .order('term');
+      
+      if (error) {
+        console.error('Error fetching glossary:', error);
+        toast.error("Failed to load glossary terms");
+        return;
+      }
+      
+      setTerms((data || []) as GlossaryTerm[]);
+    } catch (error) {
+      console.error('Error in fetchTerms:', error);
     }
-    
-    setTerms(data || []);
     setIsLoading(false);
   };
 
@@ -58,13 +62,17 @@ const Glossary = () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
-    const { data } = await supabase
-      .from('user_glossary_bookmarks')
-      .select('term_id')
-      .eq('user_id', user.id);
-    
-    if (data) {
-      setBookmarkedTermIds(new Set(data.map(b => b.term_id)));
+    try {
+      const { data } = await (supabase as any)
+        .from('user_glossary_bookmarks')
+        .select('term_id')
+        .eq('user_id', user.id);
+      
+      if (data) {
+        setBookmarkedTermIds(new Set(data.map((b: any) => b.term_id)));
+      }
+    } catch (error) {
+      console.error('Error fetching bookmarks:', error);
     }
   };
 
@@ -105,24 +113,28 @@ const Glossary = () => {
 
     const isBookmarked = bookmarkedTermIds.has(termId);
 
-    if (isBookmarked) {
-      await supabase
-        .from('user_glossary_bookmarks')
-        .delete()
-        .eq('user_id', user.id)
-        .eq('term_id', termId);
-      
-      setBookmarkedTermIds(prev => {
-        const newSet = new Set(prev);
-        newSet.delete(termId);
-        return newSet;
-      });
-    } else {
-      await supabase
-        .from('user_glossary_bookmarks')
-        .insert({ user_id: user.id, term_id: termId });
-      
-      setBookmarkedTermIds(prev => new Set([...prev, termId]));
+    try {
+      if (isBookmarked) {
+        await (supabase as any)
+          .from('user_glossary_bookmarks')
+          .delete()
+          .eq('user_id', user.id)
+          .eq('term_id', termId);
+        
+        setBookmarkedTermIds(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(termId);
+          return newSet;
+        });
+      } else {
+        await (supabase as any)
+          .from('user_glossary_bookmarks')
+          .insert({ user_id: user.id, term_id: termId });
+        
+        setBookmarkedTermIds(prev => new Set([...prev, termId]));
+      }
+    } catch (error) {
+      console.error('Error toggling bookmark:', error);
     }
   };
 
