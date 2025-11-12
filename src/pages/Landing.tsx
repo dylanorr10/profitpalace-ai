@@ -74,22 +74,29 @@ const Landing = () => {
         </div>
       </section>
 
-      {/* Social Proof Stats */}
-      <section className="py-12 bg-secondary/30">
-        <div className="container mx-auto max-w-6xl px-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-            {[
-              { icon: Users, label: "Business Owners", value: "2,500+" },
-              { icon: Clock, label: "Hours Saved", value: "10,000+" },
-              { icon: TrendingUp, label: "Avg. Tax Saved", value: "£2,400" },
-              { icon: Zap, label: "Completion Rate", value: "94%" },
-            ].map((stat) => (
-              <div key={stat.label} className="space-y-2">
-                <stat.icon className="w-8 h-8 mx-auto text-primary" />
-                <div className="text-3xl font-bold text-foreground">{stat.value}</div>
-                <div className="text-sm text-muted-foreground">{stat.label}</div>
-              </div>
-            ))}
+      {/* About the Creator */}
+      <section className="py-20 px-4 bg-secondary/20">
+        <div className="container mx-auto max-w-4xl">
+          <div className="text-center space-y-6">
+            <h2 className="text-4xl md:text-5xl font-bold mb-4">
+              Built by Someone Who's <span className="text-primary">Been There</span>
+            </h2>
+            <div className="max-w-3xl mx-auto space-y-4 text-lg text-muted-foreground">
+              <p>
+                After studying accounting and working in the field, I saw many business owners 
+                struggling with their finances. They'd come asking for advice, often after making 
+                costly mistakes or spending hours trying to figure things out on their own.
+              </p>
+              <p>
+                I realized that most business owners don't need a full accounting degree - they 
+                just need practical, bite-sized guidance on the essentials. That's why I created 
+                Reelin: to empower business owners to take control of their finances with confidence.
+              </p>
+              <p className="font-semibold text-foreground">
+                My mission is simple: help you master the financial skills that will save you time, 
+                money, and stress - without overwhelming you with jargon.
+              </p>
+            </div>
           </div>
         </div>
       </section>
@@ -251,7 +258,8 @@ const Landing = () => {
             Ready to Master Your Business Finances?
           </h2>
           <p className="text-xl mb-8 text-white/90">
-            Join 2,500+ UK business owners who've already saved thousands in tax and countless hours.
+            Built by an ex-accountant who's helped countless business owners master their finances. 
+            Take control of your business with confidence.
           </p>
           <Button 
             size="lg" 
