@@ -177,7 +177,11 @@ export type Database = {
           duration: number
           emoji: string
           id: string
+          lesson_type: string | null
+          next_lesson_id: string | null
           order_index: number
+          parent_lesson_id: string | null
+          quiz_required: boolean | null
           title: string
           updated_at: string | null
         }
@@ -189,7 +193,11 @@ export type Database = {
           duration: number
           emoji: string
           id?: string
+          lesson_type?: string | null
+          next_lesson_id?: string | null
           order_index: number
+          parent_lesson_id?: string | null
+          quiz_required?: boolean | null
           title: string
           updated_at?: string | null
         }
@@ -201,16 +209,38 @@ export type Database = {
           duration?: number
           emoji?: string
           id?: string
+          lesson_type?: string | null
+          next_lesson_id?: string | null
           order_index?: number
+          parent_lesson_id?: string | null
+          quiz_required?: boolean | null
           title?: string
           updated_at?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "lessons_next_lesson_id_fkey"
+            columns: ["next_lesson_id"]
+            isOneToOne: false
+            referencedRelation: "lessons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lessons_parent_lesson_id_fkey"
+            columns: ["parent_lesson_id"]
+            isOneToOne: false
+            referencedRelation: "lessons"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_profiles: {
         Row: {
+          annual_turnover: string | null
+          business_goals: string[] | null
           business_structure: string | null
           created_at: string | null
+          employees_count: string | null
           experience_level: string | null
           has_purchased: boolean | null
           id: string
@@ -222,16 +252,27 @@ export type Database = {
           payment_method: string | null
           preferred_study_time: string | null
           purchased_at: string | null
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
           study_days: string[] | null
+          subscription_ends_at: string | null
+          subscription_started_at: string | null
+          subscription_status: string | null
+          subscription_type: string | null
           time_commitment: string | null
           updated_at: string | null
           user_id: string
+          vat_registered: boolean | null
+          vat_threshold_approaching: boolean | null
           waitlist_joined: boolean | null
           waitlist_joined_at: string | null
         }
         Insert: {
+          annual_turnover?: string | null
+          business_goals?: string[] | null
           business_structure?: string | null
           created_at?: string | null
+          employees_count?: string | null
           experience_level?: string | null
           has_purchased?: boolean | null
           id?: string
@@ -243,16 +284,27 @@ export type Database = {
           payment_method?: string | null
           preferred_study_time?: string | null
           purchased_at?: string | null
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
           study_days?: string[] | null
+          subscription_ends_at?: string | null
+          subscription_started_at?: string | null
+          subscription_status?: string | null
+          subscription_type?: string | null
           time_commitment?: string | null
           updated_at?: string | null
           user_id: string
+          vat_registered?: boolean | null
+          vat_threshold_approaching?: boolean | null
           waitlist_joined?: boolean | null
           waitlist_joined_at?: string | null
         }
         Update: {
+          annual_turnover?: string | null
+          business_goals?: string[] | null
           business_structure?: string | null
           created_at?: string | null
+          employees_count?: string | null
           experience_level?: string | null
           has_purchased?: boolean | null
           id?: string
@@ -264,10 +316,18 @@ export type Database = {
           payment_method?: string | null
           preferred_study_time?: string | null
           purchased_at?: string | null
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
           study_days?: string[] | null
+          subscription_ends_at?: string | null
+          subscription_started_at?: string | null
+          subscription_status?: string | null
+          subscription_type?: string | null
           time_commitment?: string | null
           updated_at?: string | null
           user_id?: string
+          vat_registered?: boolean | null
+          vat_threshold_approaching?: boolean | null
           waitlist_joined?: boolean | null
           waitlist_joined_at?: string | null
         }
