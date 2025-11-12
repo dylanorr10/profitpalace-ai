@@ -88,7 +88,7 @@ export const NextUpCard = ({ lesson, reason, isInProgress = false, progressPerce
             <Button 
               size="lg" 
               variant="outline"
-              className="h-12 md:h-14 px-4"
+              className="h-12 md:h-14 px-4 border-primary/30 hover:bg-primary/10 hover:text-primary hover:border-primary"
               onClick={() => navigate(`/lesson/${lesson.id}`)}
             >
               <TrendingUp className="w-4 h-4 md:w-5 md:h-5" />

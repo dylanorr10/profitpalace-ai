@@ -39,7 +39,8 @@ export const UrgentBanner = ({ triggers, onActionClick, isSubscribed = true }: U
         {urgentTrigger.lessonIds.length > 0 && onActionClick && (
           <Button
             size="sm"
-            variant={urgentTrigger.priority === "urgent" ? "secondary" : "outline"}
+            variant={urgentTrigger.priority === "urgent" ? "default" : "outline"}
+            className={urgentTrigger.priority !== "urgent" ? "border-primary/30 hover:bg-primary/10 hover:text-primary hover:border-primary" : ""}
             onClick={() => onActionClick(urgentTrigger.lessonIds[0])}
           >
             {isSubscribed ? "Start Lesson" : "Unlock Lesson"}

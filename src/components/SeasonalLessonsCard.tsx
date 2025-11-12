@@ -103,7 +103,7 @@ export const SeasonalLessonsCard = ({
             <button
               key={lesson.id}
               onClick={() => onLessonClick(lesson.id)}
-              className="w-full p-3 bg-background/50 hover:bg-background rounded-lg border transition-all hover:shadow-sm text-left group"
+              className="w-full p-3 bg-background/50 hover:bg-primary/5 rounded-lg border border-border hover:border-primary/50 transition-all hover:shadow-sm text-left group"
             >
               <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -136,7 +136,7 @@ export const SeasonalLessonsCard = ({
         <div className="flex items-center justify-between pt-2">
           <Button 
             onClick={() => onLessonClick(primaryGroup.lessons[0].id)}
-            className="w-full sm:w-auto"
+            className={`w-full sm:w-auto ${primaryGroup.urgency !== "urgent" ? "border-primary/30 hover:bg-primary/10 hover:text-primary hover:border-primary" : ""}`}
             variant={primaryGroup.urgency === "urgent" ? "default" : "outline"}
           >
             {isSubscribed ? "Start First Lesson" : "Unlock Lessons"}
