@@ -153,9 +153,11 @@ const Landing = () => {
               </Button>
             </form>
 
-            <p className="text-white/70 text-sm">
-              Get 3 free lessons • £9.99/month or £79.99/year
-            </p>
+            <div className="mt-6 inline-block px-6 py-3 bg-white/10 backdrop-blur-sm rounded-lg border-2 border-white/30">
+              <p className="text-white text-lg font-semibold">
+                Get 3 free lessons • £9.99/month or £79.99/year
+              </p>
+            </div>
           </div>
         </div>
       </header>
