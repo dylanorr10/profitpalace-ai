@@ -43,6 +43,28 @@ serve(async (req) => {
     if (!user?.email) throw new Error("User not authenticated or email not available");
     logStep("User authenticated", { userId: user.id, email: user.email });
 
+    // First check database for existing subscription status
+    const { data: profile } = await supabaseClient
+      .from('user_profiles')
+      .select('subscription_status, subscription_type')
+      .eq('user_id', user.id)
+      .single();
+
+    // If user already has active subscription in database, return it without checking Stripe
+    // This allows for testing and manual subscription management
+    if (profile?.subscription_status === 'active') {
+      logStep("User has active subscription in database (bypassing Stripe check)", { userId: user.id });
+      return new Response(JSON.stringify({
+        subscribed: true,
+        product_id: 'manual_active',
+        subscription_end: null,
+        subscription_type: profile.subscription_type || 'active'
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 200,
+      });
+    }
+
     const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
     const customers = await stripe.customers.list({ email: user.email, limit: 1 });
     
