@@ -148,56 +148,53 @@ const Landing = () => {
           <div className="text-center space-y-8 max-w-5xl mx-auto">
             {/* Badge */}
             <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-white/15 backdrop-blur-md rounded-full text-white text-sm font-medium border border-white/20 shadow-lg animate-slide-up">
-              <Zap className="w-4 h-4" />
-              <span>Join 500+ UK business owners mastering their finances</span>
+              💡 <span>Created by an ex-ACCA accountant — built for real self-employed people</span>
             </div>
             
             {/* Main Headline */}
             <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold text-white leading-[1.1] animate-slide-up" style={{ animationDelay: '0.1s' }}>
-              Master Your Business
+              Take Control of Your
               <br />
-              <span className="text-white/90">Finances with Confidence</span>
+              <span className="text-white/90">Self-Employed Finances</span>
+              <br />
+              <span className="text-white/90">— Without the Stress</span>
             </h1>
             
             {/* Subheadline */}
             <p className="text-xl md:text-2xl lg:text-3xl text-white/90 max-w-3xl mx-auto leading-relaxed animate-slide-up" style={{ animationDelay: '0.2s' }}>
-              UK-focused financial education for the self-employed. Learn tax, bookkeeping, and business finances in <span className="font-semibold text-white">bite-sized lessons</span>.
+              Learn how to master tax, bookkeeping, and money management in simple, bite-sized lessons — guided by your <span className="font-semibold text-white">personal AI finance coach</span>.
             </p>
 
             {/* CTA Form */}
             <form onSubmit={handleEmailSubmit} className="max-w-xl mx-auto mt-10 animate-slide-up" style={{ animationDelay: '0.3s' }}>
-              <div className="flex flex-col sm:flex-row gap-4 p-2 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 shadow-2xl">
-                <Input
-                  type="email"
-                  placeholder="Enter your work email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="bg-white/95 text-foreground flex-1 h-14 text-lg border-0 rounded-xl focus:ring-2 focus:ring-white/50"
-                  required
-                  maxLength={255}
-                />
-                <Button type="submit" size="lg" className="h-14 px-10 bg-white text-primary hover:bg-white/95 font-bold text-lg rounded-xl shadow-xl hover:scale-105 transition-transform">
-                  Start Free
-                </Button>
+              <div className="flex flex-col gap-4">
+                <div className="flex flex-col sm:flex-row gap-4 p-2 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 shadow-2xl">
+                  <Input
+                    type="email"
+                    placeholder="Enter your work email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="bg-white/95 text-foreground flex-1 h-14 text-lg border-0 rounded-xl focus:ring-2 focus:ring-white/50"
+                    required
+                    maxLength={255}
+                  />
+                  <Button type="submit" size="lg" className="h-14 px-10 bg-white text-primary hover:bg-white/95 font-bold text-lg rounded-xl shadow-xl hover:scale-105 transition-transform">
+                    Start Free →
+                  </Button>
+                </div>
+                <p className="text-white/90 text-base font-medium">
+                  Skip the jargon. Learn smarter, not harder.
+                </p>
               </div>
             </form>
 
             {/* Trust Indicators */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mt-8 text-white/90 animate-slide-up" style={{ animationDelay: '0.4s' }}>
-              <div className="flex items-center gap-2">
-                <Clock className="w-5 h-5" />
-                <span className="text-sm font-medium">3 free lessons to start</span>
-              </div>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mt-6 text-white/90 animate-slide-up" style={{ animationDelay: '0.4s' }}>
+              <span className="text-sm font-medium">3 free lessons</span>
               <div className="hidden sm:block w-1 h-1 bg-white/50 rounded-full"></div>
-              <div className="flex items-center gap-2">
-                <Users className="w-5 h-5" />
-                <span className="text-sm font-medium">No credit card required</span>
-              </div>
+              <span className="text-sm font-medium">Cancel anytime</span>
               <div className="hidden sm:block w-1 h-1 bg-white/50 rounded-full"></div>
-              <div className="flex items-center gap-2">
-                <TrendingUp className="w-5 h-5" />
-                <span className="text-sm font-medium">Cancel anytime</span>
-              </div>
+              <span className="text-sm font-medium">No card required</span>
             </div>
 
             {/* Social Proof Stats */}
