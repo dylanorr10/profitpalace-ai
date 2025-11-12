@@ -20,7 +20,9 @@ import { NextUpCard } from "@/components/NextUpCard";
 import { JourneyPath } from "@/components/JourneyPath";
 import { MilestoneModal } from "@/components/MilestoneModal";
 import { StreakCard } from "@/components/StreakCard";
+import { SeasonalLessonsCard } from "@/components/SeasonalLessonsCard";
 import { logDailyActivity, getStreakInfo } from "@/utils/streakTracking";
+import { getSeasonalLessons, SeasonalLessonGroup } from "@/utils/seasonalLessons";
 
 interface Lesson {
   id: string;
@@ -54,6 +56,7 @@ interface UserProfile {
   onboarding_completed?: boolean;
   time_commitment?: string;
   last_milestone_celebrated?: string;
+  prompts_dismissed?: any;
 }
 
 interface UserProgress {
@@ -83,6 +86,7 @@ const Dashboard = () => {
     totalStudyDays: 0,
     lastActivityDate: undefined as string | undefined,
   });
+  const [seasonalLessonGroups, setSeasonalLessonGroups] = useState<SeasonalLessonGroup[]>([]);
 
   useEffect(() => {
     checkUser();
@@ -186,6 +190,20 @@ const Dashboard = () => {
       const foundLesson = lessonsData.find(l => l.id === recommendations.primary?.id);
       const upcoming = sortedLessons.filter(l => l.id !== foundLesson?.id).slice(0, 3);
       setUpcomingLessons(upcoming);
+
+      // Calculate seasonal lessons
+      const seasonalGroups = getSeasonalLessons(
+        lessonsData as Lesson[],
+        profileData,
+        progressData || []
+      );
+      
+      // Filter out dismissed seasonal sections
+      const dismissedPrompts = (profileData.prompts_dismissed as any) || {};
+      const activeSeasonalGroups = seasonalGroups.filter(
+        group => !dismissedPrompts[`seasonal_${group.id}`]
+      );
+      setSeasonalLessonGroups(activeSeasonalGroups);
 
       // Calculate progress
       const total = lessonsData?.length || 1;
@@ -344,6 +362,29 @@ const Dashboard = () => {
     return progressItem?.completion_rate || 0;
   };
 
+  const handleDismissSeasonalSection = async (groupId: string) => {
+    if (!user) return;
+    
+    const currentPrompts = (profile?.prompts_dismissed as any) || {};
+    const updatedPrompts = {
+      ...currentPrompts,
+      [`seasonal_${groupId}`]: true,
+    };
+    
+    await (supabase as any)
+      .from('user_profiles')
+      .update({ prompts_dismissed: updatedPrompts })
+      .eq('user_id', user.id);
+    
+    // Update local state
+    setSeasonalLessonGroups(prev => prev.filter(g => g.id !== groupId));
+    
+    toast({
+      title: "Seasonal section dismissed",
+      description: "You can always find these lessons in the curriculum.",
+    });
+  };
+
   return (
     <div className="min-h-screen bg-background">
       {/* Onboarding Modal */}
@@ -436,6 +477,16 @@ const Dashboard = () => {
               </Button>
             </div>
           </Card>
+        )}
+
+        {/* Seasonal Lessons Section */}
+        {seasonalLessonGroups.length > 0 && (
+          <SeasonalLessonsCard
+            seasonalGroups={seasonalLessonGroups}
+            onLessonClick={(lessonId) => navigate(`/lesson/${lessonId}`)}
+            onDismiss={handleDismissSeasonalSection}
+            isSubscribed={profile?.subscription_status === 'active'}
+          />
         )}
 
         {/* Streak Card & Progress */}

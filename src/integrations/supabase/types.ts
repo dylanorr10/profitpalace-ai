@@ -201,6 +201,33 @@ export type Database = {
         }
         Relationships: []
       }
+      daily_activity: {
+        Row: {
+          activity_date: string
+          created_at: string | null
+          id: string
+          lessons_completed: number | null
+          time_spent_minutes: number | null
+          user_id: string
+        }
+        Insert: {
+          activity_date: string
+          created_at?: string | null
+          id?: string
+          lessons_completed?: number | null
+          time_spent_minutes?: number | null
+          user_id: string
+        }
+        Update: {
+          activity_date?: string
+          created_at?: string | null
+          id?: string
+          lessons_completed?: number | null
+          time_spent_minutes?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       daily_goals: {
         Row: {
           completed: boolean | null
@@ -263,6 +290,48 @@ export type Database = {
           source?: string | null
           subscribed_at?: string | null
           tags?: string[] | null
+        }
+        Relationships: []
+      }
+      glossary_terms: {
+        Row: {
+          category: Database["public"]["Enums"]["glossary_category"]
+          created_at: string | null
+          definition: string
+          example: string | null
+          id: string
+          industry_specific: Json | null
+          related_lesson_ids: string[] | null
+          simple_explanation: string
+          synonyms: string[] | null
+          term: string
+          updated_at: string | null
+        }
+        Insert: {
+          category: Database["public"]["Enums"]["glossary_category"]
+          created_at?: string | null
+          definition: string
+          example?: string | null
+          id?: string
+          industry_specific?: Json | null
+          related_lesson_ids?: string[] | null
+          simple_explanation: string
+          synonyms?: string[] | null
+          term: string
+          updated_at?: string | null
+        }
+        Update: {
+          category?: Database["public"]["Enums"]["glossary_category"]
+          created_at?: string | null
+          definition?: string
+          example?: string | null
+          id?: string
+          industry_specific?: Json | null
+          related_lesson_ids?: string[] | null
+          simple_explanation?: string
+          synonyms?: string[] | null
+          term?: string
+          updated_at?: string | null
         }
         Relationships: []
       }
@@ -377,6 +446,32 @@ export type Database = {
         }
         Relationships: []
       }
+      user_glossary_bookmarks: {
+        Row: {
+          created_at: string | null
+          term_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          term_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          term_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_glossary_bookmarks_term_id_fkey"
+            columns: ["term_id"]
+            isOneToOne: false
+            referencedRelation: "glossary_terms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_milestones: {
         Row: {
           acknowledged: boolean | null
@@ -415,12 +510,15 @@ export type Database = {
           business_start_date: string | null
           business_structure: string | null
           created_at: string | null
+          current_streak: number | null
           employees_count: string | null
           experience_level: string | null
           has_purchased: boolean | null
           id: string
           industry: string | null
+          last_activity_date: string | null
           learning_goal: string | null
+          longest_streak: number | null
           mtd_status: string | null
           newsletter_subscribed: boolean | null
           next_vat_return_due: string | null
@@ -438,6 +536,7 @@ export type Database = {
           subscription_status: string | null
           subscription_type: string | null
           time_commitment: string | null
+          total_study_days: number | null
           turnover_last_updated: string | null
           updated_at: string | null
           user_id: string
@@ -453,12 +552,15 @@ export type Database = {
           business_start_date?: string | null
           business_structure?: string | null
           created_at?: string | null
+          current_streak?: number | null
           employees_count?: string | null
           experience_level?: string | null
           has_purchased?: boolean | null
           id?: string
           industry?: string | null
+          last_activity_date?: string | null
           learning_goal?: string | null
+          longest_streak?: number | null
           mtd_status?: string | null
           newsletter_subscribed?: boolean | null
           next_vat_return_due?: string | null
@@ -476,6 +578,7 @@ export type Database = {
           subscription_status?: string | null
           subscription_type?: string | null
           time_commitment?: string | null
+          total_study_days?: number | null
           turnover_last_updated?: string | null
           updated_at?: string | null
           user_id: string
@@ -491,12 +594,15 @@ export type Database = {
           business_start_date?: string | null
           business_structure?: string | null
           created_at?: string | null
+          current_streak?: number | null
           employees_count?: string | null
           experience_level?: string | null
           has_purchased?: boolean | null
           id?: string
           industry?: string | null
+          last_activity_date?: string | null
           learning_goal?: string | null
+          longest_streak?: number | null
           mtd_status?: string | null
           newsletter_subscribed?: boolean | null
           next_vat_return_due?: string | null
@@ -514,6 +620,7 @@ export type Database = {
           subscription_status?: string | null
           subscription_type?: string | null
           time_commitment?: string | null
+          total_study_days?: number | null
           turnover_last_updated?: string | null
           updated_at?: string | null
           user_id?: string
@@ -582,7 +689,13 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      glossary_category:
+        | "tax"
+        | "expenses"
+        | "structure"
+        | "dates"
+        | "compliance"
+        | "general"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -709,6 +822,15 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      glossary_category: [
+        "tax",
+        "expenses",
+        "structure",
+        "dates",
+        "compliance",
+        "general",
+      ],
+    },
   },
 } as const
