@@ -121,53 +121,99 @@ const Landing = () => {
   return (
     <main className="min-h-screen bg-background">
       {/* Hero Section */}
-      <header className="relative overflow-hidden bg-gradient-hero py-20 px-4" role="banner">
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMSIgb3BhY2l0eT0iMC4xIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2dyaWQpIi8+PC9zdmc+')] opacity-20"></div>
+      <header className="relative overflow-hidden bg-gradient-hero min-h-[90vh] flex items-center px-4 py-12" role="banner">
+        {/* Animated Background Elements */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute top-20 left-10 w-72 h-72 bg-white/5 rounded-full blur-3xl animate-float"></div>
+          <div className="absolute bottom-20 right-10 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }}></div>
+          <div className="absolute top-1/2 left-1/3 w-64 h-64 bg-primary/5 rounded-full blur-3xl animate-float" style={{ animationDelay: '4s' }}></div>
+        </div>
         
-        <div className="container mx-auto max-w-6xl relative z-10">
-          {/* Sign In Button for Existing Users */}
-          <div className="flex justify-end mb-4">
+        <div className="container mx-auto max-w-7xl relative z-10">
+          {/* Top Navigation Bar */}
+          <div className="flex justify-between items-center mb-12 md:mb-16">
+            <div className="flex items-center gap-3">
+              <div className="text-3xl">🎣</div>
+              <span className="text-white font-bold text-xl hidden sm:inline">Reelin</span>
+            </div>
             <Button 
-              variant="outline" 
-              className="bg-white/10 text-white border-white/30 hover:bg-white/20 backdrop-blur-sm"
+              variant="ghost" 
+              className="text-white hover:bg-white/10 border border-white/20 backdrop-blur-sm"
               onClick={() => navigate("/login")}
             >
-              Already a member? Sign In
+              Sign In
             </Button>
           </div>
 
-          <div className="text-center space-y-6 animate-slide-up">
-            <div className="inline-block px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-white text-sm font-medium mb-4">
-              ⚡ Save 10+ hours per month on bookkeeping
+          <div className="text-center space-y-8 max-w-5xl mx-auto">
+            {/* Badge */}
+            <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-white/15 backdrop-blur-md rounded-full text-white text-sm font-medium border border-white/20 shadow-lg animate-slide-up">
+              <Zap className="w-4 h-4" />
+              <span>Join 500+ UK business owners mastering their finances</span>
             </div>
             
-            <h1 className="text-5xl md:text-7xl font-bold text-white leading-tight">
-              Reel in Your Finances 🎣
+            {/* Main Headline */}
+            <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold text-white leading-[1.1] animate-slide-up" style={{ animationDelay: '0.1s' }}>
+              Master Your Business
+              <br />
+              <span className="text-white/90">Finances with Confidence</span>
             </h1>
             
-            <p className="text-xl md:text-2xl text-white/90 max-w-3xl mx-auto">
-              Helping the self-employed reel in their finances. Learn tax, bookkeeping, and business finances in bite-sized lessons.
+            {/* Subheadline */}
+            <p className="text-xl md:text-2xl lg:text-3xl text-white/90 max-w-3xl mx-auto leading-relaxed animate-slide-up" style={{ animationDelay: '0.2s' }}>
+              UK-focused financial education for the self-employed. Learn tax, bookkeeping, and business finances in <span className="font-semibold text-white">bite-sized lessons</span>.
             </p>
 
-            <form onSubmit={handleEmailSubmit} className="max-w-md mx-auto mt-8 flex flex-col sm:flex-row gap-3">
-              <Input
-                type="email"
-                placeholder="Enter your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="bg-white text-foreground flex-1 h-12 text-lg"
-                required
-                maxLength={255}
-              />
-              <Button type="submit" size="lg" className="h-12 px-8 bg-white text-primary hover:bg-white/90 font-semibold shadow-lg">
-                Start Free →
-              </Button>
+            {/* CTA Form */}
+            <form onSubmit={handleEmailSubmit} className="max-w-xl mx-auto mt-10 animate-slide-up" style={{ animationDelay: '0.3s' }}>
+              <div className="flex flex-col sm:flex-row gap-4 p-2 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 shadow-2xl">
+                <Input
+                  type="email"
+                  placeholder="Enter your work email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="bg-white/95 text-foreground flex-1 h-14 text-lg border-0 rounded-xl focus:ring-2 focus:ring-white/50"
+                  required
+                  maxLength={255}
+                />
+                <Button type="submit" size="lg" className="h-14 px-10 bg-white text-primary hover:bg-white/95 font-bold text-lg rounded-xl shadow-xl hover:scale-105 transition-transform">
+                  Start Free
+                </Button>
+              </div>
             </form>
 
-            <div className="mt-6 inline-block px-4 sm:px-6 py-3 bg-white/10 backdrop-blur-sm rounded-lg border-2 border-white/30">
-              <p className="text-white text-base sm:text-lg font-semibold">
-                Get 3 free lessons • £9.99/month or £79.99/year
-              </p>
+            {/* Trust Indicators */}
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mt-8 text-white/90 animate-slide-up" style={{ animationDelay: '0.4s' }}>
+              <div className="flex items-center gap-2">
+                <Clock className="w-5 h-5" />
+                <span className="text-sm font-medium">3 free lessons to start</span>
+              </div>
+              <div className="hidden sm:block w-1 h-1 bg-white/50 rounded-full"></div>
+              <div className="flex items-center gap-2">
+                <Users className="w-5 h-5" />
+                <span className="text-sm font-medium">No credit card required</span>
+              </div>
+              <div className="hidden sm:block w-1 h-1 bg-white/50 rounded-full"></div>
+              <div className="flex items-center gap-2">
+                <TrendingUp className="w-5 h-5" />
+                <span className="text-sm font-medium">Cancel anytime</span>
+              </div>
+            </div>
+
+            {/* Social Proof Stats */}
+            <div className="grid grid-cols-3 gap-8 max-w-3xl mx-auto mt-16 pt-12 border-t border-white/20 animate-slide-up" style={{ animationDelay: '0.5s' }}>
+              <div>
+                <div className="text-4xl md:text-5xl font-bold text-white mb-2">20+</div>
+                <div className="text-white/80 text-sm md:text-base">Expert Lessons</div>
+              </div>
+              <div>
+                <div className="text-4xl md:text-5xl font-bold text-white mb-2">500+</div>
+                <div className="text-white/80 text-sm md:text-base">Active Learners</div>
+              </div>
+              <div>
+                <div className="text-4xl md:text-5xl font-bold text-white mb-2">10h</div>
+                <div className="text-white/80 text-sm md:text-base">Saved Monthly</div>
+              </div>
             </div>
           </div>
         </div>
