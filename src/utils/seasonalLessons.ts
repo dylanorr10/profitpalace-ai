@@ -121,9 +121,13 @@ export function getSeasonalLessons(
     return !progress || progress.completion_rate < 100;
   });
 
-  // Self Assessment Season (Dec-Jan)
-  if (currentSeason === "self_assessment_deadline" && 
-      (profile.business_structure === "Sole Trader" || profile.business_structure === "Partnership")) {
+  // Normalize business structure for comparison
+  const businessStructure = (profile.business_structure || '').toLowerCase().replace(/[-\s]/g, '');
+  const isSoleTraderOrPartnership = businessStructure === 'soletrader' || businessStructure === 'partnership';
+  const isLimitedCompany = businessStructure === 'limitedcompany';
+
+  // Self Assessment Season (Nov-Jan) - extended to Nov for early preparation
+  if ((currentSeason === "self_assessment_deadline" || (now.getMonth() === 10)) && isSoleTraderOrPartnership) {
     
     const saLessons = incompleteLessons.filter(lesson =>
       lesson.seasonal_tags?.includes("self_assessment_deadline")
@@ -150,7 +154,7 @@ export function getSeasonalLessons(
   }
 
   // Tax Year End (March - April 5)
-  if (currentSeason === "tax_year_end" && profile.business_structure === "Limited Company") {
+  if (currentSeason === "tax_year_end" && isLimitedCompany) {
     const yearEndLessons = incompleteLessons.filter(lesson =>
       lesson.seasonal_tags?.includes("tax_year_end")
     );
