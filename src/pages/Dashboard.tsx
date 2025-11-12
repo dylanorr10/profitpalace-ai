@@ -55,7 +55,6 @@ interface UserProfile {
   turnover_last_updated?: string | null;
   onboarding_completed?: boolean;
   time_commitment?: string;
-  last_milestone_celebrated?: string;
   prompts_dismissed?: any;
 }
 
@@ -210,8 +209,8 @@ const Dashboard = () => {
       const progressPercent = (completed / total) * 100;
       setProgress(progressPercent);
 
-      // Check for milestones (once migration is approved, this field will exist)
-      checkMilestones(completed, total, (profileData as any).last_milestone_celebrated);
+      // Check for milestones
+      checkMilestones(completed, total);
 
       // Show onboarding for new users
       if (!profileData.onboarding_completed && completed === 0 && progressData?.length === 0) {
@@ -226,38 +225,25 @@ const Dashboard = () => {
     }
   };
 
-  const checkMilestones = (completed: number, total: number, lastCelebrated?: string) => {
+  const checkMilestones = (completed: number, total: number) => {
     const percent = (completed / total) * 100;
     
-    if (completed === 1 && lastCelebrated !== 'first_lesson') {
+    // Simple milestone checking without database updates
+    if (completed === 1) {
       setCurrentMilestone('first_lesson');
       setShowMilestone(true);
-      updateMilestoneCelebrated('first_lesson');
-    } else if (percent >= 25 && percent < 50 && lastCelebrated !== '25_percent' && !['50_percent', '75_percent', '100_percent'].includes(lastCelebrated || '')) {
+    } else if (percent >= 25 && percent < 50) {
       setCurrentMilestone('25_percent');
       setShowMilestone(true);
-      updateMilestoneCelebrated('25_percent');
-    } else if (percent >= 50 && percent < 75 && lastCelebrated !== '50_percent' && !['75_percent', '100_percent'].includes(lastCelebrated || '')) {
+    } else if (percent >= 50 && percent < 75) {
       setCurrentMilestone('50_percent');
       setShowMilestone(true);
-      updateMilestoneCelebrated('50_percent');
-    } else if (percent >= 75 && percent < 100 && lastCelebrated !== '75_percent' && lastCelebrated !== '100_percent') {
+    } else if (percent >= 75 && percent < 100) {
       setCurrentMilestone('75_percent');
       setShowMilestone(true);
-      updateMilestoneCelebrated('75_percent');
-    } else if (percent === 100 && lastCelebrated !== '100_percent') {
+    } else if (percent === 100) {
       setCurrentMilestone('100_percent');
       setShowMilestone(true);
-      updateMilestoneCelebrated('100_percent');
-    }
-  };
-
-  const updateMilestoneCelebrated = async (milestone: string) => {
-    if (user) {
-      await (supabase as any)
-        .from('user_profiles')
-        .update({ last_milestone_celebrated: milestone })
-        .eq('user_id', user.id);
     }
   };
 
