@@ -299,16 +299,34 @@ const Dashboard = () => {
 
   // Determine lesson status for journey path
   const getJourneyPathLessons = () => {
-    return lessons.slice(0, 8).map(lesson => {
+    // Sort lessons by order_index for proper sequential display
+    const sortedLessons = [...lessons].sort((a, b) => a.order_index - b.order_index);
+    
+    // Find the first incomplete lesson to mark as current
+    const firstIncomplete = sortedLessons.find(lesson => {
+      const progressItem = userProgress.find(p => p.lesson_id === lesson.id);
+      return progressItem?.completion_rate !== 100;
+    });
+
+    return sortedLessons.slice(0, 8).map(lesson => {
       const progressItem = userProgress.find(p => p.lesson_id === lesson.id);
       let status: 'completed' | 'current' | 'next' | 'locked' = 'locked';
       
+      // Mark completed lessons
       if (progressItem?.completion_rate === 100) {
         status = 'completed';
-      } else if (lesson.id === nextUpLesson?.id) {
+      }
+      // Mark the current lesson (first incomplete)
+      else if (firstIncomplete && lesson.id === firstIncomplete.id) {
         status = 'current';
-      } else if (upcomingLessons.some(l => l.id === lesson.id)) {
-        status = 'next';
+      }
+      // Mark next few lessons after current as 'next'
+      else if (firstIncomplete) {
+        const currentIndex = sortedLessons.findIndex(l => l.id === firstIncomplete.id);
+        const thisIndex = sortedLessons.findIndex(l => l.id === lesson.id);
+        if (thisIndex > currentIndex && thisIndex <= currentIndex + 2) {
+          status = 'next';
+        }
       }
 
       return {
