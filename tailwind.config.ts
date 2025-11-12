@@ -51,11 +51,17 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        slate: {
+          bg: "hsl(var(--slate-bg))",
+          'bg-light': "hsl(var(--slate-bg-light))",
+          'bg-dark': "hsl(var(--slate-bg-dark))",
+        },
       },
       backgroundImage: {
         'gradient-primary': 'var(--gradient-primary)',
         'gradient-hero': 'var(--gradient-hero)',
         'gradient-card': 'var(--gradient-card)',
+        'gradient-slate': 'var(--gradient-slate)',
       },
       boxShadow: {
         'sm': 'var(--shadow-sm)',

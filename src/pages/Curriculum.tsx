@@ -115,17 +115,17 @@ const Curriculum = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="border-b bg-card sticky top-0 z-10">
+      <header className="border-b border-primary/20 bg-[hsl(var(--slate-bg))] sticky top-0 z-10">
         <div className="container mx-auto px-4 py-4">
           <Button
             variant="ghost"
             onClick={() => navigate('/dashboard')}
-            className="mb-3"
+            className="mb-3 hover:text-primary"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Dashboard
           </Button>
-          <h1 className="text-3xl font-bold">Full Curriculum</h1>
+          <h1 className="text-3xl font-bold text-primary">Full Curriculum</h1>
           <p className="text-muted-foreground">
             Browse all {lessons.length} lessons at your own pace
           </p>
@@ -137,12 +137,12 @@ const Curriculum = () => {
         <div className="mb-8 space-y-4">
           {/* Search */}
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-primary w-5 h-5" />
             <Input
               placeholder="Search lessons..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 h-12"
+              className="pl-10 h-12 focus:ring-primary focus:border-primary"
             />
           </div>
 
@@ -194,7 +194,7 @@ const Curriculum = () => {
             return (
               <Card 
                 key={lesson.id}
-                className={`p-6 hover:shadow-lg transition-all relative overflow-hidden ${
+                className={`p-6 hover:shadow-[var(--shadow-glow)] hover:border-primary/50 transition-all relative overflow-hidden ${
                   hasAccess ? 'cursor-pointer group' : 'opacity-60 cursor-not-allowed'
                 }`}
                 onClick={() => hasAccess && navigate(`/lesson/${lesson.id}`)}

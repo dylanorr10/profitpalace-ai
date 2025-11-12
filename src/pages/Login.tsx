@@ -51,7 +51,7 @@ const Login = () => {
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <Card className="w-full max-w-md p-8 space-y-6">
+      <Card className="w-full max-w-md p-8 space-y-6 border-primary/20">
         <div className="text-center space-y-2">
           <h1 className="text-3xl font-bold text-primary">Welcome Back</h1>
           <p className="text-muted-foreground">Log in to continue your learning journey</p>
@@ -67,6 +67,7 @@ const Login = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              className="focus:ring-primary focus:border-primary"
             />
           </div>
 
@@ -79,6 +80,7 @@ const Login = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              className="focus:ring-primary focus:border-primary"
             />
           </div>
 
@@ -92,7 +94,7 @@ const Login = () => {
             Don't have an account?{" "}
             <button
               onClick={() => navigate("/signup")}
-              className="text-primary hover:underline font-medium"
+              className="text-primary hover:text-primary/80 font-medium transition-colors"
             >
               Sign up
             </button>

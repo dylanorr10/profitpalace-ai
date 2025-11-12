@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { LogOut, Settings, Sparkles, Users, Mail, BookOpen, Award, TrendingUp } from "lucide-react";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
@@ -382,34 +383,35 @@ const Dashboard = () => {
       />
 
       {/* Header */}
-      <header className="border-b bg-card sticky top-0 z-10 h-14 md:h-16">
+      <header className="border-b border-primary/20 bg-[hsl(var(--slate-bg))] sticky top-0 z-10 h-14 md:h-16">
         <div className="container mx-auto px-4 h-full flex items-center justify-between">
           <div className="flex items-center gap-2 touch-manipulation">
             <span className="text-2xl">🎣</span>
-            <h1 className="text-xl font-bold">Reelin</h1>
+            <h1 className="text-xl font-bold text-primary">Reelin</h1>
           </div>
           <div className="flex items-center gap-1 md:gap-2">
-            <Button variant="ghost" size="sm" onClick={() => navigate('/curriculum')} className="hidden md:flex">
+            <Button variant="ghost" size="sm" onClick={() => navigate('/curriculum')} className="hidden md:flex hover:text-primary">
               <BookOpen className="w-4 h-4 mr-2" />
               Curriculum
             </Button>
-            <Button variant="ghost" size="sm" onClick={() => navigate('/curriculum')} className="md:hidden">
+            <Button variant="ghost" size="sm" onClick={() => navigate('/curriculum')} className="md:hidden hover:text-primary">
               <BookOpen className="w-4 h-4" />
             </Button>
-            <Button variant="ghost" size="sm" onClick={() => navigate('/glossary')} className="hidden md:inline-flex">
+            <Button variant="ghost" size="sm" onClick={() => navigate('/glossary')} className="hidden md:inline-flex hover:text-primary">
               Glossary
             </Button>
-            <Button variant="ghost" size="sm" onClick={() => navigate('/community')} className="hidden md:flex">
+            <Button variant="ghost" size="sm" onClick={() => navigate('/community')} className="hidden md:flex hover:text-primary">
               <Users className="w-4 h-4 mr-2" />
               Community
             </Button>
-            <Button variant="ghost" size="sm" onClick={() => navigate('/community')} className="md:hidden">
+            <Button variant="ghost" size="sm" onClick={() => navigate('/community')} className="md:hidden hover:text-primary">
               <Users className="w-4 h-4" />
             </Button>
-            <Button variant="ghost" size="sm" onClick={() => navigate('/settings')}>
+            <ThemeToggle />
+            <Button variant="ghost" size="sm" onClick={() => navigate('/settings')} className="hover:text-primary">
               <Settings className="w-4 h-4" />
             </Button>
-            <Button variant="ghost" size="sm" onClick={handleLogout}>
+            <Button variant="ghost" size="sm" onClick={handleLogout} className="hover:text-primary">
               <LogOut className="w-4 h-4" />
             </Button>
           </div>

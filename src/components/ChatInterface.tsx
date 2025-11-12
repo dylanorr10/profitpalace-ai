@@ -168,7 +168,7 @@ const ChatInterface = ({ lessonContext, remainingQuestions }: ChatInterfaceProps
         {messages.length === 0 && (
           <div className="text-center py-8">
             <Sparkles className="w-12 h-12 mx-auto mb-4 text-primary" />
-            <h3 className="text-lg font-semibold mb-2">AI Study Buddy</h3>
+            <h3 className="text-lg font-semibold mb-2 text-primary">AI Study Buddy</h3>
             <p className="text-muted-foreground mb-6">
               Ask me anything about UK business finances, tax, or bookkeeping
             </p>
@@ -179,7 +179,7 @@ const ChatInterface = ({ lessonContext, remainingQuestions }: ChatInterfaceProps
                   variant="outline"
                   size="sm"
                   onClick={() => setInput(question)}
-                  className="text-left justify-start h-auto py-2 px-3"
+                  className="text-left justify-start h-auto py-2 px-3 hover:border-primary hover:text-primary"
                 >
                   {question}
                 </Button>
@@ -194,10 +194,10 @@ const ChatInterface = ({ lessonContext, remainingQuestions }: ChatInterfaceProps
             className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
           >
             <Card
-              className={`max-w-[80%] p-3 ${
+              className={`max-w-[80%] p-3 border-primary/20 ${
                 message.role === 'user'
                   ? 'bg-primary text-primary-foreground'
-                  : 'bg-muted'
+                  : 'bg-card'
               }`}
             >
               <p className="whitespace-pre-wrap">{message.content}</p>
