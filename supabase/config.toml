@@ -17,3 +17,6 @@ verify_jwt = true
 
 [functions.generate-newsletter]
 verify_jwt = true
+
+[functions.generate-personalized-content]
+verify_jwt = true
