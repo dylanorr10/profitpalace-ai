@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, Clock, CheckCircle2, XCircle, Lightbulb, MessageSquare, Sparkles, RefreshCw } from "lucide-react";
+import { ArrowLeft, Clock, CheckCircle2, XCircle, Lightbulb, MessageSquare, Sparkles, RefreshCw, Target } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { hasAccessToLesson } from "@/utils/accessControl";
@@ -13,6 +13,15 @@ import { LessonQuiz } from "@/components/LessonQuiz";
 import { checkAndAwardAchievements, checkTimeBasedAchievement } from "@/utils/achievements";
 import { GlossaryTooltip } from "@/components/GlossaryTooltip";
 import { logDailyActivity } from "@/utils/streakTracking";
+import { 
+  filterAndSortContent, 
+  isPriorityContent, 
+  getRelevanceScore,
+  type ContentSection 
+} from "@/utils/contextEvaluator";
+import type { Database } from "@/integrations/supabase/types";
+
+type UserProfile = Database['public']['Tables']['user_profiles']['Row'];
 
 interface QuizQuestion {
   id: number;
@@ -67,10 +76,26 @@ const Lesson = () => {
   const [personalizedExpenses, setPersonalizedExpenses] = useState<any[]>([]);
   const [personalizedActionSteps, setPersonalizedActionSteps] = useState<any[]>([]);
   const [loadingPersonalized, setLoadingPersonalized] = useState(false);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [filteredSections, setFilteredSections] = useState<ContentSection[]>([]);
 
   useEffect(() => {
     fetchLesson();
+    fetchUserProfile();
   }, [id]);
+
+  const fetchUserProfile = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const { data: profile } = await supabase
+      .from('user_profiles')
+      .select('*')
+      .eq('user_id', user.id)
+      .single();
+
+    if (profile) setUserProfile(profile);
+  };
 
   const fetchPersonalizedContent = async (contentType: string) => {
     if (!lesson?.id || !userId) return;
@@ -123,12 +148,13 @@ const Lesson = () => {
     // Fetch user profile
     const { data: profile } = await supabase
       .from('user_profiles')
-      .select('industry, subscription_status, has_purchased')
+      .select('*')
       .eq('user_id', user.id)
       .single();
 
     let isActive = false;
     if (profile) {
+      setUserProfile(profile); // Store full profile
       setUserIndustry(profile.industry?.toLowerCase() || 'general');
       isActive = (profile.subscription_status === 'active') || !!profile.has_purchased;
       setSubscriptionStatus(isActive ? 'active' : undefined);
@@ -185,6 +211,16 @@ const Lesson = () => {
       ...lessonData,
       content: lessonData.content as unknown as LessonContent
     } as LessonData);
+
+    // Filter sections based on user profile if available
+    if (profile && lessonData?.content?.sections) {
+      const filtered = filterAndSortContent(
+        lessonData.content.sections as ContentSection[], 
+        profile, 
+        { hideIrrelevant: true, sortByRelevance: true }
+      );
+      setFilteredSections(filtered);
+    }
 
     // Create or fetch user progress record
     const { data: progressData } = await supabase
@@ -296,6 +332,9 @@ const Lesson = () => {
                          lesson.content.industry_examples.general || 
                          'Example for your business type';
 
+  // Use filtered sections if available, otherwise use original
+  const displaySections = filteredSections.length > 0 ? filteredSections : lesson.content.sections;
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -399,12 +438,30 @@ const Lesson = () => {
           </Card>
         )}
 
-        {/* Main Content */}
+        {/* Main Content with Relevance Filtering */}
         <div className="space-y-6 md:space-y-8">
-          {lesson.content.sections.map((section, idx) => (
-            <Card key={idx} className="p-4 md:p-6 bg-gradient-card">
-              <h2 className="text-xl md:text-2xl font-bold mb-3 md:mb-4">{section.heading}</h2>
-              <p className="text-base md:text-lg mb-3 md:mb-4 whitespace-pre-line">
+          {displaySections.map((section: any, idx: number) => {
+            const isPriority = isPriorityContent(userProfile, section as ContentSection);
+            const relevanceScore = getRelevanceScore(userProfile, section as ContentSection);
+            
+            return (
+              <Card key={idx} className="p-4 md:p-6 bg-gradient-card">
+                <div className="flex items-center gap-2 mb-3 md:mb-4 flex-wrap">
+                  <h2 className="text-xl md:text-2xl font-bold">{section.heading}</h2>
+                  {isPriority && (
+                    <Badge variant="default" className="bg-accent/20 text-accent border-accent/30 gap-1">
+                      <Target className="h-3 w-3" />
+                      Relevant to you
+                    </Badge>
+                  )}
+                  {relevanceScore > 70 && !isPriority && (
+                    <Badge variant="secondary" className="gap-1">
+                      <Sparkles className="h-3 w-3" />
+                      Recommended
+                    </Badge>
+                  )}
+                </div>
+                <p className="text-base md:text-lg mb-3 md:mb-4 whitespace-pre-line">
                 {section.content.split(/\b(HMRC|Self Assessment|VAT|PAYE|NI|National Insurance|UTR|Corporation Tax|Capital Allowances|Self-Employed|Limited Company|Sole Trader|Payment on Account|CIS|MTD|Making Tax Digital)\b/g).map((part, i) => {
                   const glossaryTerms = ['HMRC', 'Self Assessment', 'VAT', 'PAYE', 'NI', 'National Insurance', 'UTR', 'Corporation Tax', 'Capital Allowances', 'Self-Employed', 'Limited Company', 'Sole Trader', 'Payment on Account', 'CIS', 'MTD', 'Making Tax Digital'];
                   if (glossaryTerms.includes(part)) {
@@ -412,20 +469,21 @@ const Lesson = () => {
                   }
                   return part;
                 })}
-              </p>
+                </p>
 
-              {section.bullets && (
-                <ul className="space-y-2">
-                  {section.bullets.map((bullet, i) => (
-                    <li key={i} className="flex items-start gap-2">
-                      <span className="text-primary mt-1">•</span>
-                      <span>{bullet}</span>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </Card>
-          ))}
+                {section.bullets && (
+                  <ul className="space-y-2">
+                    {section.bullets.map((bullet: string, i: number) => (
+                      <li key={i} className="flex items-start gap-2">
+                        <span className="text-primary mt-1">•</span>
+                        <span>{bullet}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </Card>
+            );
+          })}
 
           {/* What You CAN Do */}
           <Card className="p-4 md:p-6 border-success">
