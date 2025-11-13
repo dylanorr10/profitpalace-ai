@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, Clock, CheckCircle2, XCircle, Lightbulb, MessageSquare } from "lucide-react";
+import { ArrowLeft, Clock, CheckCircle2, XCircle, Lightbulb, MessageSquare, Sparkles, RefreshCw } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { hasAccessToLesson } from "@/utils/accessControl";
@@ -64,10 +64,48 @@ const Lesson = () => {
   const [quizCompleted, setQuizCompleted] = useState(false);
   const [startTime] = useState(Date.now());
   const notesTimeoutRef = useRef<NodeJS.Timeout>();
+  const [personalizedExpenses, setPersonalizedExpenses] = useState<any[]>([]);
+  const [personalizedActionSteps, setPersonalizedActionSteps] = useState<any[]>([]);
+  const [loadingPersonalized, setLoadingPersonalized] = useState(false);
 
   useEffect(() => {
     fetchLesson();
   }, [id]);
+
+  const fetchPersonalizedContent = async (contentType: string) => {
+    if (!lesson?.id || !userId) return;
+    
+    setLoadingPersonalized(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-personalized-content', {
+        body: { lessonId: lesson.id, contentType }
+      });
+
+      if (error) {
+        console.error('Error fetching personalized content:', error);
+        if (error.message?.includes('Rate limit')) {
+          toast({
+            title: 'Rate limit reached',
+            description: 'Please wait a moment before requesting personalized content again.',
+            variant: 'destructive',
+          });
+        }
+        return;
+      }
+
+      if (data?.content) {
+        if (contentType === 'expenses') {
+          setPersonalizedExpenses(data.content);
+        } else if (contentType === 'action_steps') {
+          setPersonalizedActionSteps(data.content);
+        }
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    } finally {
+      setLoadingPersonalized(false);
+    }
+  };
 
   const fetchLesson = async () => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -319,6 +357,48 @@ const Lesson = () => {
           </Card>
         )}
 
+        {/* Personalized Expenses Section */}
+        {(lesson.category.toLowerCase().includes('expense') || lesson.title.toLowerCase().includes('expense')) && (
+          <Card className="p-4 md:p-6 mb-6 md:mb-8 border-primary/30 bg-gradient-to-br from-primary/5 to-accent/5">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-bold text-lg md:text-xl flex items-center gap-2">
+                <Sparkles className="w-5 h-5 text-primary" />
+                Personalized for Your Business
+              </h3>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => fetchPersonalizedContent('expenses')}
+                disabled={loadingPersonalized}
+                className="border-primary/30 hover:bg-primary/10"
+              >
+                <RefreshCw className={`w-4 h-4 mr-1 ${loadingPersonalized ? 'animate-spin' : ''}`} />
+                {personalizedExpenses.length > 0 ? 'Refresh' : 'Generate'}
+              </Button>
+            </div>
+            
+            {personalizedExpenses.length > 0 ? (
+              <div className="space-y-3">
+                {personalizedExpenses.map((expense, idx) => (
+                  <div key={idx} className="bg-background/50 p-3 rounded-lg border border-border">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex-1">
+                        <p className="font-semibold text-sm md:text-base">{expense.name}</p>
+                        <p className="text-xs md:text-sm text-muted-foreground mt-1">{expense.note}</p>
+                      </div>
+                      <Badge variant="outline" className="text-xs whitespace-nowrap">{expense.amount}</Badge>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                Click "Generate" to see expense examples tailored specifically to your {userIndustry} business.
+              </p>
+            )}
+          </Card>
+        )}
+
         {/* Main Content */}
         <div className="space-y-6 md:space-y-8">
           {lesson.content.sections.map((section, idx) => (
@@ -397,7 +477,50 @@ const Lesson = () => {
 
         {/* Action Steps */}
         <Card className="p-4 md:p-6">
-          <h2 className="text-xl md:text-2xl font-bold mb-4">Your Action Steps 🎯</h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl md:text-2xl font-bold">Your Action Steps 🎯</h2>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => fetchPersonalizedContent('action_steps')}
+              disabled={loadingPersonalized}
+              className="border-primary/30 hover:bg-primary/10"
+            >
+              <Sparkles className={`w-4 h-4 mr-1 ${loadingPersonalized ? 'animate-spin' : ''}`} />
+              Personalize
+            </Button>
+          </div>
+          
+          {/* Personalized Action Steps */}
+          {personalizedActionSteps.length > 0 && (
+            <div className="mb-6 p-4 bg-primary/5 border border-primary/20 rounded-lg">
+              <h3 className="font-semibold text-sm text-primary mb-3 flex items-center gap-2">
+                <Sparkles className="w-4 h-4" />
+                Tailored for Your Business
+              </h3>
+              <div className="space-y-3">
+                {personalizedActionSteps.map((step, idx) => (
+                  <div key={idx} className="bg-background/50 p-3 rounded-lg">
+                    <p className="font-medium text-sm md:text-base mb-1">{step.step}</p>
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 text-xs text-muted-foreground">
+                      <span className="flex items-center gap-1">
+                        <Clock className="w-3 h-3" />
+                        {step.timeline}
+                      </span>
+                      {step.tools && (
+                        <span className="flex items-center gap-1">
+                          <Lightbulb className="w-3 h-3" />
+                          {step.tools}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          
+          {/* General Action Steps */}
           <div className="space-y-3">
             {lesson.content.actionSteps.map((step, idx) => (
               <div key={idx} className="flex items-start gap-3 p-3 bg-secondary/30 rounded-lg">
