@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, Clock, CheckCircle2, XCircle, Lightbulb, MessageSquare, Sparkles, RefreshCw, Target, BookOpen, TrendingUp, AlertCircle } from "lucide-react";
+import { ArrowLeft, Clock, CheckCircle2, XCircle, Lightbulb, MessageSquare, Sparkles, RefreshCw, Target, BookOpen, TrendingUp, AlertCircle, ArrowUp } from "lucide-react";
 import { VisualSection } from "@/components/VisualSection";
 import { ActionTimeline } from "@/components/ActionTimeline";
 import { ComparisonTable } from "@/components/ComparisonTable";
@@ -84,11 +84,26 @@ const Lesson = () => {
   const [loadingPersonalized, setLoadingPersonalized] = useState(false);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [filteredSections, setFilteredSections] = useState<ContentSection[]>([]);
+  const [showBackToTop, setShowBackToTop] = useState(false);
 
   // Scroll to top when lesson changes
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [id]);
+
+  // Track scroll position for back to top button
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowBackToTop(window.scrollY > 400);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   useEffect(() => {
     fetchLesson();
@@ -657,6 +672,20 @@ const Lesson = () => {
           )}
         </div>
       </div>
+
+      {/* Back to Top Button */}
+      {showBackToTop && (
+        <div className="fixed bottom-6 right-6 z-50 animate-fade-in">
+          <Button
+            onClick={scrollToTop}
+            size="icon"
+            className="rounded-full shadow-lg hover:scale-110 transition-transform bg-primary hover:bg-primary/90"
+            aria-label="Scroll to top"
+          >
+            <ArrowUp className="w-5 h-5" />
+          </Button>
+        </div>
+      )}
     </div>
   );
 };
