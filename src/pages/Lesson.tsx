@@ -85,16 +85,25 @@ const Lesson = () => {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [filteredSections, setFilteredSections] = useState<ContentSection[]>([]);
   const [showBackToTop, setShowBackToTop] = useState(false);
+  const [scrollProgress, setScrollProgress] = useState(0);
 
   // Scroll to top when lesson changes
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [id]);
 
-  // Track scroll position for back to top button
+  // Track scroll position for back to top button and progress
   useEffect(() => {
     const handleScroll = () => {
       setShowBackToTop(window.scrollY > 400);
+      
+      // Calculate scroll progress
+      const windowHeight = window.innerHeight;
+      const documentHeight = document.documentElement.scrollHeight;
+      const scrollTop = window.scrollY;
+      const scrollableHeight = documentHeight - windowHeight;
+      const progress = (scrollTop / scrollableHeight) * 100;
+      setScrollProgress(Math.min(progress, 100));
     };
 
     window.addEventListener('scroll', handleScroll);
@@ -359,6 +368,14 @@ const Lesson = () => {
 
   return (
     <div className="min-h-screen bg-background page-transition">
+      {/* Scroll Progress Bar */}
+      <div className="fixed top-0 left-0 right-0 h-1 bg-muted z-50">
+        <div 
+          className="h-full bg-gradient-primary transition-all duration-150 ease-out"
+          style={{ width: `${scrollProgress}%` }}
+        />
+      </div>
+
       {/* Header */}
       <header className="border-b bg-card sticky top-0 z-10">
         <div className="container mx-auto px-4 py-3 md:py-4 flex items-center justify-between gap-2">
