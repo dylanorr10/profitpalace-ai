@@ -119,6 +119,10 @@ All colors MUST be HSL.
     @apply border-border;
   }
 
+  html {
+    scroll-behavior: smooth;
+  }
+
   body {
     @apply bg-background text-foreground;
     font-size: 16px; /* Minimum 16px for mobile to prevent zoom on input focus */
