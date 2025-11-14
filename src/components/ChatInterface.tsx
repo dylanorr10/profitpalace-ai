@@ -36,7 +36,7 @@ const ChatInterface = ({ lessonContext, remainingQuestions }: ChatInterfaceProps
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  // Check if user has scrolled up
+  // Check if user has scrolled up and only auto-scroll on initial load
   useEffect(() => {
     const container = messagesContainerRef.current;
     if (!container) return;
@@ -51,7 +51,12 @@ const ChatInterface = ({ lessonContext, remainingQuestions }: ChatInterfaceProps
     return () => container.removeEventListener('scroll', handleScroll);
   }, [messages]);
 
-  useEffect(scrollToBottom, [messages]);
+  // Only auto-scroll for the very first message exchange
+  useEffect(() => {
+    if (messages.length <= 2) {
+      scrollToBottom();
+    }
+  }, [messages]);
 
   const sendMessage = async () => {
     if (!input.trim() || isLoading) return;
@@ -188,13 +193,20 @@ const ChatInterface = ({ lessonContext, remainingQuestions }: ChatInterfaceProps
         {messages.length === 0 && (
           <div className="text-center py-12 px-4">
             <div className="mb-6 animate-fade-in">
-              <div className="w-20 h-20 mx-auto mb-4 bg-primary/10 rounded-full flex items-center justify-center">
-                <Sparkles className="w-10 h-10 text-primary" />
+              <div className="w-20 h-20 mx-auto mb-4 bg-gradient-primary rounded-full flex items-center justify-center shadow-lg">
+                <Sparkles className="w-10 h-10 text-white" />
               </div>
-              <h3 className="text-2xl font-bold mb-2 text-foreground">AI Study Buddy</h3>
-              <p className="text-muted-foreground text-lg max-w-md mx-auto">
-                Ask me anything about UK business finances, tax, or bookkeeping
+              <h3 className="text-2xl font-bold mb-3 text-foreground">AI Study Buddy</h3>
+              <p className="text-muted-foreground text-base max-w-md mx-auto mb-2">
+                Get quick, clear answers about UK business finances
               </p>
+              <div className="flex items-center justify-center gap-2 text-sm text-primary">
+                <span>✨ Short responses</span>
+                <span>•</span>
+                <span>📊 Visual examples</span>
+                <span>•</span>
+                <span>💡 Actionable tips</span>
+              </div>
             </div>
             
             <div className="grid gap-3 max-w-lg mx-auto mt-8">
