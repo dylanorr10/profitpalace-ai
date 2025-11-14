@@ -5,7 +5,11 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, Clock, CheckCircle2, XCircle, Lightbulb, MessageSquare, Sparkles, RefreshCw, Target } from "lucide-react";
+import { ArrowLeft, Clock, CheckCircle2, XCircle, Lightbulb, MessageSquare, Sparkles, RefreshCw, Target, BookOpen } from "lucide-react";
+import { VisualSection } from "@/components/VisualSection";
+import { ActionTimeline } from "@/components/ActionTimeline";
+import { ComparisonTable } from "@/components/ComparisonTable";
+import { ScenarioCard } from "@/components/ScenarioCard";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { hasAccessToLesson } from "@/utils/accessControl";
@@ -388,12 +392,9 @@ const Lesson = () => {
 
         {/* Industry-Specific Example */}
         {industryExample && industryExample !== 'Example for your business type' && (
-          <Card className="p-4 md:p-6 bg-primary/10 border-primary mb-6 md:mb-8">
-            <h3 className="font-semibold mb-2 flex items-center gap-2 text-sm md:text-base">
-              <span>💡</span> For Your Industry ({userIndustry})
-            </h3>
-            <p className="text-sm md:text-base">{industryExample}</p>
-          </Card>
+          <div className="mb-6 md:mb-8">
+            <ScenarioCard industry={userIndustry} content={industryExample} />
+          </div>
         )}
 
         {/* Personalized Expenses Section */}
@@ -444,23 +445,26 @@ const Lesson = () => {
             const isPriority = isPriorityContent(userProfile, section as ContentSection);
             const relevanceScore = getRelevanceScore(userProfile, section as ContentSection);
             
+            const badge = isPriority ? (
+              <Badge variant="default" className="bg-accent/20 text-accent border-accent/30 gap-1">
+                <Target className="h-3 w-3" />
+                Relevant to you
+              </Badge>
+            ) : relevanceScore > 70 ? (
+              <Badge variant="secondary" className="gap-1">
+                <Sparkles className="h-3 w-3" />
+                Recommended
+              </Badge>
+            ) : undefined;
+
             return (
-              <Card key={idx} className="p-4 md:p-6 bg-gradient-card">
-                <div className="flex items-center gap-2 mb-3 md:mb-4 flex-wrap">
-                  <h2 className="text-xl md:text-2xl font-bold">{section.heading}</h2>
-                  {isPriority && (
-                    <Badge variant="default" className="bg-accent/20 text-accent border-accent/30 gap-1">
-                      <Target className="h-3 w-3" />
-                      Relevant to you
-                    </Badge>
-                  )}
-                  {relevanceScore > 70 && !isPriority && (
-                    <Badge variant="secondary" className="gap-1">
-                      <Sparkles className="h-3 w-3" />
-                      Recommended
-                    </Badge>
-                  )}
-                </div>
+              <VisualSection 
+                key={idx} 
+                icon={BookOpen} 
+                title={section.heading}
+                variant="info"
+                badge={badge}
+              >
                 <p className="text-base md:text-lg mb-3 md:mb-4 whitespace-pre-line">
                 {section.content.split(/\b(HMRC|Self Assessment|VAT|PAYE|NI|National Insurance|UTR|Corporation Tax|Capital Allowances|Self-Employed|Limited Company|Sole Trader|Payment on Account|CIS|MTD|Making Tax Digital)\b/g).map((part, i) => {
                   const glossaryTerms = ['HMRC', 'Self Assessment', 'VAT', 'PAYE', 'NI', 'National Insurance', 'UTR', 'Corporation Tax', 'Capital Allowances', 'Self-Employed', 'Limited Company', 'Sole Trader', 'Payment on Account', 'CIS', 'MTD', 'Making Tax Digital'];
@@ -481,48 +485,19 @@ const Lesson = () => {
                     ))}
                   </ul>
                 )}
-              </Card>
+              </VisualSection>
             );
           })}
 
-          {/* What You CAN Do */}
-          <Card className="p-4 md:p-6 border-success">
-            <div className="flex items-center gap-2 mb-3 md:mb-4">
-              <CheckCircle2 className="w-5 h-5 md:w-6 md:h-6 text-success" />
-              <h2 className="text-xl md:text-2xl font-bold">What You CAN Do ✅</h2>
-            </div>
-            <ul className="space-y-2 md:space-y-3">
-              {lesson.content.canDo.map((item, idx) => (
-                <li key={idx} className="flex items-start gap-2 md:gap-3 text-sm md:text-base">
-                  <CheckCircle2 className="w-4 h-4 md:w-5 md:h-5 text-success mt-0.5 flex-shrink-0" />
-                  <span>{item}</span>
-                </li>
-              ))}
-            </ul>
-          </Card>
-
-          {/* Common Mistakes */}
-          <Card className="p-4 md:p-6 border-destructive">
-            <div className="flex items-center gap-2 mb-3 md:mb-4">
-              <XCircle className="w-5 h-5 md:w-6 md:h-6 text-destructive" />
-              <h2 className="text-xl md:text-2xl font-bold">Common Mistakes to Avoid ❌</h2>
-            </div>
-            <ul className="space-y-2 md:space-y-3">
-              {lesson.content.cantDo.map((item, idx) => (
-                <li key={idx} className="flex items-start gap-2 md:gap-3 text-sm md:text-base">
-                  <XCircle className="w-4 h-4 md:w-5 md:h-5 text-destructive mt-0.5 flex-shrink-0" />
-                  <span>{item}</span>
-                </li>
-              ))}
-            </ul>
-          </Card>
+          {/* Comparison Table: Can Do vs Can't Do */}
+          <ComparisonTable canDo={lesson.content.canDo} cantDo={lesson.content.cantDo} />
 
           {/* Pro Tips */}
-          <Card className="p-4 md:p-6 bg-gradient-primary text-white">
-            <div className="flex items-center gap-2 mb-3 md:mb-4">
-              <Lightbulb className="w-5 h-5 md:w-6 md:h-6" />
-              <h2 className="text-xl md:text-2xl font-bold">Pro Tips 💡</h2>
-            </div>
+          <VisualSection 
+            icon={Lightbulb} 
+            title="Pro Tips 💡" 
+            variant="primary"
+          >
             <ul className="space-y-2 md:space-y-3">
               {lesson.content.proTips.map((tip, idx) => (
                 <li key={idx} className="flex items-start gap-2 md:gap-3 text-sm md:text-base">
@@ -531,12 +506,14 @@ const Lesson = () => {
                 </li>
               ))}
             </ul>
-          </Card>
+          </VisualSection>
 
         {/* Action Steps */}
-        <Card className="p-4 md:p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl md:text-2xl font-bold">Your Action Steps 🎯</h2>
+        <VisualSection 
+          icon={Target} 
+          title="Your Action Steps 🎯" 
+          variant="primary"
+          badge={
             <Button
               size="sm"
               variant="outline"
@@ -547,8 +524,8 @@ const Lesson = () => {
               <Sparkles className={`w-4 h-4 mr-1 ${loadingPersonalized ? 'animate-spin' : ''}`} />
               Personalize
             </Button>
-          </div>
-          
+          }
+        >
           {/* Personalized Action Steps */}
           {personalizedActionSteps.length > 0 && (
             <div className="mb-6 p-4 bg-primary/5 border border-primary/20 rounded-lg">
@@ -578,18 +555,9 @@ const Lesson = () => {
             </div>
           )}
           
-          {/* General Action Steps */}
-          <div className="space-y-3">
-            {lesson.content.actionSteps.map((step, idx) => (
-              <div key={idx} className="flex items-start gap-3 p-3 bg-secondary/30 rounded-lg">
-                <div className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold flex-shrink-0 text-sm md:text-base">
-                  {idx + 1}
-                </div>
-                <span className="mt-1 text-sm md:text-base">{step}</span>
-              </div>
-            ))}
-          </div>
-        </Card>
+          {/* Interactive Timeline */}
+          <ActionTimeline steps={lesson.content.actionSteps} />
+        </VisualSection>
         </div>
 
         {/* Notes Section */}
