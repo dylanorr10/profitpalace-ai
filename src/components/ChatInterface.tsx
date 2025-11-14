@@ -28,9 +28,53 @@ const ChatInterface = ({ lessonContext, remainingQuestions }: ChatInterfaceProps
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showScrollButton, setShowScrollButton] = useState(false);
+  const [userProfile, setUserProfile] = useState<any>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data: profile } = await supabase
+        .from('user_profiles')
+        .select('display_name, business_structure, industry, experience_level')
+        .eq('user_id', user.id)
+        .single();
+
+      setUserProfile(profile);
+
+      // Add personalized greeting message if chat is empty
+      if (messages.length === 0 && profile) {
+        const greeting = getGreetingMessage(profile);
+        setMessages([{ role: 'assistant', content: greeting }]);
+      }
+    };
+
+    fetchProfile();
+  }, []);
+
+  const getGreetingMessage = (profile: any) => {
+    const name = profile?.display_name || 'there';
+    const industry = profile?.industry || 'your business';
+    const structure = profile?.business_structure || 'your business';
+    const level = profile?.experience_level || 'beginner';
+    
+    return `Hey ${name}! 👋
+
+I'm your AI Study Buddy, here to help with **${industry}** finances and **${structure}** tax questions.
+
+I know you're at a **${level}** level with finances, so I'll keep things clear and practical. Feel free to ask me anything about:
+
+💡 **Expenses & deductions** for your ${industry} business
+📊 **VAT and tax** specific to ${structure}
+📝 **Bookkeeping tips** that actually work
+⚠️ **Common mistakes** to avoid
+
+What would you like to know today?`;
+  };
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -181,11 +225,23 @@ const ChatInterface = ({ lessonContext, remainingQuestions }: ChatInterfaceProps
     `Explain ${lessonContext.title} with an example from my industry`,
     'What are common mistakes people make with this?',
     'How does this apply to my business structure?',
+  ] : userProfile?.industry ? [
+    `What expenses can I claim for my ${userProfile.industry} business?`,
+    `As a ${userProfile.business_structure}, when should I register for VAT?`,
+    `What tax deadlines should I know about for my ${userProfile.business_structure}?`,
   ] : [
     'What expenses can I claim for my business?',
     'When do I need to register for VAT?',
     'How do I file a Self Assessment tax return?',
   ];
+
+  const getPersonalizedGreeting = () => {
+    const name = userProfile?.display_name || 'there';
+    const industry = userProfile?.industry || 'your business';
+    const structure = userProfile?.business_structure || 'your business';
+    
+    return `Hey ${name}! 👋 I'm here to help with ${industry} finances and ${structure} tax questions. What would you like to know?`;
+  };
 
   return (
     <div className="flex flex-col h-full relative">
@@ -196,16 +252,29 @@ const ChatInterface = ({ lessonContext, remainingQuestions }: ChatInterfaceProps
               <div className="w-20 h-20 mx-auto mb-4 bg-gradient-primary rounded-full flex items-center justify-center shadow-lg">
                 <Sparkles className="w-10 h-10 text-white" />
               </div>
-              <h3 className="text-2xl font-bold mb-3 text-foreground">AI Study Buddy</h3>
-              <p className="text-muted-foreground text-base max-w-md mx-auto mb-2">
-                Get quick, clear answers about UK business finances
-              </p>
-              <div className="flex items-center justify-center gap-2 text-sm text-primary">
-                <span>✨ Short responses</span>
+              <h3 className="text-2xl font-bold mb-3 text-foreground">
+                {userProfile?.display_name ? `Hey ${userProfile.display_name}! 👋` : 'AI Study Buddy'}
+              </h3>
+              {userProfile ? (
+                <div className="space-y-2">
+                  <p className="text-muted-foreground text-base max-w-md mx-auto">
+                    I'm here to help with your <span className="font-semibold text-primary">{userProfile.industry || 'business'}</span> finances
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    Tailored advice for {userProfile.business_structure || 'your business'} • {userProfile.experience_level || 'All levels'}
+                  </p>
+                </div>
+              ) : (
+                <p className="text-muted-foreground text-base max-w-md mx-auto mb-2">
+                  Get quick, clear answers about UK business finances
+                </p>
+              )}
+              <div className="flex items-center justify-center gap-2 text-sm text-primary mt-4">
+                <span>✨ Personal</span>
                 <span>•</span>
-                <span>📊 Visual examples</span>
+                <span>📊 Visual</span>
                 <span>•</span>
-                <span>💡 Actionable tips</span>
+                <span>💡 Actionable</span>
               </div>
             </div>
             
