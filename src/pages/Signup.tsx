@@ -7,6 +7,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 type QuizStep = "account" | "business" | "industry" | "experience" | "pain" | "goal" | "schedule" | "study_time";
 
@@ -342,18 +343,25 @@ const Signup = () => {
       case "schedule":
         return (
           <div className="space-y-4">
-            <Label htmlFor="time-input">How many minutes per day can you dedicate to learning?</Label>
+            <Label htmlFor="time-select">How many minutes per day can you dedicate to learning?</Label>
             <div className="space-y-2">
-              <Input
-                id="time-input"
-                type="number"
-                min="5"
-                max="300"
-                placeholder="e.g. 15, 30, 60..."
-                value={formData.timeCommitment ? parseInt(formData.timeCommitment) : ""}
-                onChange={(e) => setFormData({ ...formData, timeCommitment: e.target.value })}
-                className="text-lg"
-              />
+              <Select
+                value={formData.timeCommitment}
+                onValueChange={(value) => setFormData({ ...formData, timeCommitment: value })}
+              >
+                <SelectTrigger id="time-select" className="text-lg">
+                  <SelectValue placeholder="Select minutes per day" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="10">10 minutes</SelectItem>
+                  <SelectItem value="15">15 minutes</SelectItem>
+                  <SelectItem value="30">30 minutes</SelectItem>
+                  <SelectItem value="45">45 minutes</SelectItem>
+                  <SelectItem value="60">1 hour</SelectItem>
+                  <SelectItem value="90">1.5 hours</SelectItem>
+                  <SelectItem value="120">2 hours</SelectItem>
+                </SelectContent>
+              </Select>
               <p className="text-xs text-muted-foreground">
                 💡 Even 10-15 minutes a day can make a real difference
               </p>
