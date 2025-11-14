@@ -155,4 +155,29 @@ All colors MUST be HSL.
     10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
     20%, 40%, 60%, 80% { transform: translateX(4px); }
   }
+
+  /* Prose styles for markdown */
+  .prose {
+    color: hsl(var(--foreground));
+  }
+  
+  .prose h1, .prose h2, .prose h3 {
+    color: hsl(var(--foreground));
+  }
+  
+  .prose strong {
+    color: hsl(var(--foreground));
+  }
+  
+  .prose a {
+    color: hsl(var(--primary));
+  }
+  
+  .prose code {
+    color: hsl(var(--foreground));
+  }
+  
+  .prose blockquote {
+    border-left-color: hsl(var(--primary));
+  }
 }

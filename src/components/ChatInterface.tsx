@@ -1,10 +1,13 @@
 import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Card } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Send, Loader2, Sparkles } from 'lucide-react';
+import { Send, Sparkles } from 'lucide-react';
+import { MessageBubble } from '@/components/MessageBubble';
+import { SuggestionCard } from '@/components/SuggestionCard';
+import { TypingIndicator } from '@/components/TypingIndicator';
+import { ScrollToBottom } from '@/components/ScrollToBottom';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -24,12 +27,29 @@ const ChatInterface = ({ lessonContext, remainingQuestions }: ChatInterfaceProps
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [showScrollButton, setShowScrollButton] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
+
+  // Check if user has scrolled up
+  useEffect(() => {
+    const container = messagesContainerRef.current;
+    if (!container) return;
+
+    const handleScroll = () => {
+      const { scrollTop, scrollHeight, clientHeight } = container;
+      const isNearBottom = scrollHeight - scrollTop - clientHeight < 100;
+      setShowScrollButton(!isNearBottom && messages.length > 3);
+    };
+
+    container.addEventListener('scroll', handleScroll);
+    return () => container.removeEventListener('scroll', handleScroll);
+  }, [messages]);
 
   useEffect(scrollToBottom, [messages]);
 
@@ -163,58 +183,47 @@ const ChatInterface = ({ lessonContext, remainingQuestions }: ChatInterfaceProps
   ];
 
   return (
-    <div className="flex flex-col h-full">
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+    <div className="flex flex-col h-full relative">
+      <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.length === 0 && (
-          <div className="text-center py-8">
-            <Sparkles className="w-12 h-12 mx-auto mb-4 text-primary" />
-            <h3 className="text-lg font-semibold mb-2 text-primary">AI Study Buddy</h3>
-            <p className="text-muted-foreground mb-6">
-              Ask me anything about UK business finances, tax, or bookkeeping
-            </p>
-            <div className="grid gap-2 max-w-md mx-auto">
+          <div className="text-center py-12 px-4">
+            <div className="mb-6 animate-fade-in">
+              <div className="w-20 h-20 mx-auto mb-4 bg-primary/10 rounded-full flex items-center justify-center">
+                <Sparkles className="w-10 h-10 text-primary" />
+              </div>
+              <h3 className="text-2xl font-bold mb-2 text-foreground">AI Study Buddy</h3>
+              <p className="text-muted-foreground text-lg max-w-md mx-auto">
+                Ask me anything about UK business finances, tax, or bookkeeping
+              </p>
+            </div>
+            
+            <div className="grid gap-3 max-w-lg mx-auto mt-8">
+              <p className="text-sm text-muted-foreground mb-2">Try asking:</p>
               {suggestedQuestions.map((question, i) => (
-                <Button
+                <SuggestionCard
                   key={i}
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setInput(question)}
-                  className="text-left justify-start h-auto py-2 px-3 hover:border-primary hover:text-primary"
-                >
-                  {question}
-                </Button>
+                  question={question}
+                  onClick={setInput}
+                />
               ))}
             </div>
           </div>
         )}
 
         {messages.map((message, i) => (
-          <div
+          <MessageBubble
             key={i}
-            className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
-          >
-            <Card
-              className={`max-w-[80%] p-3 border-primary/20 ${
-                message.role === 'user'
-                  ? 'bg-primary text-primary-foreground'
-                  : 'bg-card'
-              }`}
-            >
-              <p className="whitespace-pre-wrap">{message.content}</p>
-            </Card>
-          </div>
+            role={message.role}
+            content={message.content}
+          />
         ))}
 
-        {isLoading && (
-          <div className="flex justify-start">
-            <Card className="max-w-[80%] p-3 bg-muted">
-              <Loader2 className="w-4 h-4 animate-spin" />
-            </Card>
-          </div>
-        )}
+        {isLoading && <TypingIndicator />}
 
         <div ref={messagesEndRef} />
       </div>
+
+      <ScrollToBottom show={showScrollButton} onClick={scrollToBottom} />
 
       <div className="border-t p-4">
         {remainingQuestions !== undefined && remainingQuestions !== Infinity && (
@@ -242,11 +251,7 @@ const ChatInterface = ({ lessonContext, remainingQuestions }: ChatInterfaceProps
             size="icon"
             className="h-[60px] w-[60px]"
           >
-            {isLoading ? (
-              <Loader2 className="w-5 h-5 animate-spin" />
-            ) : (
-              <Send className="w-5 h-5" />
-            )}
+            <Send className="w-5 h-5" />
           </Button>
         </div>
       </div>
