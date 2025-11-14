@@ -154,9 +154,30 @@ const Dashboard = () => {
       // Use recommendation engine
       const recommendations = await getRecommendedLessons(user.id, profileData);
       
+      // Check if demo account
+      const { data: { user: authUser } } = await supabase.auth.getUser();
+      const isDemoAccount = authUser?.email === 'demo@reelin.co.uk';
+      
       // Set next up lesson
-      if (recommendations.primary) {
-        const foundLesson = lessonsData.find(l => l.id === recommendations.primary?.id);
+      let nextLesson = recommendations.primary;
+      
+      if (isDemoAccount) {
+        // For demo account, randomly pick from available recommendations
+        const availableRecs = [
+          recommendations.primary,
+          recommendations.quickWin,
+          recommendations.challenge,
+          recommendations.review
+        ].filter(Boolean);
+        
+        if (availableRecs.length > 0) {
+          const randomIndex = Math.floor(Math.random() * availableRecs.length);
+          nextLesson = availableRecs[randomIndex];
+        }
+      }
+      
+      if (nextLesson) {
+        const foundLesson = lessonsData.find(l => l.id === nextLesson?.id);
         setNextUpLesson(foundLesson ? foundLesson as Lesson : null);
       }
 
