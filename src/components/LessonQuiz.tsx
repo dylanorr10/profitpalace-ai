@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle2, XCircle, Sparkles } from "lucide-react";
+import { Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { checkAndAwardAchievements } from "@/utils/achievements";
+import { QuizAnswerCard } from "@/components/QuizAnswerCard";
+import { QuizResults } from "@/components/QuizResults";
 
 interface QuizQuestion {
   id: number;
@@ -149,54 +151,14 @@ export const LessonQuiz = ({ lessonId, userId, questions, passingScore = 60, onC
     const correctAnswers = answers.filter(Boolean).length;
 
     return (
-      <Card className="mt-8">
-        <CardHeader className="text-center">
-          <div className="mx-auto mb-4">
-            {passed ? (
-              <div className="text-6xl">🎉</div>
-            ) : (
-              <div className="text-6xl">📚</div>
-            )}
-          </div>
-          <CardTitle className="text-3xl">
-            {passed ? "Great Work!" : "Keep Learning!"}
-          </CardTitle>
-          <CardDescription className="text-lg">
-            You scored {score}% ({correctAnswers}/{questions.length} correct)
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {passed ? (
-            <>
-              <Badge className="w-full justify-center py-2 text-base bg-success">
-                ✓ Quiz Passed
-              </Badge>
-              <p className="text-center text-muted-foreground">
-                You've successfully completed this lesson!
-              </p>
-            </>
-          ) : (
-            <>
-              <Badge variant="secondary" className="w-full justify-center py-2 text-base">
-                Score {passingScore}% or higher to pass
-              </Badge>
-              <p className="text-center text-muted-foreground">
-                Review the lesson material and try again. You can retake the quiz as many times as you need.
-              </p>
-            </>
-          )}
-          <div className="flex gap-3 pt-4">
-            {!passed && (
-              <Button onClick={handleRetakeQuiz} variant="outline" className="flex-1">
-                Retake Quiz
-              </Button>
-            )}
-            <Button onClick={() => onComplete(score, passed)} className="flex-1">
-              {passed ? "Continue" : "Review Lesson"}
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+      <QuizResults
+        score={score}
+        correctAnswers={correctAnswers}
+        totalQuestions={questions.length}
+        passingScore={passingScore}
+        onRetake={handleRetakeQuiz}
+        onContinue={onComplete}
+      />
     );
   }
 
@@ -225,35 +187,17 @@ export const LessonQuiz = ({ lessonId, userId, questions, passingScore = 60, onC
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-3">
-          {currentQuestion.options.map((option, index) => {
-            const isSelected = selectedAnswer === index;
-            const isCorrect = index === currentQuestion.correct_answer;
-            const showCorrect = showExplanation && isCorrect;
-            const showIncorrect = showExplanation && isSelected && !isCorrect;
-
-            return (
-              <button
-                key={index}
-                onClick={() => handleAnswerSelect(index)}
-                disabled={showExplanation}
-                className={`w-full text-left p-4 rounded-lg border-2 transition-all min-h-[56px] ${
-                  showCorrect
-                    ? "border-success bg-success/10"
-                    : showIncorrect
-                    ? "border-destructive bg-destructive/10"
-                    : isSelected
-                    ? "border-primary bg-primary/5"
-                    : "border-border hover:border-primary/50 hover:bg-secondary/50 active:scale-98"
-                } ${showExplanation ? "cursor-not-allowed" : "cursor-pointer"}`}
-              >
-                <div className="flex items-center justify-between">
-                  <span className="flex-1">{option}</span>
-                  {showCorrect && <CheckCircle2 className="w-5 h-5 text-success" />}
-                  {showIncorrect && <XCircle className="w-5 h-5 text-destructive" />}
-                </div>
-              </button>
-            );
-          })}
+          {currentQuestion.options.map((option, index) => (
+            <QuizAnswerCard
+              key={index}
+              option={option}
+              index={index}
+              isSelected={selectedAnswer === index}
+              isCorrect={index === currentQuestion.correct_answer}
+              showExplanation={showExplanation}
+              onSelect={handleAnswerSelect}
+            />
+          ))}
         </div>
 
         {showExplanation && (
