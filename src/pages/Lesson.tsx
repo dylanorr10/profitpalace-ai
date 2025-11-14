@@ -5,7 +5,8 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, Clock, CheckCircle2, XCircle, Lightbulb, MessageSquare, Sparkles, RefreshCw, Target, BookOpen, TrendingUp, AlertCircle, ArrowUp, Bookmark } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { ArrowLeft, Clock, CheckCircle2, XCircle, Lightbulb, MessageSquare, Sparkles, RefreshCw, Target, BookOpen, TrendingUp, AlertCircle, ArrowUp, Bookmark, ChevronRight } from "lucide-react";
 import { VisualSection } from "@/components/VisualSection";
 import { ActionTimeline } from "@/components/ActionTimeline";
 import { ComparisonTable } from "@/components/ComparisonTable";
@@ -82,6 +83,8 @@ const Lesson = () => {
   const [personalizedExpenses, setPersonalizedExpenses] = useState<any[]>([]);
   const [personalizedActionSteps, setPersonalizedActionSteps] = useState<any[]>([]);
   const [loadingPersonalized, setLoadingPersonalized] = useState(false);
+  const [selectedExpense, setSelectedExpense] = useState<any>(null);
+  const [expenseDialogOpen, setExpenseDialogOpen] = useState(false);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [filteredSections, setFilteredSections] = useState<ContentSection[]>([]);
   const [showBackToTop, setShowBackToTop] = useState(false);
@@ -512,17 +515,28 @@ const Lesson = () => {
             </div>
             
             {personalizedExpenses.length > 0 ? (
-              <div className="space-y-3">
+              <div className="space-y-2">
                 {personalizedExpenses.map((expense, idx) => (
-                  <div key={idx} className="bg-background/50 p-3 rounded-lg border border-border">
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="flex-1">
-                        <p className="font-semibold text-sm md:text-base">{expense.name}</p>
-                        <p className="text-xs md:text-sm text-muted-foreground mt-1">{expense.note}</p>
+                  <button
+                    key={idx}
+                    onClick={() => {
+                      setSelectedExpense(expense);
+                      setExpenseDialogOpen(true);
+                    }}
+                    className="w-full bg-background/50 p-3 rounded-lg border border-border hover:bg-background/70 transition-colors text-left group"
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-sm md:text-base truncate">{expense.name}</p>
+                        <p className="text-xs text-muted-foreground truncate md:hidden">{expense.note}</p>
+                        <p className="text-xs md:text-sm text-muted-foreground mt-1 hidden md:block">{expense.note}</p>
                       </div>
-                      <Badge variant="outline" className="text-xs whitespace-nowrap">{expense.amount}</Badge>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <Badge variant="outline" className="text-xs">{expense.amount}</Badge>
+                        <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors" />
+                      </div>
                     </div>
-                  </div>
+                  </button>
                 ))}
               </div>
             ) : (
@@ -532,6 +546,24 @@ const Lesson = () => {
             )}
           </Card>
         )}
+
+        {/* Expense Details Dialog */}
+        <Dialog open={expenseDialogOpen} onOpenChange={setExpenseDialogOpen}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle className="flex items-center justify-between">
+                <span className="truncate pr-2">{selectedExpense?.name}</span>
+                <Badge variant="outline">{selectedExpense?.amount}</Badge>
+              </DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <h4 className="text-sm font-medium mb-2">Details</h4>
+                <p className="text-sm text-muted-foreground">{selectedExpense?.note}</p>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
 
         {/* Main Content with Relevance Filtering */}
         <div className="space-y-6 md:space-y-8">
