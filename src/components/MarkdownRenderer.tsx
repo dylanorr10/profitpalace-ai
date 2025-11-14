@@ -9,34 +9,37 @@ interface MarkdownRendererProps {
 
 export const MarkdownRenderer = ({ content }: MarkdownRendererProps) => {
   return (
-    <div className="prose prose-sm dark:prose-invert max-w-none">
+    <div className="prose prose-sm dark:prose-invert max-w-none space-y-2">
       <ReactMarkdown
         components={{
-        // Headings
+        // Headings with better spacing
         h1: ({ children }) => (
-          <h1 className="text-2xl font-bold mt-4 mb-2">{children}</h1>
+          <h1 className="text-xl font-bold mt-4 mb-3 flex items-center gap-2 text-foreground">{children}</h1>
         ),
         h2: ({ children }) => (
-          <h2 className="text-xl font-bold mt-3 mb-2">{children}</h2>
+          <h2 className="text-lg font-bold mt-3 mb-2 flex items-center gap-2 text-foreground border-b border-border/50 pb-1">{children}</h2>
         ),
         h3: ({ children }) => (
-          <h3 className="text-lg font-semibold mt-2 mb-1">{children}</h3>
+          <h3 className="text-base font-semibold mt-2 mb-1.5 text-foreground">{children}</h3>
         ),
         
-        // Paragraphs
+        // Paragraphs with better readability
         p: ({ children }) => (
-          <p className="mb-3 leading-relaxed">{children}</p>
+          <p className="mb-2 leading-relaxed text-foreground/90 text-[15px]">{children}</p>
         ),
         
-        // Lists
+        // Lists with better visual hierarchy
         ul: ({ children }) => (
-          <ul className="list-disc list-inside space-y-1 mb-3 ml-2">{children}</ul>
+          <ul className="space-y-1.5 mb-3 ml-1">{children}</ul>
         ),
         ol: ({ children }) => (
-          <ol className="list-decimal list-inside space-y-1 mb-3 ml-2">{children}</ol>
+          <ol className="space-y-1.5 mb-3 ml-1">{children}</ol>
         ),
         li: ({ children }) => (
-          <li className="text-sm leading-relaxed">{children}</li>
+          <li className="text-[15px] leading-relaxed flex items-start gap-2 text-foreground/90">
+            <span className="text-primary mt-1.5">•</span>
+            <span className="flex-1">{children}</span>
+          </li>
         ),
         
         // Code blocks
@@ -60,12 +63,12 @@ export const MarkdownRenderer = ({ content }: MarkdownRendererProps) => {
           );
         },
         
-        // Blockquotes (for key points)
+        // Blockquotes (for key points) with better visual prominence
         blockquote: ({ children }) => (
-          <Card className="border-l-4 border-l-primary bg-primary/5 p-3 mb-3">
+          <Card className="border-l-4 border-l-primary bg-primary/10 p-3 mb-3 shadow-sm">
             <div className="flex items-start gap-2">
               <Lightbulb className="w-5 h-5 text-primary shrink-0 mt-0.5" />
-              <div className="text-sm">{children}</div>
+              <div className="text-[15px] font-medium text-foreground">{children}</div>
             </div>
           </Card>
         ),

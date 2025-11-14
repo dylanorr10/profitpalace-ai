@@ -26,15 +26,17 @@ export const MessageBubble = ({ role, content }: MessageBubbleProps) => {
       <Card
         className={`max-w-[85%] md:max-w-[75%] overflow-hidden ${
           isUser
-            ? "bg-primary text-primary-foreground border-primary"
-            : "bg-card border-border"
+            ? "bg-primary text-primary-foreground border-primary shadow-md"
+            : "bg-card border-border shadow-sm hover:shadow-md transition-shadow"
         }`}
       >
-        <div className="p-3">
+        <div className={`p-4 ${isUser ? '' : 'prose prose-sm max-w-none dark:prose-invert'}`}>
           {isUser ? (
             <p className="whitespace-pre-wrap text-sm leading-relaxed">{content}</p>
           ) : (
-            <MarkdownRenderer content={content} />
+            <div className="space-y-2">
+              <MarkdownRenderer content={content} />
+            </div>
           )}
         </div>
       </Card>
