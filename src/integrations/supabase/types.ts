@@ -502,6 +502,39 @@ export type Database = {
         }
         Relationships: []
       }
+      user_personalized_content: {
+        Row: {
+          content_type: string
+          context_hash: string | null
+          created_at: string | null
+          expires_at: string | null
+          generated_content: Json
+          id: string
+          lesson_id: string
+          user_id: string
+        }
+        Insert: {
+          content_type: string
+          context_hash?: string | null
+          created_at?: string | null
+          expires_at?: string | null
+          generated_content: Json
+          id?: string
+          lesson_id: string
+          user_id: string
+        }
+        Update: {
+          content_type?: string
+          context_hash?: string | null
+          created_at?: string | null
+          expires_at?: string | null
+          generated_content?: Json
+          id?: string
+          lesson_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_profiles: {
         Row: {
           accounting_year_end: string | null
@@ -509,6 +542,8 @@ export type Database = {
           business_goals: string[] | null
           business_start_date: string | null
           business_structure: string | null
+          business_tools: string[] | null
+          common_expenses: string[] | null
           created_at: string | null
           current_streak: number | null
           employees_count: string | null
@@ -530,6 +565,7 @@ export type Database = {
           preferred_study_time: string | null
           prompts_dismissed: Json | null
           purchased_at: string | null
+          specific_challenges: string[] | null
           stripe_customer_id: string | null
           stripe_subscription_id: string | null
           study_days: string[] | null
@@ -553,6 +589,8 @@ export type Database = {
           business_goals?: string[] | null
           business_start_date?: string | null
           business_structure?: string | null
+          business_tools?: string[] | null
+          common_expenses?: string[] | null
           created_at?: string | null
           current_streak?: number | null
           employees_count?: string | null
@@ -574,6 +612,7 @@ export type Database = {
           preferred_study_time?: string | null
           prompts_dismissed?: Json | null
           purchased_at?: string | null
+          specific_challenges?: string[] | null
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
           study_days?: string[] | null
@@ -597,6 +636,8 @@ export type Database = {
           business_goals?: string[] | null
           business_start_date?: string | null
           business_structure?: string | null
+          business_tools?: string[] | null
+          common_expenses?: string[] | null
           created_at?: string | null
           current_streak?: number | null
           employees_count?: string | null
@@ -618,6 +659,7 @@ export type Database = {
           preferred_study_time?: string | null
           prompts_dismissed?: Json | null
           purchased_at?: string | null
+          specific_challenges?: string[] | null
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
           study_days?: string[] | null
@@ -639,9 +681,11 @@ export type Database = {
       }
       user_progress: {
         Row: {
+          bookmarked: boolean | null
           completed_at: string | null
           completion_rate: number | null
           id: string
+          last_noted_at: string | null
           lesson_id: string
           mastery_level: number | null
           next_review_date: string | null
@@ -651,13 +695,16 @@ export type Database = {
           quiz_score: number | null
           review_count: number | null
           started_at: string | null
+          tags: string[] | null
           time_spent: number | null
           user_id: string
         }
         Insert: {
+          bookmarked?: boolean | null
           completed_at?: string | null
           completion_rate?: number | null
           id?: string
+          last_noted_at?: string | null
           lesson_id: string
           mastery_level?: number | null
           next_review_date?: string | null
@@ -667,13 +714,16 @@ export type Database = {
           quiz_score?: number | null
           review_count?: number | null
           started_at?: string | null
+          tags?: string[] | null
           time_spent?: number | null
           user_id: string
         }
         Update: {
+          bookmarked?: boolean | null
           completed_at?: string | null
           completion_rate?: number | null
           id?: string
+          last_noted_at?: string | null
           lesson_id?: string
           mastery_level?: number | null
           next_review_date?: string | null
@@ -683,6 +733,7 @@ export type Database = {
           quiz_score?: number | null
           review_count?: number | null
           started_at?: string | null
+          tags?: string[] | null
           time_spent?: number | null
           user_id?: string
         }

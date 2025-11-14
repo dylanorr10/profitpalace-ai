@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, Clock, CheckCircle2, XCircle, Lightbulb, MessageSquare, Sparkles, RefreshCw, Target, BookOpen, TrendingUp, AlertCircle, ArrowUp } from "lucide-react";
+import { ArrowLeft, Clock, CheckCircle2, XCircle, Lightbulb, MessageSquare, Sparkles, RefreshCw, Target, BookOpen, TrendingUp, AlertCircle, ArrowUp, Bookmark } from "lucide-react";
 import { VisualSection } from "@/components/VisualSection";
 import { ActionTimeline } from "@/components/ActionTimeline";
 import { ComparisonTable } from "@/components/ComparisonTable";
@@ -86,6 +86,8 @@ const Lesson = () => {
   const [filteredSections, setFilteredSections] = useState<ContentSection[]>([]);
   const [showBackToTop, setShowBackToTop] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
+  const [isBookmarked, setIsBookmarked] = useState(false);
+  const [progressId, setProgressId] = useState<string | null>(null);
 
   // Scroll to top when lesson changes
   useEffect(() => {
@@ -260,23 +262,29 @@ const Lesson = () => {
     // Create or fetch user progress record
     const { data: progressData } = await supabase
       .from('user_progress')
-      .select('notes, quiz_score')
+      .select('id, notes, quiz_score, bookmarked')
       .eq('user_id', user.id)
       .eq('lesson_id', lessonData.id)
       .maybeSingle();
 
     if (progressData) {
+      setProgressId(progressData.id);
       setNotes(progressData.notes || '');
+      setIsBookmarked(progressData.bookmarked || false);
       if (progressData.quiz_score !== null) {
         setQuizCompleted(true);
       }
     } else {
       // Create progress record
-      await supabase.from('user_progress').insert({
+      const { data: newProgress } = await supabase.from('user_progress').insert({
         user_id: user.id,
         lesson_id: lessonData.id,
         started_at: new Date().toISOString(),
-      });
+      }).select('id').single();
+
+      if (newProgress) {
+        setProgressId(newProgress.id);
+      }
 
       // Check for first lesson achievement
       const { data: allProgress } = await supabase
@@ -301,10 +309,41 @@ const Lesson = () => {
     notesTimeoutRef.current = setTimeout(async () => {
       await supabase
         .from('user_progress')
-        .update({ notes: value })
+        .update({ 
+          notes: value,
+          last_noted_at: new Date().toISOString()
+        })
         .eq('user_id', userId)
         .eq('lesson_id', id);
     }, 1000);
+  };
+
+  const toggleBookmark = async () => {
+    if (!progressId) return;
+    
+    const newBookmarkStatus = !isBookmarked;
+    setIsBookmarked(newBookmarkStatus);
+    
+    const { error } = await supabase
+      .from('user_progress')
+      .update({ bookmarked: newBookmarkStatus })
+      .eq('id', progressId);
+
+    if (error) {
+      setIsBookmarked(!newBookmarkStatus); // Revert on error
+      toast({
+        title: 'Error',
+        description: 'Failed to update bookmark',
+        variant: 'destructive',
+      });
+    } else {
+      toast({
+        title: newBookmarkStatus ? 'Bookmarked! 📌' : 'Bookmark removed',
+        description: newBookmarkStatus 
+          ? 'Find this lesson in your Notes Library'
+          : 'Removed from bookmarks',
+      });
+    }
   };
 
   const handleQuizComplete = async (score: number, passed: boolean) => {
@@ -384,24 +423,37 @@ const Lesson = () => {
             <span className="hidden sm:inline">Back to Dashboard</span>
             <span className="sm:hidden">Back</span>
           </Button>
-          <Button 
-            variant="outline" 
-            size="sm"
-            onClick={() => navigate('/chat', { 
-              state: { 
-                lessonContext: { 
-                  id: lesson.id, 
-                  title: lesson.title, 
-                  category: lesson.category 
+          <div className="flex gap-2">
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={toggleBookmark}
+              className={`text-xs md:text-sm ${isBookmarked ? 'border-primary' : ''}`}
+            >
+              <Bookmark className={`w-3 h-3 md:w-4 md:h-4 ${isBookmarked ? 'fill-primary text-primary' : ''}`} />
+              <span className="hidden sm:inline ml-1 md:ml-2">
+                {isBookmarked ? 'Bookmarked' : 'Bookmark'}
+              </span>
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => navigate('/chat', { 
+                state: { 
+                  lessonContext: { 
+                    id: lesson.id, 
+                    title: lesson.title, 
+                    category: lesson.category 
+                  }
                 }
-              }
-            })}
-            className="text-xs md:text-sm"
-          >
-            <MessageSquare className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />
-            <span className="hidden sm:inline">Ask AI About This</span>
-            <span className="sm:hidden">Ask AI</span>
-          </Button>
+              })}
+              className="text-xs md:text-sm"
+            >
+              <MessageSquare className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />
+              <span className="hidden sm:inline">Ask AI About This</span>
+              <span className="sm:hidden">Ask AI</span>
+            </Button>
+          </div>
         </div>
       </header>
 
