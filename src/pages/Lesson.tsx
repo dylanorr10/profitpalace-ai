@@ -5,11 +5,13 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, Clock, CheckCircle2, XCircle, Lightbulb, MessageSquare, Sparkles, RefreshCw, Target, BookOpen } from "lucide-react";
+import { ArrowLeft, Clock, CheckCircle2, XCircle, Lightbulb, MessageSquare, Sparkles, RefreshCw, Target, BookOpen, TrendingUp, AlertCircle } from "lucide-react";
 import { VisualSection } from "@/components/VisualSection";
 import { ActionTimeline } from "@/components/ActionTimeline";
 import { ComparisonTable } from "@/components/ComparisonTable";
 import { ScenarioCard } from "@/components/ScenarioCard";
+import { LessonSkeleton } from "@/components/LoadingSkeleton";
+import { IconBadge } from "@/components/IconBadge";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { hasAccessToLesson } from "@/utils/accessControl";
@@ -325,11 +327,7 @@ const Lesson = () => {
   };
 
   if (!lesson) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <p className="text-muted-foreground">Loading lesson...</p>
-      </div>
-    );
+    return <LessonSkeleton />;
   }
 
   const industryExample = lesson.content.industry_examples[userIndustry] || 
@@ -371,21 +369,28 @@ const Lesson = () => {
       </header>
 
       <div className="container mx-auto px-4 py-6 md:py-8 max-w-4xl overflow-x-hidden">
-        {/* Lesson Header */}
-        <div className="mb-6 md:mb-8">
-          <div className="flex items-start gap-3 md:gap-4 mb-4">
-            <div className="text-4xl md:text-6xl">{lesson.emoji}</div>
+        {/* Lesson Header with enhanced visual hierarchy */}
+        <div className="mb-8 md:mb-10 animate-fade-in">
+          <div className="flex items-start gap-4 md:gap-6 mb-6">
+            <div className="text-5xl md:text-7xl animate-scale-in">{lesson.emoji}</div>
             <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 mb-2 flex-wrap">
-                <Badge className="bg-success/10 text-success text-xs md:text-sm">{lesson.difficulty}</Badge>
+              <div className="flex items-center gap-2 mb-3 flex-wrap">
+                <IconBadge icon={TrendingUp} variant="success" size="sm" />
+                <Badge className="bg-success/10 text-success text-xs md:text-sm border-success/20">
+                  {lesson.difficulty}
+                </Badge>
                 <Badge variant="outline" className="text-xs md:text-sm">{lesson.category}</Badge>
-                <div className="flex items-center gap-1 text-muted-foreground text-xs md:text-sm">
-                  <Clock className="w-3 h-3 md:w-4 md:h-4" />
-                  <span>{lesson.duration} min</span>
+                <div className="flex items-center gap-1.5 text-muted-foreground text-xs md:text-sm">
+                  <Clock className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                  <span>{lesson.duration} min read</span>
                 </div>
               </div>
-              <h1 className="text-2xl md:text-4xl font-bold mb-2 break-words">{lesson.title}</h1>
-              <p className="text-base md:text-xl text-muted-foreground">{lesson.content.intro}</p>
+              <h1 className="text-3xl md:text-5xl font-bold mb-3 break-words leading-tight">
+                {lesson.title}
+              </h1>
+              <p className="text-lg md:text-xl text-muted-foreground leading-relaxed">
+                {lesson.content.intro}
+              </p>
             </div>
           </div>
         </div>
@@ -560,9 +565,14 @@ const Lesson = () => {
         </VisualSection>
         </div>
 
-        {/* Notes Section */}
-        <Card className="p-4 md:p-6 mt-6 md:mt-8">
-          <Label htmlFor="notes" className="text-base md:text-lg font-semibold mb-2">Your Notes 📝</Label>
+        {/* Notes Section with enhanced design */}
+        <Card className="p-4 md:p-6 mt-6 md:mt-8 border-primary/20 hover:border-primary/40 transition-colors">
+          <div className="flex items-center gap-2 mb-3">
+            <IconBadge icon={Lightbulb} variant="primary" />
+            <Label htmlFor="notes" className="text-base md:text-lg font-semibold">
+              Your Notes
+            </Label>
+          </div>
           <Textarea
             id="notes"
             placeholder="Write your thoughts, questions, or key takeaways..."
@@ -570,21 +580,32 @@ const Lesson = () => {
             onChange={(e) => handleNotesChange(e.target.value)}
             className="mt-2 min-h-[120px] text-sm md:text-base"
           />
-          <p className="text-xs text-muted-foreground mt-2">
-            Auto-saved • Visible only to you
-          </p>
+          <div className="flex items-center gap-2 mt-2">
+            <div className="flex items-center gap-1 text-xs text-muted-foreground">
+              <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+              Auto-saved
+            </div>
+            <span className="text-xs text-muted-foreground">•</span>
+            <span className="text-xs text-muted-foreground">Visible only to you</span>
+          </div>
         </Card>
 
-        {/* Quiz Section */}
+        {/* Quiz Section with enhanced design */}
         {lesson.content.quiz && !quizCompleted && (
           <div className="mt-6 md:mt-8">
             {!showQuiz ? (
-              <Card className="p-6 md:p-8 text-center">
-                <h2 className="text-xl md:text-2xl font-bold mb-3 md:mb-4">Ready to test your knowledge?</h2>
-                <p className="text-sm md:text-base text-muted-foreground mb-4 md:mb-6">
-                  Complete the quiz to finish this lesson
-                </p>
-                <Button size="lg" onClick={() => setShowQuiz(true)} className="w-full sm:w-auto">
+              <Card className="p-8 md:p-10 text-center border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-accent/5 hover:border-primary/40 transition-all">
+                <div className="mb-4">
+                  <div className="w-16 h-16 mx-auto mb-4 bg-primary/10 rounded-full flex items-center justify-center">
+                    <AlertCircle className="w-8 h-8 text-primary" />
+                  </div>
+                  <h2 className="text-2xl md:text-3xl font-bold mb-3">Ready to test your knowledge?</h2>
+                  <p className="text-sm md:text-base text-muted-foreground max-w-md mx-auto">
+                    Complete the quiz to finish this lesson and unlock your achievement
+                  </p>
+                </div>
+                <Button size="lg" onClick={() => setShowQuiz(true)} className="w-full sm:w-auto mt-4">
+                  <Target className="w-4 h-4 mr-2" />
                   Start Quiz
                 </Button>
               </Card>
