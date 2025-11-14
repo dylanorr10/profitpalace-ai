@@ -149,6 +149,50 @@ All colors MUST be HSL.
     transform: scale(0.98);
   }
 
+  /* Micro-interactions */
+  button, a, [role="button"] {
+    transition: all 0.2s ease-in-out;
+  }
+
+  /* Smooth hover effects */
+  button:hover:not(:disabled),
+  a:hover,
+  [role="button"]:hover {
+    transform: translateY(-1px);
+  }
+
+  button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  /* Focus visible styles */
+  *:focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+  }
+
+  /* Loading skeleton shimmer */
+  @keyframes shimmer {
+    0% {
+      background-position: -1000px 0;
+    }
+    100% {
+      background-position: 1000px 0;
+    }
+  }
+
+  .animate-shimmer {
+    animation: shimmer 2s infinite linear;
+    background: linear-gradient(
+      to right,
+      hsl(var(--muted)) 0%,
+      hsl(var(--muted-foreground) / 0.1) 50%,
+      hsl(var(--muted)) 100%
+    );
+    background-size: 1000px 100%;
+  }
+
   /* Quiz animations */
   @keyframes shake {
     0%, 100% { transform: translateX(0); }
@@ -179,5 +223,31 @@ All colors MUST be HSL.
   
   .prose blockquote {
     border-left-color: hsl(var(--primary));
+  }
+
+  /* Card hover effects */
+  .hover-card {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .hover-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 30px -10px hsl(var(--primary) / 0.3);
+  }
+
+  /* Smooth page transitions */
+  .page-transition {
+    animation: fadeInUp 0.4s ease-out;
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 }
