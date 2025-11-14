@@ -338,7 +338,7 @@ const Lesson = () => {
   const displaySections = filteredSections.length > 0 ? filteredSections : lesson.content.sections;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background page-transition">
       {/* Header */}
       <header className="border-b bg-card sticky top-0 z-10">
         <div className="container mx-auto px-4 py-3 md:py-4 flex items-center justify-between gap-2">

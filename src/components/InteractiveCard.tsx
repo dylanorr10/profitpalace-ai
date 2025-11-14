@@ -17,17 +17,16 @@ export const InteractiveCard = ({
 }: InteractiveCardProps) => {
   const variants = {
     default: "",
-    "hover-lift": "hover:shadow-lg hover:-translate-y-1",
-    "hover-glow": "hover:shadow-[0_0_20px_rgba(3,255,246,0.3)] hover:border-primary/50",
+    "hover-lift": "hover:shadow-lg hover:-translate-y-1 hover:border-primary/30",
+    "hover-glow": "hover:shadow-[0_0_25px_hsl(178_100%_51%/0.4)] hover:border-primary/60",
   };
 
   return (
     <Card
       onClick={onClick}
       className={cn(
-        "transition-all duration-300 cursor-pointer active:scale-[0.98]",
+        "transition-all duration-300 cursor-pointer active:scale-[0.98] touch-manipulation",
         variants[variant],
-        onClick && "hover:border-primary/30",
         className
       )}
     >
