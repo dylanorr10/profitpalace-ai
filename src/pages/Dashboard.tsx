@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { LogOut, Settings, Sparkles, Users, Mail, BookOpen, Award, TrendingUp, GraduationCap } from "lucide-react";
+import { LogOut, Settings, Sparkles, Users, Mail, BookOpen, Award, TrendingUp, GraduationCap, FileText } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -30,6 +30,7 @@ import { logDailyActivity, getStreakInfo } from "@/utils/streakTracking";
 import { getSeasonalLessons, SeasonalLessonGroup } from "@/utils/seasonalLessons";
 import { getLessonsDueForReview, ReviewLesson } from "@/utils/reviewSchedule";
 import { ReviewCard } from "@/components/ReviewCard";
+import NotesWidget from "@/components/NotesWidget";
 
 interface Lesson {
   id: string;
@@ -403,6 +404,13 @@ const Dashboard = () => {
             <Button variant="ghost" size="sm" onClick={() => navigate('/glossary')} className="hidden md:inline-flex hover:text-primary">
               Glossary
             </Button>
+            <Button variant="ghost" size="sm" onClick={() => navigate('/notes')} className="hidden md:flex hover:text-primary">
+              <FileText className="w-4 h-4 mr-2" />
+              Notes
+            </Button>
+            <Button variant="ghost" size="sm" onClick={() => navigate('/notes')} className="md:hidden hover:text-primary">
+              <FileText className="w-4 h-4" />
+            </Button>
             <Button variant="ghost" size="sm" onClick={() => navigate('/community')} className="hidden md:flex hover:text-primary">
               <Users className="w-4 h-4 mr-2" />
               Community
@@ -530,9 +538,13 @@ const Dashboard = () => {
           </Card>
         </div>
 
-        {/* Review Mode - Spaced Repetition */}
-        <div className="mb-8">
+        {/* Review Mode & Notes Section */}
+        <div className="grid md:grid-cols-2 gap-4 md:gap-6 mb-8">
+          {/* Review Card */}
           <ReviewCard reviewLessons={reviewLessons} />
+          
+          {/* Notes Widget */}
+          <NotesWidget />
         </div>
 
         {/* Journey Path Visualization */}

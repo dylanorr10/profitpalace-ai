@@ -25,6 +25,7 @@ import FirstDay from "./pages/FirstDay";
 import Curriculum from "./pages/Curriculum";
 import TermsOfService from "./pages/TermsOfService";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
+import NotesLibrary from "./pages/NotesLibrary";
 
 const queryClient = new QueryClient();
 
@@ -59,6 +60,7 @@ const App = () => (
             <Route path="/glossary" element={<ProtectedRoute><Glossary /></ProtectedRoute>} />
             <Route path="/first-day" element={<ProtectedRoute><FirstDay /></ProtectedRoute>} />
             <Route path="/curriculum" element={<ProtectedRoute><Curriculum /></ProtectedRoute>} />
+            <Route path="/notes" element={<ProtectedRoute><NotesLibrary /></ProtectedRoute>} />
             
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
