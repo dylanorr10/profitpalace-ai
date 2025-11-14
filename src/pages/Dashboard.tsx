@@ -11,7 +11,6 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { UrgentBanner } from "@/components/UrgentBanner";
 import { MonthlyFocusCard } from "@/components/MonthlyFocusCard";
-import ProfilePrompt from "@/components/ProfilePrompt";
 import { DashboardSkeleton } from "@/components/LoadingSkeleton";
 import { EmptyState } from "@/components/EmptyState";
 import { InteractiveCard } from "@/components/InteractiveCard";
@@ -443,11 +442,6 @@ const Dashboard = () => {
               progressPercent={getNextUpProgress()}
             />
           </div>
-        )}
-
-        {/* Profile Completion Prompt */}
-        {profile && user && (
-          <ProfilePrompt profile={profile} userId={user.id} />
         )}
 
         {/* Urgent Banner */}
