@@ -85,6 +85,11 @@ const Lesson = () => {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [filteredSections, setFilteredSections] = useState<ContentSection[]>([]);
 
+  // Scroll to top when lesson changes
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [id]);
+
   useEffect(() => {
     fetchLesson();
     fetchUserProfile();
