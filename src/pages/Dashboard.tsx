@@ -31,6 +31,7 @@ import { getSeasonalLessons, SeasonalLessonGroup } from "@/utils/seasonalLessons
 import { getLessonsDueForReview, ReviewLesson } from "@/utils/reviewSchedule";
 import { ReviewCard } from "@/components/ReviewCard";
 import NotesWidget from "@/components/NotesWidget";
+import { DemoModeIndicator } from "@/components/DemoModeIndicator";
 
 interface Lesson {
   id: string;
@@ -391,6 +392,9 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-background page-transition">
+      {/* Demo Mode Indicator */}
+      <DemoModeIndicator />
+
       {/* Onboarding Modal */}
       <OnboardingWelcome 
         isOpen={showOnboarding}
