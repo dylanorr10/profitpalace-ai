@@ -31,7 +31,6 @@ import { getSeasonalLessons, SeasonalLessonGroup } from "@/utils/seasonalLessons
 import { getLessonsDueForReview, ReviewLesson } from "@/utils/reviewSchedule";
 import { ReviewCard } from "@/components/ReviewCard";
 import NotesWidget from "@/components/NotesWidget";
-import { WelcomeAnimation } from "@/components/WelcomeAnimation";
 import { LessonShowcase } from "@/components/LessonShowcase";
 
 interface Lesson {
@@ -99,19 +98,12 @@ const Dashboard = () => {
   });
   const [seasonalLessonGroups, setSeasonalLessonGroups] = useState<SeasonalLessonGroup[]>([]);
   const [reviewLessons, setReviewLessons] = useState<ReviewLesson[]>([]);
-  const [showWelcome, setShowWelcome] = useState(false);
   const [isDemo, setIsDemo] = useState(false);
 
   useEffect(() => {
     if (user) {
       const isDemoUser = user.email === 'demo@reelin.co.uk';
       setIsDemo(isDemoUser);
-      
-      // Show welcome animation for demo users on first visit
-      if (isDemoUser && !sessionStorage.getItem('welcomeShown')) {
-        setTimeout(() => setShowWelcome(true), 500);
-        sessionStorage.setItem('welcomeShown', 'true');
-      }
       
       loadData();
       logDailyActivity(user.id);
@@ -405,14 +397,6 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-background page-transition">
-      {/* Welcome Animation for Demo Users */}
-      <WelcomeAnimation
-        isOpen={showWelcome}
-        onClose={() => setShowWelcome(false)}
-        currentStreak={streakInfo.currentStreak}
-        lessonsCompleted={completedCount}
-      />
-
       {/* Onboarding Modal */}
       <OnboardingWelcome 
         isOpen={showOnboarding}
