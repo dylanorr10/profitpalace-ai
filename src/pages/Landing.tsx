@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Check, Clock, TrendingUp, Users, Zap, CheckCircle2, Award } from "lucide-react";
+import { Check, Clock, TrendingUp, Users, Zap, CheckCircle2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -196,10 +196,6 @@ const Landing = () => {
 
               {/* Social Proof */}
               <div className="flex flex-wrap items-center justify-center lg:justify-start gap-6 text-[#03fff6]/80 text-sm animate-slide-up" style={{ animationDelay: '0.25s' }}>
-                <div className="flex items-center gap-2">
-                  <Award className="w-5 h-5" />
-                  <span className="font-medium">UK Tax Specialist</span>
-                </div>
                 <div className="flex items-center gap-2">
                   <Users className="w-5 h-5" />
                   <span className="font-medium">Growing Community</span>
