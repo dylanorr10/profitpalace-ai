@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Check, Clock, TrendingUp, Users, Zap, CheckCircle2, Download, FileCheck } from "lucide-react";
+import { Check, Clock, TrendingUp, Users, Zap, CheckCircle2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -9,9 +9,6 @@ import { z } from "zod";
 
 const Landing = () => {
   const [email, setEmail] = useState("");
-  const [leadMagnetEmail, setLeadMagnetEmail] = useState("");
-  const [isDownloading, setIsDownloading] = useState(false);
-  const [downloadSuccess, setDownloadSuccess] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -103,66 +100,34 @@ const Landing = () => {
       return;
     }
 
-    // Save validated email to database
+    // Save validated email to database with comprehensive tags
     try {
       await supabase.from('email_subscribers').insert({
         email: result.data.email,
-        source: 'landing_page',
-        tags: ['course_interest']
+        source: 'landing_page_hero',
+        tags: ['newsletter', 'lead_magnet', 'expenses_checklist']
       });
     } catch (error) {
       console.log('Email already exists or error saving');
     }
 
-    toast({
-      title: "Thanks for your interest!",
-      description: "Let's get you started.",
-    });
-    navigate("/signup", { state: { email: result.data.email } });
-  };
-
-  const handleLeadMagnetDownload = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsDownloading(true);
-    
-    // Validate email input
-    const result = emailSchema.safeParse({ email: leadMagnetEmail });
-    if (!result.success) {
-      toast({
-        title: 'Invalid email',
-        description: result.error.errors[0].message,
-        variant: 'destructive'
-      });
-      setIsDownloading(false);
-      return;
-    }
-
-    // Save validated email to database with lead magnet tags
-    try {
-      await supabase.from('email_subscribers').insert({
-        email: result.data.email,
-        source: 'lead_magnet_expenses_checklist',
-        tags: ['lead_magnet', 'expenses_checklist']
-      });
-    } catch (error) {
-      console.log('Email already exists or error saving');
-    }
-
-    // Trigger PDF download
+    // Trigger free checklist PDF download as bonus
     const link = document.createElement('a');
     link.href = '/ReelinChecklist.pdf';
-    link.download = 'ReelinChecklist.pdf';
+    link.download = 'Reelin-UK-Business-Expenses-Checklist.pdf';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-
-    setIsDownloading(false);
-    setDownloadSuccess(true);
     
     toast({
       title: "Success! Check your downloads",
-      description: "Your free checklist is downloading now.",
+      description: "Your free checklist is downloading. Taking you to signup...",
     });
+
+    // Navigate to signup with email prefilled
+    setTimeout(() => {
+      navigate("/signup", { state: { email: result.data.email } });
+    }, 1000);
   };
 
   return (
@@ -238,7 +203,7 @@ const Landing = () => {
               
               {/* Subheadline */}
               <p className="text-xl md:text-2xl text-[#03fff6]/90 leading-relaxed animate-slide-up" style={{ animationDelay: '0.2s' }}>
-                Learn UK tax & bookkeeping with your <span className="font-semibold text-[#03fff6]">personal AI finance coach</span>. Master the essentials in 10 minutes a day.
+                Learn UK tax & bookkeeping with your <span className="font-semibold text-[#03fff6]">personal AI finance coach</span>. Master the essentials in 10 minutes a day. <span className="inline-block bg-[#03fff6]/20 px-3 py-1 rounded-full text-sm font-semibold mt-2">+ Free expenses checklist</span>
               </p>
 
               {/* Social Proof */}
@@ -272,7 +237,7 @@ const Landing = () => {
                   </div>
                   
                   <p className="text-[#03fff6]/90 text-base font-medium">
-                    Skip the jargon. Learn smarter, not harder.
+                    🎁 Get instant access + free UK expenses checklist
                   </p>
                 </div>
               </form>
@@ -317,76 +282,6 @@ const Landing = () => {
         </div>
       </section>
 
-      {/* Lead Magnet Section - Free Expenses Checklist */}
-      <section className="py-20 px-4 bg-gradient-to-br from-primary/5 via-background to-background" aria-labelledby="free-checklist">
-        <div className="container mx-auto max-w-4xl">
-          <div className="bg-card border border-primary/20 rounded-2xl p-8 md:p-12 shadow-lg hover:shadow-xl transition-shadow">
-            <div className="flex flex-col md:flex-row items-center gap-8">
-              {/* Icon/Visual */}
-              <div className="flex-shrink-0">
-                <div className="w-24 h-24 bg-primary/10 rounded-full flex items-center justify-center">
-                  <FileCheck className="w-12 h-12 text-primary" />
-                </div>
-              </div>
-
-              {/* Content */}
-              <div className="flex-1 text-center md:text-left">
-                <h2 id="free-checklist" className="text-3xl md:text-4xl font-bold mb-4">
-                  Free Download: <span className="text-primary">Ultimate UK Business Expenses Checklist</span>
-                </h2>
-                <p className="text-lg text-muted-foreground mb-6">
-                  Get our comprehensive checklist of allowable business expenses, organized by category. 
-                  Never miss a deductible expense again and keep more of your hard-earned money!
-                </p>
-
-                {!downloadSuccess ? (
-                  <form onSubmit={handleLeadMagnetDownload} className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto md:mx-0">
-                    <Input
-                      type="email"
-                      placeholder="Enter your email"
-                      value={leadMagnetEmail}
-                      onChange={(e) => setLeadMagnetEmail(e.target.value)}
-                      required
-                      className="flex-1 h-12 px-4 bg-background border-primary/20 focus:border-primary"
-                      aria-label="Email for free checklist download"
-                    />
-                    <Button 
-                      type="submit" 
-                      size="lg"
-                      disabled={isDownloading}
-                      className="gap-2 h-12 min-w-[180px]"
-                    >
-                      {isDownloading ? (
-                        <>Processing...</>
-                      ) : (
-                        <>
-                          <Download className="w-4 h-4" />
-                          Get Free Checklist
-                        </>
-                      )}
-                    </Button>
-                  </form>
-                ) : (
-                  <div className="flex flex-col items-center md:items-start gap-4">
-                    <div className="flex items-center gap-2 text-primary">
-                      <CheckCircle2 className="w-6 h-6" />
-                      <span className="font-semibold">Downloaded! Check your downloads folder.</span>
-                    </div>
-                    <Button 
-                      onClick={() => navigate("/signup", { state: { email: leadMagnetEmail } })}
-                      size="lg"
-                      variant="outline"
-                      className="gap-2"
-                    >
-                      Start Free Lessons
-                    </Button>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* Value Proposition */}
       <section className="py-20 px-4" aria-labelledby="value-proposition">
