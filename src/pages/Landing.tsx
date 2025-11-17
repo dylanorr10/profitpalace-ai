@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Check, Clock, TrendingUp, Users, Zap, Eye } from "lucide-react";
+import { Check, Clock, TrendingUp, Users, Zap, Eye, CheckCircle2, Award } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { z } from "zod";
+import dashboardPreview from "@/assets/dashboard-preview.jpg";
 
 const Landing = () => {
   const [email, setEmail] = useState("");
@@ -153,17 +154,22 @@ const Landing = () => {
   return (
     <main className="min-h-screen bg-background">
       {/* Hero Section */}
-      <header className="relative overflow-hidden bg-gradient-hero min-h-[90vh] flex items-center px-4 py-12" role="banner">
+      <header className="relative overflow-hidden bg-gradient-hero min-h-[95vh] flex items-center px-4 py-12" role="banner">
         {/* Animated Background Elements */}
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute top-20 left-10 w-72 h-72 bg-[#03fff6]/5 rounded-full blur-3xl animate-float"></div>
           <div className="absolute bottom-20 right-10 w-96 h-96 bg-[#03fff6]/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }}></div>
           <div className="absolute top-1/2 left-1/3 w-64 h-64 bg-[#03fff6]/5 rounded-full blur-3xl animate-float" style={{ animationDelay: '4s' }}></div>
+          
+          {/* Floating elements */}
+          <div className="absolute top-40 right-20 text-4xl animate-float opacity-20" style={{ animationDelay: '1s' }}>💰</div>
+          <div className="absolute bottom-40 left-20 text-4xl animate-float opacity-20" style={{ animationDelay: '3s' }}>📊</div>
+          <div className="absolute top-60 left-1/4 text-4xl animate-float opacity-20" style={{ animationDelay: '5s' }}>🎯</div>
         </div>
         
         <div className="container mx-auto max-w-7xl relative z-10">
           {/* Top Navigation Bar */}
-          <div className="flex justify-between items-center mb-12 md:mb-16">
+          <div className="flex justify-between items-center mb-8 md:mb-12">
             <div className="flex items-center gap-3">
               <div className="text-3xl">🎣</div>
               <span className="text-[#03fff6] font-bold text-xl hidden sm:inline">Reelin</span>
@@ -177,76 +183,118 @@ const Landing = () => {
             </Button>
           </div>
 
-          <div className="text-center space-y-8 max-w-5xl mx-auto">
-            {/* Badge */}
-            <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#03fff6]/15 backdrop-blur-md rounded-full text-[#03fff6] text-sm font-medium border border-[#03fff6]/20 shadow-lg animate-slide-up">
-              💡 <span>Created by an ex-ACCA accountant — built for real self-employed people</span>
-            </div>
-            
-            {/* Main Headline */}
-            <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold text-[#03fff6] leading-[1.1] animate-slide-up" style={{ animationDelay: '0.1s' }}>
-              Take Control of Your
-              <br />
-              <span className="text-[#03fff6]/90">Self-Employed Finances</span>
-            </h1>
-            
-            {/* Subheadline */}
-            <p className="text-xl md:text-2xl text-[#03fff6]/90 max-w-3xl mx-auto leading-relaxed animate-slide-up" style={{ animationDelay: '0.2s' }}>
-              Master tax, bookkeeping, and money management with your <span className="font-semibold text-[#03fff6]">personal AI finance coach</span>.
-            </p>
-
-            {/* CTA Form */}
-            <form onSubmit={handleEmailSubmit} className="max-w-xl mx-auto mt-10 animate-slide-up" style={{ animationDelay: '0.3s' }}>
-              <div className="flex flex-col gap-4">
-                <div className="flex flex-col sm:flex-row gap-4 p-2 bg-[#03fff6]/10 backdrop-blur-md rounded-2xl border border-[#03fff6]/20 shadow-2xl">
-                  <Input
-                    type="email"
-                    placeholder="Enter your email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="bg-white/95 text-foreground flex-1 h-14 text-lg border-0 rounded-xl focus:ring-2 focus:ring-[#03fff6]/50"
-                    required
-                    maxLength={255}
-                  />
-                  <Button type="submit" size="lg" className="h-14 px-10 bg-[#03fff6] text-[#687b88] hover:bg-[#03fff6]/90 font-bold text-lg rounded-xl shadow-xl hover:scale-105 transition-transform">
-                    Start Free →
-                  </Button>
-                </div>
-                
-                {/* Demo Button */}
-                <div className="relative">
-                  <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-[#03fff6]/20"></div>
-                  </div>
-                  <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-background px-2 text-[#03fff6]/70">Or</span>
-                  </div>
-                </div>
-                
-                <Button 
-                  type="button"
-                  size="lg" 
-                  variant="outline"
-                  onClick={handleDemoLogin}
-                  className="h-14 px-10 bg-[#03fff6]/5 text-[#03fff6] border-[#03fff6]/30 hover:bg-[#03fff6]/10 hover:border-[#03fff6]/50 font-bold text-lg rounded-xl shadow-lg hover:scale-105 transition-all backdrop-blur-sm"
-                >
-                  <Eye className="mr-2 h-5 w-5" />
-                  Try Live Demo
-                </Button>
-                
-                <p className="text-[#03fff6]/90 text-base font-medium">
-                  Skip the jargon. Learn smarter, not harder.
-                </p>
+          {/* Split Hero Layout */}
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            {/* Left: Copy */}
+            <div className="space-y-8 text-center lg:text-left order-2 lg:order-1">
+              {/* Enhanced Credibility Badge */}
+              <div className="inline-flex items-center gap-3 px-6 py-3 bg-[#03fff6]/15 backdrop-blur-md rounded-full text-[#03fff6] text-base font-semibold border border-[#03fff6]/20 shadow-lg animate-slide-up">
+                <CheckCircle2 className="w-5 h-5" />
+                <span>Created by an ex-ACCA accountant</span>
               </div>
-            </form>
+              
+              {/* Main Headline */}
+              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-[#03fff6] leading-[1.1] animate-slide-up" style={{ animationDelay: '0.1s' }}>
+                Stop Stressing About Tax Season
+              </h1>
+              
+              {/* Subheadline */}
+              <p className="text-xl md:text-2xl text-[#03fff6]/90 leading-relaxed animate-slide-up" style={{ animationDelay: '0.2s' }}>
+                Learn UK tax & bookkeeping with your <span className="font-semibold text-[#03fff6]">personal AI finance coach</span>. Master the essentials in 10-minute lessons.
+              </p>
 
-            {/* Trust Indicators */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mt-6 text-[#03fff6]/90 animate-slide-up" style={{ animationDelay: '0.4s' }}>
-              <span className="text-sm font-medium">3 free lessons</span>
-              <div className="hidden sm:block w-1 h-1 bg-[#03fff6]/50 rounded-full"></div>
-              <span className="text-sm font-medium">Cancel anytime</span>
-              <div className="hidden sm:block w-1 h-1 bg-[#03fff6]/50 rounded-full"></div>
-              <span className="text-sm font-medium">No card required</span>
+              {/* Social Proof */}
+              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-6 text-[#03fff6]/80 text-sm animate-slide-up" style={{ animationDelay: '0.25s' }}>
+                <div className="flex items-center gap-2">
+                  <Award className="w-5 h-5" />
+                  <span className="font-medium">UK Tax Specialist</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Users className="w-5 h-5" />
+                  <span className="font-medium">Growing Community</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-5 h-5" />
+                  <span className="font-medium">Self-Employed Focused</span>
+                </div>
+              </div>
+
+              {/* CTA Form */}
+              <form onSubmit={handleEmailSubmit} className="mt-10 animate-slide-up" style={{ animationDelay: '0.3s' }}>
+                <div className="flex flex-col gap-4">
+                  <div className="flex flex-col sm:flex-row gap-4 p-2 bg-[#03fff6]/10 backdrop-blur-md rounded-2xl border border-[#03fff6]/20 shadow-2xl">
+                    <Input
+                      type="email"
+                      placeholder="Enter your email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="bg-white/95 text-foreground flex-1 h-14 text-lg border-0 rounded-xl focus:ring-2 focus:ring-[#03fff6]/50"
+                      required
+                      maxLength={255}
+                    />
+                    <Button type="submit" size="lg" className="h-14 px-10 bg-[#03fff6] text-[#687b88] hover:bg-[#03fff6]/90 font-bold text-lg rounded-xl shadow-xl hover:scale-105 transition-transform">
+                      Start Free →
+                    </Button>
+                  </div>
+                  
+                  {/* Demo Button */}
+                  <div className="relative">
+                    <div className="absolute inset-0 flex items-center">
+                      <div className="w-full border-t border-[#03fff6]/20"></div>
+                    </div>
+                    <div className="relative flex justify-center text-xs uppercase">
+                      <span className="bg-background px-2 text-[#03fff6]/70">Or</span>
+                    </div>
+                  </div>
+                  
+                  <Button 
+                    type="button"
+                    size="lg" 
+                    variant="outline"
+                    onClick={handleDemoLogin}
+                    className="h-14 px-10 bg-[#03fff6]/5 text-[#03fff6] border-[#03fff6]/30 hover:bg-[#03fff6]/10 hover:border-[#03fff6]/50 font-bold text-lg rounded-xl shadow-lg hover:scale-105 transition-all backdrop-blur-sm"
+                  >
+                    <Eye className="mr-2 h-5 w-5" />
+                    Try Live Demo
+                  </Button>
+                  
+                  <p className="text-[#03fff6]/90 text-base font-medium">
+                    Skip the jargon. Learn smarter, not harder.
+                  </p>
+                </div>
+              </form>
+
+              {/* Trust Indicators */}
+              <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-6 mt-6 text-[#03fff6]/90 animate-slide-up" style={{ animationDelay: '0.4s' }}>
+                <span className="text-sm font-medium">3 free lessons</span>
+                <div className="hidden sm:block w-1 h-1 bg-[#03fff6]/50 rounded-full"></div>
+                <span className="text-sm font-medium">Cancel anytime</span>
+                <div className="hidden sm:block w-1 h-1 bg-[#03fff6]/50 rounded-full"></div>
+                <span className="text-sm font-medium">No card required</span>
+              </div>
+            </div>
+
+            {/* Right: Animated Dashboard Preview */}
+            <div className="relative order-1 lg:order-2 animate-slide-up" style={{ animationDelay: '0.2s' }}>
+              <div className="relative rounded-2xl overflow-hidden shadow-2xl border-2 border-[#03fff6]/20 bg-gradient-to-br from-[#03fff6]/5 to-[#03fff6]/10 backdrop-blur-sm">
+                <img 
+                  src={dashboardPreview} 
+                  alt="Reelin dashboard showing learning progress, streak tracking, and personalized lessons"
+                  className="w-full h-auto rounded-xl"
+                  loading="eager"
+                />
+                {/* Floating stats overlay */}
+                <div className="absolute top-4 right-4 bg-[#03fff6]/90 backdrop-blur-md px-4 py-2 rounded-lg shadow-lg animate-float">
+                  <div className="text-white font-bold text-lg">45 🔥</div>
+                  <div className="text-white/80 text-xs">Day Streak</div>
+                </div>
+                <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur-md px-4 py-2 rounded-lg shadow-lg animate-float" style={{ animationDelay: '1s' }}>
+                  <div className="text-foreground font-bold text-lg">20+ Lessons</div>
+                  <div className="text-muted-foreground text-xs">Tax & Finance</div>
+                </div>
+              </div>
+              {/* Glow effect */}
+              <div className="absolute inset-0 bg-gradient-to-br from-[#03fff6]/20 to-transparent rounded-2xl blur-3xl -z-10 animate-pulse"></div>
             </div>
           </div>
         </div>
