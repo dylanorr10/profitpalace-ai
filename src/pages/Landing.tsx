@@ -203,10 +203,6 @@ const Landing = () => {
                   <div className="text-white font-bold text-sm md:text-lg">45 🔥</div>
                   <div className="text-white/80 text-xs">Day Streak</div>
                 </div>
-                <div className="absolute bottom-2 left-2 md:bottom-4 md:left-4 bg-white/90 backdrop-blur-md px-2 py-1 md:px-4 md:py-2 rounded-lg shadow-lg animate-float" style={{ animationDelay: '1s' }}>
-                  <div className="text-foreground font-bold text-sm md:text-lg">20+ Lessons</div>
-                  <div className="text-muted-foreground text-xs">Tax & Finance</div>
-                </div>
               </div>
               {/* Glow effect */}
               <div className="absolute inset-0 bg-gradient-to-br from-[#03fff6]/20 to-transparent rounded-2xl blur-3xl -z-10 animate-pulse"></div>
@@ -299,34 +295,6 @@ const Landing = () => {
                 <div className="hidden sm:block w-1 h-1 bg-[#03fff6]/50 rounded-full"></div>
                 <span className="text-sm font-medium">No card required</span>
               </div>
-            </div>
-
-            {/* Right: Animated Dashboard Video Preview */}
-            <div className="relative order-1 lg:order-2 animate-slide-up" style={{ animationDelay: '0.2s' }}>
-              <div className="relative rounded-2xl overflow-hidden shadow-2xl border-2 border-[#03fff6]/20 bg-gradient-to-br from-[#03fff6]/5 to-[#03fff6]/10 backdrop-blur-sm">
-                <video
-                  autoPlay
-                  loop
-                  muted
-                  playsInline
-                  className="w-full h-auto rounded-xl"
-                  aria-label="Reelin dashboard demonstration showing learning progress, streak tracking, and personalized lessons"
-                >
-                  <source src="/dashboard-demo.mov" type="video/mp4" />
-                  Your browser does not support the video tag.
-                </video>
-                {/* Floating stats overlay */}
-                <div className="absolute top-2 right-2 md:top-4 md:right-4 bg-[#03fff6]/90 backdrop-blur-md px-2 py-1 md:px-4 md:py-2 rounded-lg shadow-lg animate-float">
-                  <div className="text-white font-bold text-sm md:text-lg">45 🔥</div>
-                  <div className="text-white/80 text-xs">Day Streak</div>
-                </div>
-                <div className="absolute bottom-2 left-2 md:bottom-4 md:left-4 bg-white/90 backdrop-blur-md px-2 py-1 md:px-4 md:py-2 rounded-lg shadow-lg animate-float" style={{ animationDelay: '1s' }}>
-                  <div className="text-foreground font-bold text-sm md:text-lg">20+ Lessons</div>
-                  <div className="text-muted-foreground text-xs">Tax & Finance</div>
-                </div>
-              </div>
-              {/* Glow effect */}
-              <div className="absolute inset-0 bg-gradient-to-br from-[#03fff6]/20 to-transparent rounded-2xl blur-3xl -z-10 animate-pulse"></div>
             </div>
           </div>
         </div>
