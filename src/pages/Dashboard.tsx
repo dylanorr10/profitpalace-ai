@@ -32,6 +32,8 @@ import { getLessonsDueForReview, ReviewLesson } from "@/utils/reviewSchedule";
 import { ReviewCard } from "@/components/ReviewCard";
 import NotesWidget from "@/components/NotesWidget";
 import { DemoModeIndicator } from "@/components/DemoModeIndicator";
+import { WelcomeAnimation } from "@/components/WelcomeAnimation";
+import { LessonShowcase } from "@/components/LessonShowcase";
 
 interface Lesson {
   id: string;
@@ -98,10 +100,22 @@ const Dashboard = () => {
   });
   const [seasonalLessonGroups, setSeasonalLessonGroups] = useState<SeasonalLessonGroup[]>([]);
   const [reviewLessons, setReviewLessons] = useState<ReviewLesson[]>([]);
+  const [showWelcome, setShowWelcome] = useState(false);
+  const [isDemo, setIsDemo] = useState(false);
 
   useEffect(() => {
     if (user) {
+      const isDemoUser = user.email === 'demo@reelin.co.uk';
+      setIsDemo(isDemoUser);
+      
+      // Show welcome animation for demo users on first visit
+      if (isDemoUser && !sessionStorage.getItem('welcomeShown')) {
+        setTimeout(() => setShowWelcome(true), 500);
+        sessionStorage.setItem('welcomeShown', 'true');
+      }
+      
       loadData();
+      logDailyActivity(user.id);
     }
   }, [user]);
 
@@ -395,6 +409,14 @@ const Dashboard = () => {
       {/* Demo Mode Indicator */}
       <DemoModeIndicator />
 
+      {/* Welcome Animation for Demo Users */}
+      <WelcomeAnimation
+        isOpen={showWelcome}
+        onClose={() => setShowWelcome(false)}
+        currentStreak={streakInfo.currentStreak}
+        lessonsCompleted={completedCount}
+      />
+
       {/* Onboarding Modal */}
       <OnboardingWelcome 
         isOpen={showOnboarding}
@@ -465,7 +487,17 @@ const Dashboard = () => {
           </p>
         </div>
 
-        {/* Next Up Card (Primary Recommendation) - Prioritized at top */}
+        {/* Streak Card - Featured at Top for Demo Impact */}
+        <div className="mb-6 md:mb-8">
+          <StreakCard
+            currentStreak={streakInfo.currentStreak}
+            longestStreak={streakInfo.longestStreak}
+            totalStudyDays={streakInfo.totalStudyDays}
+            lastActivityDate={streakInfo.lastActivityDate}
+          />
+        </div>
+
+        {/* Next Up Card (Primary Recommendation) */}
         {nextUpLesson && completedCount > 0 && (
           <div className="mb-6 md:mb-8">
             <NextUpCard 
@@ -518,16 +550,18 @@ const Dashboard = () => {
           />
         )}
 
-        {/* Streak Card & Progress */}
-        <div className="grid md:grid-cols-2 gap-4 md:gap-6 mb-6 md:mb-8">
-          {/* Streak Tracking */}
-          <StreakCard
-            currentStreak={streakInfo.currentStreak}
-            longestStreak={streakInfo.longestStreak}
-            totalStudyDays={streakInfo.totalStudyDays}
-            lastActivityDate={streakInfo.lastActivityDate}
-          />
+        {/* Lesson Showcase - Horizontal Scrolling */}
+        {lessons.length > 0 && (
+          <div className="mb-6 md:mb-8">
+            <LessonShowcase 
+              lessons={lessons}
+              onLessonClick={(lessonId) => navigate(`/lesson/${lessonId}`)}
+            />
+          </div>
+        )}
 
+        {/* Progress Card */}
+        <div className="mb-6 md:mb-8">
           {/* Compact Progress Card */}
           <Card className="p-6 bg-gradient-card">
             <div className="flex items-center justify-between mb-3">
