@@ -26,6 +26,7 @@ import Curriculum from "./pages/Curriculum";
 import TermsOfService from "./pages/TermsOfService";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import NotesLibrary from "./pages/NotesLibrary";
+import FreeChecklist from "./pages/FreeChecklist";
 
 const queryClient = new QueryClient();
 
@@ -39,6 +40,7 @@ const App = () => (
           <Routes>
             {/* Public routes */}
             <Route path="/" element={<Landing />} />
+            <Route path="/free-checklist" element={<FreeChecklist />} />
             <Route path="/pricing" element={<Pricing />} />
             <Route path="/waitlist" element={<Waitlist />} />
             <Route path="/terms" element={<TermsOfService />} />
