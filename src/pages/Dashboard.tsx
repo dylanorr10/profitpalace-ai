@@ -31,7 +31,6 @@ import { getSeasonalLessons, SeasonalLessonGroup } from "@/utils/seasonalLessons
 import { getLessonsDueForReview, ReviewLesson } from "@/utils/reviewSchedule";
 import { ReviewCard } from "@/components/ReviewCard";
 import NotesWidget from "@/components/NotesWidget";
-import { DemoModeIndicator } from "@/components/DemoModeIndicator";
 import { WelcomeAnimation } from "@/components/WelcomeAnimation";
 import { LessonShowcase } from "@/components/LessonShowcase";
 
@@ -406,9 +405,6 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-background page-transition">
-      {/* Demo Mode Indicator */}
-      <DemoModeIndicator />
-
       {/* Welcome Animation for Demo Users */}
       <WelcomeAnimation
         isOpen={showWelcome}
