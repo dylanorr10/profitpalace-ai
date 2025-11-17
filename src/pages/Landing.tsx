@@ -191,7 +191,7 @@ const Landing = () => {
               
               {/* Subheadline */}
               <p className="text-xl md:text-2xl text-[#03fff6]/90 leading-relaxed animate-slide-up" style={{ animationDelay: '0.2s' }}>
-                Learn UK tax & bookkeeping with your <span className="font-semibold text-[#03fff6]">personal AI finance coach</span>. Master the essentials in 10-minute lessons.
+                Learn UK tax & bookkeeping with your <span className="font-semibold text-[#03fff6]">personal AI finance coach</span>. Master the essentials in 10 minutes a day.
               </p>
 
               {/* Social Proof */}
