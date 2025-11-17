@@ -186,16 +186,16 @@ const Landing = () => {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             {/* Left: Copy */}
             <div className="space-y-8 text-center lg:text-left order-2 lg:order-1">
+              {/* Main Headline */}
+              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-[#03fff6] leading-[1.1] animate-slide-up">
+                Stop Stressing About Tax Season
+              </h1>
+              
               {/* Enhanced Credibility Badge */}
-              <div className="inline-flex items-center gap-3 px-6 py-3 bg-[#03fff6]/15 backdrop-blur-md rounded-full text-[#03fff6] text-base font-semibold border border-[#03fff6]/20 shadow-lg animate-slide-up">
+              <div className="inline-flex items-center gap-3 px-6 py-3 bg-[#03fff6]/15 backdrop-blur-md rounded-full text-[#03fff6] text-base font-semibold border border-[#03fff6]/20 shadow-lg animate-slide-up" style={{ animationDelay: '0.1s' }}>
                 <CheckCircle2 className="w-5 h-5" />
                 <span>Created by an ex-ACCA accountant</span>
               </div>
-              
-              {/* Main Headline */}
-              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-[#03fff6] leading-[1.1] animate-slide-up" style={{ animationDelay: '0.1s' }}>
-                Stop Stressing About Tax Season
-              </h1>
               
               {/* Subheadline */}
               <p className="text-xl md:text-2xl text-[#03fff6]/90 leading-relaxed animate-slide-up" style={{ animationDelay: '0.2s' }}>
