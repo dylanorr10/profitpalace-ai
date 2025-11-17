@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Check, Clock, TrendingUp, Users, Zap, Eye, CheckCircle2, Award } from "lucide-react";
+import { Check, Clock, TrendingUp, Users, Zap, CheckCircle2, Award } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -118,38 +118,6 @@ const Landing = () => {
     navigate("/signup", { state: { email: result.data.email } });
   };
 
-  const handleDemoLogin = async () => {
-    try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email: 'demo@reelin.co.uk',
-        password: 'DemoPassword123!',
-      });
-
-      if (error) {
-        toast({
-          title: "Demo access temporarily unavailable",
-          description: "Please try again or sign up for full access.",
-          variant: "destructive"
-        });
-        return;
-      }
-
-      toast({
-        title: "Welcome to the demo! 🎬",
-        description: "You're viewing a demo account with 45 days of progress!",
-      });
-
-      navigate('/dashboard');
-    } catch (error) {
-      console.error('Demo login error:', error);
-      toast({
-        title: "Something went wrong",
-        description: "Please try again later.",
-        variant: "destructive"
-      });
-    }
-  };
-
   return (
     <main className="min-h-screen bg-background">
       {/* Hero Section */}
@@ -259,27 +227,6 @@ const Landing = () => {
                       Start Free →
                     </Button>
                   </div>
-                  
-                  {/* Demo Button */}
-                  <div className="relative">
-                    <div className="absolute inset-0 flex items-center">
-                      <div className="w-full border-t border-[#03fff6]/20"></div>
-                    </div>
-                    <div className="relative flex justify-center text-xs uppercase">
-                      <span className="bg-background px-2 text-[#03fff6]/70">Or</span>
-                    </div>
-                  </div>
-                  
-                  <Button 
-                    type="button"
-                    size="lg" 
-                    variant="outline"
-                    onClick={handleDemoLogin}
-                    className="h-14 px-10 bg-[#03fff6]/5 text-[#03fff6] border-[#03fff6]/30 hover:bg-[#03fff6]/10 hover:border-[#03fff6]/50 font-bold text-lg rounded-xl shadow-lg hover:scale-105 transition-all backdrop-blur-sm"
-                  >
-                    <Eye className="mr-2 h-5 w-5" />
-                    Try Live Demo
-                  </Button>
                   
                   <p className="text-[#03fff6]/90 text-base font-medium">
                     Skip the jargon. Learn smarter, not harder.
