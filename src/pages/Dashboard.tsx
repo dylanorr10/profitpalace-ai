@@ -586,19 +586,37 @@ const Dashboard = () => {
           <NotesWidget />
         </div>
 
-        {/* Expense Swiper Game */}
-        <Card className="p-6 mb-8 bg-gradient-to-br from-purple-500/10 to-primary/10 hover:shadow-lg transition-all cursor-pointer" onClick={() => navigate('/game/expense-swiper')}>
-          <div className="flex items-center gap-4">
-            <div className="text-5xl">🎮</div>
-            <div className="flex-1">
-              <h3 className="text-xl font-bold mb-1">Expense Swiper</h3>
-              <p className="text-sm text-muted-foreground">
-                Can you tell what's claimable? Test your knowledge with our fun swipe game!
-              </p>
-            </div>
-            <Button size="lg">Play Now</Button>
+        {/* Mini-Games Section */}
+        <div className="mb-8">
+          <h3 className="text-xl font-bold mb-4">🎮 Practice Games</h3>
+          <div className="grid md:grid-cols-2 gap-4">
+            <Card className="p-6 bg-gradient-to-br from-purple-500/10 to-primary/10 hover:shadow-lg transition-all cursor-pointer" onClick={() => navigate('/game/expense-swiper')}>
+              <div className="flex items-center gap-4">
+                <div className="text-5xl">🎮</div>
+                <div className="flex-1">
+                  <h3 className="text-xl font-bold mb-1">Expense Swiper</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Can you tell what's claimable? Swipe to find out!
+                  </p>
+                </div>
+                <Button size="lg">Play</Button>
+              </div>
+            </Card>
+
+            <Card className="p-6 bg-gradient-to-br from-blue-500/10 to-primary/10 hover:shadow-lg transition-all cursor-pointer" onClick={() => navigate('/game/mtd-true-false')}>
+              <div className="flex items-center gap-4">
+                <div className="text-5xl">📱</div>
+                <div className="flex-1">
+                  <h3 className="text-xl font-bold mb-1">MTD True or False</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Test your Making Tax Digital knowledge!
+                  </p>
+                </div>
+                <Button size="lg">Play</Button>
+              </div>
+            </Card>
           </div>
-        </Card>
+        </div>
 
         {/* Journey Path Visualization */}
         {lessons.length > 0 && (
