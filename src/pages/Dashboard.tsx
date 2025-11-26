@@ -586,6 +586,20 @@ const Dashboard = () => {
           <NotesWidget />
         </div>
 
+        {/* Expense Swiper Game */}
+        <Card className="p-6 mb-8 bg-gradient-to-br from-purple-500/10 to-primary/10 hover:shadow-lg transition-all cursor-pointer" onClick={() => navigate('/game/expense-swiper')}>
+          <div className="flex items-center gap-4">
+            <div className="text-5xl">🎮</div>
+            <div className="flex-1">
+              <h3 className="text-xl font-bold mb-1">Expense Swiper</h3>
+              <p className="text-sm text-muted-foreground">
+                Can you tell what's claimable? Test your knowledge with our fun swipe game!
+              </p>
+            </div>
+            <Button size="lg">Play Now</Button>
+          </div>
+        </Card>
+
         {/* Journey Path Visualization */}
         {lessons.length > 0 && (
           <JourneyPath lessons={getJourneyPathLessons()} />
