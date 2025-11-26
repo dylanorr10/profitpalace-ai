@@ -27,6 +27,7 @@ import TermsOfService from "./pages/TermsOfService";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import NotesLibrary from "./pages/NotesLibrary";
 import FreeChecklist from "./pages/FreeChecklist";
+import ExpenseSwiper from "./pages/ExpenseSwiper";
 
 const queryClient = new QueryClient();
 
@@ -63,6 +64,7 @@ const App = () => (
             <Route path="/first-day" element={<ProtectedRoute><FirstDay /></ProtectedRoute>} />
             <Route path="/curriculum" element={<ProtectedRoute><Curriculum /></ProtectedRoute>} />
             <Route path="/notes" element={<ProtectedRoute><NotesLibrary /></ProtectedRoute>} />
+            <Route path="/game/expense-swiper" element={<ProtectedRoute><ExpenseSwiper /></ProtectedRoute>} />
             
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
