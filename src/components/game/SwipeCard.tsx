@@ -12,25 +12,53 @@ interface SwipeCardProps {
 }
 
 export const SwipeCard = ({ question, onSwipe, isActive, style }: SwipeCardProps) => {
-  const [touchStart, setTouchStart] = useState(0);
-  const [touchCurrent, setTouchCurrent] = useState(0);
+  const [startX, setStartX] = useState(0);
+  const [currentX, setCurrentX] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
 
+  // Touch handlers
   const handleTouchStart = (e: React.TouchEvent) => {
     if (!isActive) return;
-    setTouchStart(e.touches[0].clientX);
-    setTouchCurrent(e.touches[0].clientX);
+    setStartX(e.touches[0].clientX);
+    setCurrentX(e.touches[0].clientX);
     setIsDragging(true);
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
     if (!isActive || !isDragging) return;
-    setTouchCurrent(e.touches[0].clientX);
+    setCurrentX(e.touches[0].clientX);
   };
 
   const handleTouchEnd = () => {
+    handleDragEnd();
+  };
+
+  // Mouse handlers
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (!isActive) return;
+    setStartX(e.clientX);
+    setCurrentX(e.clientX);
+    setIsDragging(true);
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
     if (!isActive || !isDragging) return;
-    const diff = touchCurrent - touchStart;
+    setCurrentX(e.clientX);
+  };
+
+  const handleMouseUp = () => {
+    handleDragEnd();
+  };
+
+  const handleMouseLeave = () => {
+    if (isDragging) {
+      handleDragEnd();
+    }
+  };
+
+  const handleDragEnd = () => {
+    if (!isActive || !isDragging) return;
+    const diff = currentX - startX;
     const threshold = 100;
 
     if (Math.abs(diff) > threshold) {
@@ -38,11 +66,11 @@ export const SwipeCard = ({ question, onSwipe, isActive, style }: SwipeCardProps
     }
 
     setIsDragging(false);
-    setTouchStart(0);
-    setTouchCurrent(0);
+    setStartX(0);
+    setCurrentX(0);
   };
 
-  const dragOffset = isDragging ? touchCurrent - touchStart : 0;
+  const dragOffset = isDragging ? currentX - startX : 0;
   const rotation = dragOffset / 20;
   const opacity = 1 - Math.abs(dragOffset) / 300;
 
@@ -70,6 +98,10 @@ export const SwipeCard = ({ question, onSwipe, isActive, style }: SwipeCardProps
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
+      onMouseDown={handleMouseDown}
+      onMouseMove={handleMouseMove}
+      onMouseUp={handleMouseUp}
+      onMouseLeave={handleMouseLeave}
     >
       {/* Left indicator (Not Claimable) */}
       <div
