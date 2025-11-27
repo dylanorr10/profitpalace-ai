@@ -266,7 +266,7 @@ const Landing = () => {
           <div className="text-center mb-12">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-destructive/10 rounded-full text-destructive text-sm font-semibold mb-4">
               <AlertTriangle className="w-4 h-4" />
-              <span>2024 Changed Everything</span>
+              <span>2025 Changed Everything</span>
             </div>
             <h2 id="why-now" className="text-4xl md:text-5xl font-bold mb-4">
               Why UK Business Owners <span className="text-destructive">Need This Now</span>
@@ -284,7 +284,7 @@ const Landing = () => {
               </div>
               <h3 className="text-xl font-bold mb-3">Making Tax Digital (MTD)</h3>
               <p className="text-muted-foreground">
-                From April 2024, HMRC requires digital records. Do you know what that means for your business? The penalties for non-compliance are real.
+                From April 2026, MTD for Income Tax kicks in. Are you ready? The penalties for non-compliance are real.
               </p>
             </div>
 
