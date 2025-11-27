@@ -277,14 +277,27 @@ const Landing = () => {
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            {/* MTD Card */}
+            {/* MTD Card with Countdown */}
             <div className="bg-card p-8 rounded-2xl shadow-md border-l-4 border-l-destructive">
               <div className="w-12 h-12 bg-destructive/10 rounded-xl flex items-center justify-center mb-4">
                 <FileWarning className="w-6 h-6 text-destructive" />
               </div>
               <h3 className="text-xl font-bold mb-3">Making Tax Digital (MTD)</h3>
-              <p className="text-muted-foreground">
-                From April 2026, MTD for Income Tax kicks in. Are you ready? The penalties for non-compliance are real.
+              
+              {/* Countdown Timer */}
+              <div className="bg-destructive/5 border border-destructive/20 rounded-xl p-4 mb-4">
+                <p className="text-xs text-destructive font-semibold uppercase tracking-wider mb-1">MTD Deadline</p>
+                <div className="flex items-baseline gap-1">
+                  <span className="text-3xl font-bold text-destructive">
+                    {Math.max(0, Math.ceil((new Date('2026-04-06').getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)))}
+                  </span>
+                  <span className="text-sm text-destructive/80">days remaining</span>
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">Until April 6, 2026</p>
+              </div>
+              
+              <p className="text-muted-foreground text-sm">
+                MTD for Income Tax kicks in soon. Are you ready? The penalties for non-compliance are real.
               </p>
             </div>
 
